@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import JSON, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -34,6 +34,7 @@ class CustomerRecord(Base):
     region: Mapped[str]
     status: Mapped[str]
     account_owner_id: Mapped[str | None] = mapped_column(ForeignKey("employees.id"))
+    renewal_date: Mapped[date | None]
 
 
 class DocumentMetadataRecord(Base):

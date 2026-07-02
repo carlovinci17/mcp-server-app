@@ -41,6 +41,7 @@ DEPARTMENTS = {
     "Legal": ["Corporate Counsel", "Compliance Analyst", "General Counsel"],
     "IT": ["IT Support Specialist", "Systems Administrator", "IT Manager"],
     "Operations": ["Operations Analyst", "Operations Manager", "COO"],
+    "Design": ["UX Designer", "Product Designer", "Design Lead", "Head of Design"],
 }
 
 LOCATIONS = ["Melbourne, VIC", "Sydney, NSW", "Brisbane, QLD", "Perth, WA", "Remote - AU"]
@@ -142,6 +143,7 @@ LAST_NAMES = [
 
 INDUSTRIES = [
     "Financial Services",
+    "Fintech",
     "Healthcare",
     "Retail",
     "Manufacturing",
@@ -237,6 +239,17 @@ def _now_minus(days: int) -> datetime:
     return datetime.now(UTC) - timedelta(days=days)
 
 
+def _current_quarter_bounds(now: datetime) -> tuple[datetime, datetime]:
+    start_month = (now.month - 1) // 3 * 3 + 1
+    start = now.replace(month=start_month, day=1, hour=0, minute=0, second=0, microsecond=0)
+    end = (
+        start.replace(year=start.year + 1, month=start_month + 3 - 12)
+        if start_month + 3 > 12
+        else start.replace(month=start_month + 3)
+    )
+    return start, end
+
+
 def _paragraph(topic: str, department: str) -> str:
     return (
         f"This is fictional sample content generated for the {COMPANY} portfolio "
@@ -295,21 +308,45 @@ def generate_customers(employees: list[dict], count: int = 25) -> list[dict]:
     account_owners = [
         e["id"] for e in employees if e["department"] in ("Sales", "Customer Success")
     ]
+    now = datetime.now(UTC)
     customers = []
     for i in range(1, count + 1):
         name = f"{random.choice(CUSTOMER_WORDS_A)} {random.choice(CUSTOMER_WORDS_B)}"
+        status = random.choices(["active", "prospect", "churned"], weights=[0.6, 0.3, 0.1])[0]
+        # Only active contracts have an upcoming renewal date.
+        renewal_date = (
+            (now + timedelta(days=random.randint(-30, 400))).date().isoformat()
+            if status == "active"
+            else None
+        )
         customers.append(
             {
                 "id": f"cust-{i:03d}",
                 "name": name,
                 "industry": random.choice(INDUSTRIES),
                 "region": random.choice(REGIONS),
-                "status": random.choices(
-                    ["active", "prospect", "churned"], weights=[0.6, 0.3, 0.1]
-                )[0],
+                "status": status,
                 "account_owner_id": random.choice(account_owners),
+                "renewal_date": renewal_date,
             }
         )
+
+    # Guarantee a few concrete answers for the "try asking" suggestion chips,
+    # regardless of what the random draws above happened to produce:
+    # - a handful of active customers renewing within the current quarter
+    # - at least one churned Fintech customer
+    quarter_start, quarter_end = _current_quarter_bounds(now)
+    quarter_days = (quarter_end - quarter_start).days
+    active_customers = [c for c in customers if c["status"] == "active"]
+    for c in active_customers[:3]:
+        c["renewal_date"] = (
+            (quarter_start + timedelta(days=random.randint(0, quarter_days - 1))).date().isoformat()
+        )
+
+    customers[-1]["status"] = "churned"
+    customers[-1]["industry"] = "Fintech"
+    customers[-1]["renewal_date"] = None
+
     return customers
 
 
@@ -431,6 +468,44 @@ def generate_company_documents(employees: list[dict]) -> list[dict]:
     return docs
 
 
+def _generate_latest_project_brief(employees: list[dict], doc_index: int) -> dict:
+    # A deterministic, always-most-recent project_doc (all others are dated
+    # 10-720 days back) so "summarize the latest project brief" always
+    # resolves to a real, unambiguous document.
+    department = "Product"
+    owner = next(e for e in employees if e["department"] == department and e["manager_id"] is None)
+    doc_id = f"{DocumentType.PROJECT_DOC.value}-{doc_index:03d}"
+    title = "Project Brief - Customer Portal Redesign"
+    created = _now_minus(2)
+    content = (
+        f"# {title}\n\n"
+        "This project brief outlines the scope, goals, and timeline for the "
+        "Customer Portal Redesign initiative, Vortex Digital's current top "
+        "delivery priority.\n\n"
+        "**Objective:** Modernize the customer-facing portal to reduce support "
+        "ticket volume and improve self-service adoption.\n\n"
+        "**Timeline:** Discovery complete; build phase targeted for completion "
+        "by the end of this quarter.\n\n"
+        "This is fictional sample content generated for the Vortex Digital "
+        "portfolio project.\n"
+    )
+    return {
+        "id": doc_id,
+        "title": title,
+        "doc_type": DocumentType.PROJECT_DOC.value,
+        "blob_container": "project-docs",
+        "blob_path": f"{doc_id}.md",
+        "content_type": "text/markdown",
+        "department": department,
+        "owner_id": owner["id"],
+        "tags": [department.lower(), DocumentType.PROJECT_DOC.value, "project-brief"],
+        "related_document_ids": [],
+        "created_at": created.isoformat(),
+        "updated_at": created.isoformat(),
+        "_content": content,
+    }
+
+
 def generate_documents(employees: list[dict]) -> list[dict]:
     docs = []
     docs += generate_company_documents(employees)
@@ -446,6 +521,7 @@ def generate_documents(employees: list[dict]) -> list[dict]:
     docs += _generate_docs_for_type(
         DocumentType.PROJECT_DOC, PROJECT_TOPICS, "project-docs", 20, employees, 1
     )
+    docs.append(_generate_latest_project_brief(employees, doc_index=21))
 
     # link a few documents within the same department as "related"
     by_department: dict[str, list[dict]] = {}

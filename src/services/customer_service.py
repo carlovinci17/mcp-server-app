@@ -21,6 +21,7 @@ def _to_customer(record: CustomerRecord) -> Customer:
         region=record.region,
         status=CustomerStatus(record.status),
         account_owner_id=record.account_owner_id,
+        renewal_date=record.renewal_date,
     )
 
 

@@ -1,3 +1,4 @@
+from datetime import date
 from enum import StrEnum
 
 from pydantic import BaseModel
@@ -16,3 +17,4 @@ class Customer(BaseModel):
     region: str
     status: CustomerStatus
     account_owner_id: str | None = None
+    renewal_date: date | None = None

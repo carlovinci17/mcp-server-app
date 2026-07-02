@@ -10,7 +10,7 @@ to employees.id.
 """
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from src.core.logging import get_logger
@@ -40,7 +40,10 @@ def main() -> None:
 
     with get_session() as session:
         for c in customers:
-            session.merge(CustomerRecord(**c))
+            record = dict(c)
+            if record.get("renewal_date"):
+                record["renewal_date"] = date.fromisoformat(record["renewal_date"])
+            session.merge(CustomerRecord(**record))
     logger.info("Loaded %d customers", len(customers))
 
     with get_session() as session:

@@ -27,13 +27,49 @@ els.chipRow.addEventListener("click", (event) => {
   els.composerInput.focus();
 });
 
+// Vera's replies come back as markdown. Convert to HTML and sanitize before
+// inserting - agent output is model-generated text, not trusted input, so
+// DOMPurify strips anything (e.g. injected <script>/event handlers) that
+// shouldn't end up running in the page.
+function renderMarkdown(text) {
+  const html = marked.parse(text, { breaks: true });
+  return DOMPurify.sanitize(html);
+}
+
 function appendMessage(role, text) {
   const el = document.createElement("div");
   el.className = `message message-${role}`;
-  el.textContent = text;
+  if (role === "agent") {
+    el.innerHTML = renderMarkdown(text);
+  } else {
+    el.textContent = text;
+  }
   els.messages.appendChild(el);
   els.messages.scrollTop = els.messages.scrollHeight;
   return el;
+}
+
+function appendLoadingMessage() {
+  const el = document.createElement("div");
+  el.className = "message message-agent loading";
+  el.innerHTML =
+    '<span class="thinking">' +
+    '<span class="thinking-label">Vera is thinking</span>' +
+    '<span class="thinking-dots"><span></span><span></span><span></span></span>' +
+    "</span>";
+  els.messages.appendChild(el);
+  els.messages.scrollTop = els.messages.scrollHeight;
+  return el;
+}
+
+function resolveLoadingMessage(el, text) {
+  el.classList.remove("loading");
+  el.innerHTML = renderMarkdown(text);
+}
+
+function resolveLoadingMessageAsError(el, text) {
+  el.classList.remove("loading");
+  el.textContent = text;
 }
 
 async function sendMessage() {
@@ -48,8 +84,7 @@ async function sendMessage() {
 
   els.composerInput.value = "";
   appendMessage("user", text);
-  const loadingEl = appendMessage("agent", "Thinking…");
-  loadingEl.classList.add("loading");
+  const loadingEl = appendLoadingMessage();
 
   try {
     const response = await fetch("/api/chat", {
@@ -63,19 +98,20 @@ async function sendMessage() {
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({}));
-      loadingEl.textContent = errorBody.error || "Something went wrong. Please try again.";
-      loadingEl.classList.remove("loading");
+      resolveLoadingMessageAsError(
+        loadingEl,
+        errorBody.error || "Something went wrong. Please try again."
+      );
       return;
     }
 
     const data = await response.json();
     state.previousResponseId = data.response_id;
-    loadingEl.textContent = data.reply;
-    loadingEl.classList.remove("loading");
+    resolveLoadingMessage(loadingEl, data.reply);
   } catch (error) {
-    loadingEl.textContent = "Couldn't reach Vera. Please try again.";
-    loadingEl.classList.remove("loading");
+    resolveLoadingMessageAsError(loadingEl, "Couldn't reach Vera. Please try again.");
   }
+  els.messages.scrollTop = els.messages.scrollHeight;
 }
 
 els.sendButton.addEventListener("click", sendMessage);
