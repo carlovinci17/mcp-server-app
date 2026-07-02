@@ -81,6 +81,19 @@ def server_health() -> str:
     return _server_health()
 
 
+def _health_http(req: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse(_server_health(), status_code=200, mimetype="application/json")
+
+
+@bp.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+def health_http(req: func.HttpRequest) -> func.HttpResponse:
+    """HTTP endpoint for the chat frontend's startup check. Not an MCP tool -
+    called by the browser on page load to warm up and report on SQL/Blob
+    connectivity before the visitor sends their first message. Anonymous
+    auth level, same reasoning as the /api/chat endpoint."""
+    return _health_http(req)
+
+
 @bp.mcp_tool()
 def list_capabilities() -> str:
     """List all MCP tool categories and the tools available in each."""

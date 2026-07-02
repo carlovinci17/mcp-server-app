@@ -1,6 +1,8 @@
 const state = {
   previousResponseId: null,
   hasStartedConversation: false,
+  initializing: true,
+  pendingSends: [],
 };
 
 const els = {
@@ -10,6 +12,10 @@ const els = {
   sendButton: document.getElementById("send-button"),
   emptyState: document.getElementById("empty-state"),
   messages: document.getElementById("messages"),
+  startupBanner: document.getElementById("startup-banner"),
+  statusPill: document.getElementById("status-pill"),
+  statusText: document.getElementById("status-text"),
+  sourcesList: document.getElementById("sources-list"),
 };
 
 function formatHeaderDate() {
@@ -26,6 +32,47 @@ els.chipRow.addEventListener("click", (event) => {
   els.composerInput.value = chip.dataset.q;
   els.composerInput.focus();
 });
+
+// Once-off startup check: fired the instant the page loads (not on first
+// message) so the SQL/Blob cold-start window - up to ~40s if the database
+// had auto-paused - happens up front, with an honest "starting up" message,
+// instead of silently eating the visitor's first real question.
+function beginInitialization() {
+  fetch("/api/health")
+    .catch(() => {
+      // A failed/timed-out health check still means the attempt woke the
+      // backend up - don't block the visitor over it.
+    })
+    .finally(markReady);
+}
+
+function markReady() {
+  state.initializing = false;
+  els.startupBanner.hidden = true;
+
+  els.statusPill.classList.remove("pending");
+  els.statusText.textContent = "All systems operational";
+
+  els.sourcesList.querySelectorAll(".source-dot.pending").forEach((dot) => {
+    dot.classList.remove("pending");
+  });
+  els.sourcesList.querySelectorAll(".source-live.pending").forEach((label) => {
+    label.classList.remove("pending");
+    label.textContent = "live";
+  });
+
+  if (state.pendingSends.length > 0) {
+    const queued = state.pendingSends;
+    state.pendingSends = [];
+    dispatchQueued(queued);
+  }
+}
+
+async function dispatchQueued(queued) {
+  for (const { text, loadingEl } of queued) {
+    await dispatchToBackend(text, loadingEl);
+  }
+}
 
 // Vera's replies come back as markdown. Convert to HTML and sanitize before
 // inserting - agent output is model-generated text, not trusted input, so
@@ -72,20 +119,7 @@ function resolveLoadingMessageAsError(el, text) {
   el.textContent = text;
 }
 
-async function sendMessage() {
-  const text = els.composerInput.value.trim();
-  if (!text) return;
-
-  if (!state.hasStartedConversation) {
-    state.hasStartedConversation = true;
-    els.emptyState.hidden = true;
-    els.messages.hidden = false;
-  }
-
-  els.composerInput.value = "";
-  appendMessage("user", text);
-  const loadingEl = appendLoadingMessage();
-
+async function dispatchToBackend(text, loadingEl) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -114,6 +148,30 @@ async function sendMessage() {
   els.messages.scrollTop = els.messages.scrollHeight;
 }
 
+function sendMessage() {
+  const text = els.composerInput.value.trim();
+  if (!text) return;
+
+  if (!state.hasStartedConversation) {
+    state.hasStartedConversation = true;
+    els.emptyState.hidden = true;
+    els.messages.hidden = false;
+  }
+
+  els.composerInput.value = "";
+  appendMessage("user", text);
+  const loadingEl = appendLoadingMessage();
+
+  if (state.initializing) {
+    // Still warming up: show the message right away, but hold off calling
+    // the backend until the startup check settles.
+    state.pendingSends.push({ text, loadingEl });
+    return;
+  }
+
+  dispatchToBackend(text, loadingEl);
+}
+
 els.sendButton.addEventListener("click", sendMessage);
 els.composerInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -121,3 +179,5 @@ els.composerInput.addEventListener("keydown", (event) => {
     sendMessage();
   }
 });
+
+beginInitialization();

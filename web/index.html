@@ -31,9 +31,9 @@
       <div class="header-right">
         <span class="header-date" id="header-date"></span>
         <span class="header-divider"></span>
-        <span class="status-pill">
+        <span class="status-pill pending" id="status-pill">
           <span class="status-dot"></span>
-          All systems operational
+          <span id="status-text">Initializing…</span>
         </span>
       </div>
     </header>
@@ -63,26 +63,26 @@
         </p>
         <div class="divider"></div>
         <div class="sources-label">CONNECTED SOURCES</div>
-        <ul class="sources-list">
+        <ul class="sources-list" id="sources-list">
           <li>
-            <span class="source-left"><span class="source-dot"></span>Employee &amp; Dept Directory</span>
-            <span class="source-live">live</span>
+            <span class="source-left"><span class="source-dot pending"></span>Employee &amp; Dept Directory</span>
+            <span class="source-live pending">starting</span>
           </li>
           <li>
-            <span class="source-left"><span class="source-dot"></span>Customer Records</span>
-            <span class="source-live">live</span>
+            <span class="source-left"><span class="source-dot pending"></span>Customer Records</span>
+            <span class="source-live pending">starting</span>
           </li>
           <li>
-            <span class="source-left"><span class="source-dot"></span>Internal Documents</span>
-            <span class="source-live">live</span>
+            <span class="source-left"><span class="source-dot pending"></span>Internal Documents</span>
+            <span class="source-live pending">starting</span>
           </li>
           <li>
-            <span class="source-left"><span class="source-dot"></span>Company Policies</span>
-            <span class="source-live">live</span>
+            <span class="source-left"><span class="source-dot pending"></span>Company Policies</span>
+            <span class="source-live pending">starting</span>
           </li>
           <li>
-            <span class="source-left"><span class="source-dot"></span>Meeting Notes</span>
-            <span class="source-live">live</span>
+            <span class="source-left"><span class="source-dot pending"></span>Meeting Notes</span>
+            <span class="source-live pending">starting</span>
           </li>
         </ul>
         <div class="sidebar-spacer"></div>
@@ -90,6 +90,10 @@
       </aside>
 
       <main class="main">
+        <div class="startup-banner" id="startup-banner">
+          <span class="startup-dot"></span>
+          Once-off startup — initializing the knowledge base. This can take up to a minute on a cold start.
+        </div>
         <div class="main-scroll" id="main-scroll">
           <div class="content-inner" id="empty-state">
             <h1 class="greeting">Hi, I'm Vera.</h1>

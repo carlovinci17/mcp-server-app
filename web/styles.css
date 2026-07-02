@@ -17,6 +17,10 @@
   --success-text: #0f9d6b;
   --success-tint-bg: rgba(16, 185, 129, 0.1);
   --success-tint-border: rgba(16, 185, 129, 0.25);
+  --pending: #f59e0b;
+  --pending-text: #b45309;
+  --pending-tint-bg: rgba(245, 158, 11, 0.1);
+  --pending-tint-border: rgba(245, 158, 11, 0.25);
   --robot-visor: #081026;
   --robot-glow: #5eead4;
   /* Brand accent - single theme token, swap this to re-theme the console. */
@@ -147,12 +151,34 @@ body {
   white-space: nowrap;
 }
 
+.status-pill.pending {
+  background: var(--pending-tint-bg);
+  border-color: var(--pending-tint-border);
+  color: var(--pending-text);
+}
+
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 999px;
   background: var(--success);
   flex: none;
+}
+
+.status-dot.pending,
+.source-dot.pending {
+  background: var(--pending);
+  animation: pending-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pending-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 /* Body layout */
@@ -257,6 +283,10 @@ body {
   color: var(--success);
 }
 
+.source-live.pending {
+  color: var(--pending-text);
+}
+
 .sidebar-spacer {
   flex: 1;
 }
@@ -273,6 +303,33 @@ body {
   flex-direction: column;
   min-width: 0;
   background: var(--surface-main);
+}
+
+.startup-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: none;
+  padding: 9px 16px;
+  background: var(--pending-tint-bg);
+  border-bottom: 1px solid var(--pending-tint-border);
+  color: var(--pending-text);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.startup-banner[hidden] {
+  display: none;
+}
+
+.startup-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pending);
+  flex: none;
+  animation: pending-pulse 1.4s ease-in-out infinite;
 }
 
 .main-scroll {
