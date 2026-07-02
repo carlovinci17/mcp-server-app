@@ -17,7 +17,6 @@ dependencies = [
     "pyodbc>=5.2",
     "pyyaml>=6.0",
     "openai>=2.44.0",
-    "azure-ai-projects>=2.3.0",
 ]
 
 [dependency-groups]
@@ -27,6 +26,11 @@ dev = [
     "pytest-mock>=3.14",
     "ruff>=0.8",
     "black>=24.10",
+    # Only used by the separate api/ Functions app (deployed independently by
+    # Static Web Apps' Managed Functions, with its own requirements.txt).
+    # Kept here as a dev dependency so the shared toolchain can lint/test it
+    # without it being part of the main Function App's deployed requirements.
+    "azure-ai-projects>=2.3.0",
 ]
 
 [tool.ruff]

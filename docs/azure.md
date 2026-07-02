@@ -137,3 +137,40 @@ are manual via `func azure functionapp publish` for now.
 A custom domain (`vortex-mcp.carlovinci.com.au`, via Crazy Domains DNS) is in
 progress — CNAME + TXT records added, pending propagation before the domain
 binding and free App Service Managed Certificate can be completed.
+
+## Frontend: the Vera chat console (`web/` + `api/`)
+
+A static chat UI ("Vera") talks to a pre-configured Azure AI Foundry agent,
+which in turn calls this MCP server as its own tool backend — the end user
+never touches the MCP server's URL or system key directly. Two separate
+pieces, deployed separately:
+
+- **`web/`** — plain HTML/CSS/JS, no framework, no build step. Deployed via
+  **Azure Static Web Apps** (`mcp-app-demo-swa`, Free tier), which also
+  provides free custom-domain + SSL support.
+- **`api/`** — a second, small, self-contained Azure Functions app (own
+  `host.json`/`requirements.txt`, no shared code with `src/`) that exposes a
+  single `POST /chat` endpoint, deployed automatically by Static Web Apps'
+  **Managed Functions** feature alongside `web/`, from the same GitHub repo.
+  It authenticates to the Foundry agent via `azure-ai-projects`'
+  `AIProjectClient(...).get_openai_client(agent_name=...)`, using
+  `DefaultAzureCredential` — same pattern as everywhere else in this project.
+
+### Why a second Function App instead of reusing `mcp-app-demo-func`
+
+The original plan was to link the existing MCP server Function App to the
+Static Web App as its backend API, avoiding a second app/identity/RBAC setup
+entirely. That's only possible on Static Web Apps' **Standard** plan
+($9/month) — the **Free** tier only supports Managed Functions, a *new*
+Function App that Static Web Apps creates and deploys itself from an `/api`
+folder in the same repo; it cannot link to a pre-existing, separately-managed
+one. Discovered this while actually going through the portal flow, not from
+docs read in advance. Given this project has held to $0/month everywhere
+else, `api/` was built as a deliberately minimal second app rather than
+paying for Standard.
+
+`api/`'s managed identity needs its own, narrow RBAC grant — the **`Foundry
+User`** role (recently renamed from "Azure AI User"), scoped to the Foundry
+project resource. Don't use "Azure AI Developer" despite the name — that
+role is scoped to Azure Machine Learning workspaces/hubs, not Foundry
+projects, and won't work here.

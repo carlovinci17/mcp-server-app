@@ -1,0 +1,6 @@
+# Deployed independently by Static Web Apps' Managed Functions (Free tier).
+# Kept intentionally minimal - this app only proxies chat messages to an
+# existing Azure AI Foundry agent, nothing else.
+azure-functions>=1.24.0
+azure-ai-projects>=2.3.0
+azure-identity>=1.19

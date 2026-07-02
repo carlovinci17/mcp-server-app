@@ -8,13 +8,10 @@ anyio==4.14.1
     #   openai
 asgiref==3.11.1
     # via opentelemetry-instrumentation-asgi
-azure-ai-projects==2.3.0
-    # via enterprise-knowledge-mcp
 azure-appconfiguration==1.9.0
     # via enterprise-knowledge-mcp
 azure-core==1.41.0
     # via
-    #   azure-ai-projects
     #   azure-appconfiguration
     #   azure-core-tracing-opentelemetry
     #   azure-identity
@@ -30,7 +27,6 @@ azure-functions==2.1.0
     # via enterprise-knowledge-mcp
 azure-identity==1.25.3
     # via
-    #   azure-ai-projects
     #   azure-monitor-opentelemetry-exporter
     #   enterprise-knowledge-mcp
 azure-keyvault-secrets==4.11.0
@@ -42,9 +38,7 @@ azure-monitor-opentelemetry-exporter==1.0.0b53
 azure-search-documents==12.0.0
     # via enterprise-knowledge-mcp
 azure-storage-blob==12.30.0
-    # via
-    #   azure-ai-projects
-    #   enterprise-knowledge-mcp
+    # via enterprise-knowledge-mcp
 certifi==2026.6.17
     # via
     #   httpcore
@@ -82,7 +76,6 @@ importlib-metadata==8.7.1
     # via opentelemetry-api
 isodate==0.7.2
     # via
-    #   azure-ai-projects
     #   azure-appconfiguration
     #   azure-keyvault-secrets
     #   azure-search-documents
@@ -103,9 +96,7 @@ msrest==0.7.1
 oauthlib==3.3.1
     # via requests-oauthlib
 openai==2.44.0
-    # via
-    #   azure-ai-projects
-    #   enterprise-knowledge-mcp
+    # via enterprise-knowledge-mcp
 opentelemetry-api==1.40.0
     # via
     #   azure-core-tracing-opentelemetry
@@ -232,7 +223,6 @@ tqdm==4.68.3
     # via openai
 typing-extensions==4.15.0
     # via
-    #   azure-ai-projects
     #   azure-appconfiguration
     #   azure-core
     #   azure-identity

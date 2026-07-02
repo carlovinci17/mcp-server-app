@@ -1,7 +1,7 @@
 import azure.functions as func
 
 from src.core.logging import configure_logging
-from src.tools import chat, customers, documents, employees, health, meetings, policies, search
+from src.tools import customers, documents, employees, health, meetings, policies, search
 
 configure_logging()
 
@@ -14,4 +14,3 @@ app.register_functions(employees.bp)
 app.register_functions(customers.bp)
 app.register_functions(health.bp)
 app.register_functions(search.bp)
-app.register_functions(chat.bp)

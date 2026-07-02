@@ -32,9 +32,6 @@ class Settings(BaseSettings):
     azure_appconfig_endpoint: str | None = None
     applicationinsights_connection_string: str | None = None
 
-    foundry_project_endpoint: str | None = None
-    foundry_agent_name: str | None = None
-
     @property
     def sql_enabled(self) -> bool:
         return bool(self.azure_sql_server and self.azure_sql_database)
@@ -62,10 +59,6 @@ class Settings(BaseSettings):
     @property
     def telemetry_enabled(self) -> bool:
         return bool(self.applicationinsights_connection_string)
-
-    @property
-    def foundry_agent_enabled(self) -> bool:
-        return bool(self.foundry_project_endpoint and self.foundry_agent_name)
 
 
 @lru_cache
