@@ -1,0 +1,21 @@
+app_name: "Enterprise Knowledge Hub MCP Server"
+company_name: "Vortex Digital"
+environment: "local"
+
+blob:
+  containers:
+    documents: "documents"
+    policies: "policies"
+    meeting_notes: "meeting-notes"
+    project_docs: "project-docs"
+
+search:
+  index_name: "enterprise-knowledge-index"
+  vector_field: "content_vector"
+  top_k: 10
+
+sql:
+  schema: "dbo"
+
+logging:
+  level: "INFO"

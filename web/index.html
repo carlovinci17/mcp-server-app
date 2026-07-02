@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vortex Digital — MCP Agent Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand-cluster">
+        <div class="logo-tile">
+          <img src="assets/vortex-logo.png" alt="Vortex Digital" />
+        </div>
+        <div class="brand-block">
+          <div class="brand-title">Vortex Digital</div>
+          <div class="brand-sub">MCP AGENT CONSOLE</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="header-date" id="header-date"></span>
+        <span class="header-divider"></span>
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          All systems operational
+        </span>
+      </div>
+    </header>
+
+    <div class="body">
+      <aside class="sidebar">
+        <div class="agent-avatar">
+          <svg width="40" height="40" viewBox="0 0 48 48" class="robot-svg" style="color: var(--accent)">
+            <line class="robot-antenna" x1="24" y1="9" x2="24" y2="4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <circle class="robot-antenna-tip" cx="24" cy="3.2" r="2" fill="#5eead4" />
+            <rect x="3.6" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+            <rect x="39" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+            <rect class="robot-head" x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
+            <ellipse cx="24" cy="16" rx="13" ry="6.5" fill="#ffffff" opacity="0.15" />
+            <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
+            <g class="robot-eyes">
+              <rect class="robot-eye" x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+              <rect class="robot-eye" x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+            </g>
+          </svg>
+        </div>
+        <div class="agent-name">Vera</div>
+        <div class="agent-label">KNOWLEDGE AGENT</div>
+        <p class="agent-description">
+          I connect to Vortex's internal systems to answer questions about people, customers,
+          documents, policies, and meeting notes — in plain language.
+        </p>
+        <div class="divider"></div>
+        <div class="sources-label">CONNECTED SOURCES</div>
+        <ul class="sources-list">
+          <li>
+            <span class="source-left"><span class="source-dot"></span>Employee &amp; Dept Directory</span>
+            <span class="source-live">live</span>
+          </li>
+          <li>
+            <span class="source-left"><span class="source-dot"></span>Customer Records</span>
+            <span class="source-live">live</span>
+          </li>
+          <li>
+            <span class="source-left"><span class="source-dot"></span>Internal Documents</span>
+            <span class="source-live">live</span>
+          </li>
+          <li>
+            <span class="source-left"><span class="source-dot"></span>Company Policies</span>
+            <span class="source-live">live</span>
+          </li>
+          <li>
+            <span class="source-left"><span class="source-dot"></span>Meeting Notes</span>
+            <span class="source-live">live</span>
+          </li>
+        </ul>
+        <div class="sidebar-spacer"></div>
+        <div class="model-label">model · vortex-mcp-1</div>
+      </aside>
+
+      <main class="main">
+        <div class="main-scroll" id="main-scroll">
+          <div class="content-inner" id="empty-state">
+            <h1 class="greeting">Hi, I'm Vera.</h1>
+            <p class="subtext">Ask anything about Vortex Digital's people, customers, and knowledge base.</p>
+            <div class="try-asking">
+              <div class="try-asking-label">TRY ASKING</div>
+              <div class="chip-row" id="chip-row">
+                <button class="chip" data-q="Who manages the Design team?">Who manages the Design team?</button>
+                <button class="chip" data-q="Show churned customers in fintech">Show churned customers in fintech</button>
+                <button class="chip" data-q="Find the latest all-hands notes">Find the latest all-hands notes</button>
+                <button class="chip" data-q="Show the remote-work policy">Show the remote-work policy</button>
+                <button class="chip" data-q="Which customers are up for renewal this quarter?">Which customers are up for renewal this quarter?</button>
+                <button class="chip" data-q="Summarize the latest project brief">Summarize the latest project brief</button>
+              </div>
+            </div>
+          </div>
+          <div class="content-inner messages" id="messages" hidden></div>
+        </div>
+
+        <div class="composer-bar">
+          <div class="composer-inner">
+            <div class="composer-field">
+              <input
+                type="text"
+                id="composer-input"
+                placeholder="Message Vera — ask about people, customers, or docs…"
+                autocomplete="off"
+              />
+              <button class="send-button" id="send-button" aria-label="Send message">↑</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

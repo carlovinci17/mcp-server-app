@@ -1,0 +1,23 @@
+{
+  "servers": {
+    "mcp-demo-local-server": {
+      "url": "http://localhost:7071/runtime/webhooks/mcp",
+      "type": "http"
+    },
+    "mcp-demo-remote-server": {
+      "url": "https://mcp-app-demo-func.azurewebsites.net/runtime/webhooks/mcp",
+      "type": "http",
+      "headers": {
+        "x-functions-key": "${input:mcpSystemKey}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "id": "mcpSystemKey",
+      "type": "promptString",
+      "description": "Azure Functions MCP extension system key (az functionapp keys list -g mcp-app-demo -n mcp-app-demo-func --query systemKeys.mcp_extension -o tsv)",
+      "password": true
+    }
+  ]
+}

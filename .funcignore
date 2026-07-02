@@ -1,0 +1,14 @@
+.venv
+.git*
+tests
+scripts
+docs
+data
+web
+design_handoff_mcp_agent_console
+*.md
+.env*
+pyproject.toml
+uv.lock
+.ruff_cache
+__pycache__
