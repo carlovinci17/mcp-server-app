@@ -424,6 +424,7 @@ name = "enterprise-knowledge-mcp"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "azure-ai-projects" },
     { name = "azure-appconfiguration" },
     { name = "azure-functions" },
     { name = "azure-identity" },
@@ -441,7 +442,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "azure-ai-projects" },
     { name = "black" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -451,6 +451,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "azure-ai-projects", specifier = ">=2.3.0" },
     { name = "azure-appconfiguration", specifier = ">=1.7" },
     { name = "azure-functions", specifier = ">=1.24.0" },
     { name = "azure-identity", specifier = ">=1.19" },
@@ -468,7 +469,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "azure-ai-projects", specifier = ">=2.3.0" },
     { name = "black", specifier = ">=24.10" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-asyncio", specifier = ">=0.24" },

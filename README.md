@@ -58,12 +58,6 @@ src/services/ business logic, independent of the Functions host
 src/tools/    MCP tool definitions (thin Functions blueprint wrappers over services)
 tests/        unit tests (mocked/in-memory) and integration tests
 function_app.py   Functions app entry point; registers all tool blueprints
-
-web/          Vera chat console frontend (static HTML/CSS/JS, no build step)
-api/          separate, self-contained Functions app proxying chat messages
-              to an Azure AI Foundry agent - deployed together with web/ by
-              Static Web Apps' Managed Functions, independent of the main
-              MCP server app above (see docs/azure.md for why)
 ```
 
 ## License
