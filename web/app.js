@@ -16,6 +16,9 @@ const els = {
   statusPill: document.getElementById("status-pill"),
   statusText: document.getElementById("status-text"),
   sourcesList: document.getElementById("sources-list"),
+  sidebarTryAsking: document.getElementById("sidebar-try-asking"),
+  sidebarTryDivider: document.getElementById("sidebar-try-divider"),
+  sidebarChipList: document.getElementById("sidebar-chip-list"),
 };
 
 function formatHeaderDate() {
@@ -26,11 +29,32 @@ function formatHeaderDate() {
 }
 els.headerDate.textContent = formatHeaderDate();
 
+function applyChipQuestion(text) {
+  els.composerInput.value = text;
+  els.composerInput.focus();
+}
+
 els.chipRow.addEventListener("click", (event) => {
   const chip = event.target.closest(".chip");
   if (!chip) return;
-  els.composerInput.value = chip.dataset.q;
-  els.composerInput.focus();
+  applyChipQuestion(chip.dataset.q);
+});
+
+// The sidebar's "try asking" list mirrors the empty-state chips exactly -
+// clone from the chip row (single source of truth) instead of duplicating
+// the question text in the HTML, so the two stay in sync automatically.
+els.chipRow.querySelectorAll(".chip").forEach((chip) => {
+  const sidebarChip = document.createElement("button");
+  sidebarChip.className = "sidebar-chip";
+  sidebarChip.dataset.q = chip.dataset.q;
+  sidebarChip.textContent = chip.textContent;
+  els.sidebarChipList.appendChild(sidebarChip);
+});
+
+els.sidebarChipList.addEventListener("click", (event) => {
+  const chip = event.target.closest(".sidebar-chip");
+  if (!chip) return;
+  applyChipQuestion(chip.dataset.q);
 });
 
 // Once-off startup check: fired the instant the page loads (not on first
@@ -156,6 +180,8 @@ function sendMessage() {
     state.hasStartedConversation = true;
     els.emptyState.hidden = true;
     els.messages.hidden = false;
+    els.sidebarTryDivider.hidden = false;
+    els.sidebarTryAsking.hidden = false;
   }
 
   els.composerInput.value = "";
