@@ -10,6 +10,7 @@ const els = {
   chipRow: document.getElementById("chip-row"),
   composerInput: document.getElementById("composer-input"),
   sendButton: document.getElementById("send-button"),
+  newChatButton: document.getElementById("new-chat-button"),
   emptyState: document.getElementById("empty-state"),
   messages: document.getElementById("messages"),
   startupOverlay: document.getElementById("startup-overlay"),
@@ -293,7 +294,23 @@ function sendMessage() {
   dispatchToBackend(text, loadingEl);
 }
 
+function startNewChat() {
+  state.previousResponseId = null;
+  state.hasStartedConversation = false;
+  state.pendingSends = [];
+
+  els.messages.innerHTML = "";
+  els.messages.hidden = true;
+  els.emptyState.hidden = false;
+  els.sidebarTryDivider.hidden = true;
+  els.sidebarTryAsking.hidden = true;
+
+  els.composerInput.value = "";
+  els.composerInput.focus();
+}
+
 els.sendButton.addEventListener("click", sendMessage);
+els.newChatButton.addEventListener("click", startNewChat);
 els.composerInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();

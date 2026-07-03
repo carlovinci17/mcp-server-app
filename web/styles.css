@@ -21,7 +21,7 @@
   --pending-text: #b45309;
   --pending-tint-bg: rgba(245, 158, 11, 0.1);
   --pending-tint-border: rgba(245, 158, 11, 0.25);
-  --info-blue: #2563eb;
+  --info-blue: #4176e9;
   --info-blue-tint-bg: rgba(37, 99, 235, 0.08);
   --info-blue-tint-border: rgba(37, 99, 235, 0.22);
   --robot-visor: #081026;
@@ -43,7 +43,7 @@ body {
 }
 
 body {
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   background: var(--page-bg);
   color: var(--text-primary);
 }
@@ -116,7 +116,7 @@ body {
 }
 
 .brand-title {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 16px;
   letter-spacing: -0.01em;
@@ -124,7 +124,7 @@ body {
 }
 
 .brand-sub {
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 10.5px;
   color: var(--text-faint);
   letter-spacing: 0.14em;
@@ -224,14 +224,14 @@ body {
 }
 
 .agent-name {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 17px;
   color: var(--text-primary);
 }
 
 .agent-label {
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 10.5px;
   color: var(--text-faint);
   letter-spacing: 0.12em;
@@ -290,7 +290,7 @@ body {
 }
 
 .source-live {
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 11px;
   color: var(--success);
 }
@@ -317,7 +317,7 @@ body {
   background: none;
   border: none;
   padding: 0;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--text-body);
@@ -390,7 +390,7 @@ body {
 }
 
 .startup-title {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 22px;
   color: var(--text-primary);
@@ -410,7 +410,7 @@ body {
 }
 
 .greeting {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 30px;
   letter-spacing: -0.015em;
@@ -448,10 +448,12 @@ body {
   border: 1px solid var(--border-chip);
   background: #ffffff;
   color: var(--text-body);
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 13.5px;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .chip:hover {
@@ -473,11 +475,16 @@ body {
 }
 
 .composer-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   max-width: 780px;
   margin: 0 auto;
 }
 
 .composer-field {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -487,12 +494,40 @@ body {
   background: var(--surface-main);
 }
 
+.new-chat-button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--border-input);
+  background: #ffffff;
+  color: var(--text-body);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.new-chat-button:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.new-chat-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 #composer-input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 15px;
   color: var(--text-primary);
 }
@@ -601,6 +636,10 @@ body {
   padding-bottom: 24px;
 }
 
+.messages[hidden] {
+  display: none;
+}
+
 .message {
   /* min(), not a fixed width: caps bubbles at 640px on wide screens, but
      never exceeds the actual available width on narrow ones. A fixed
@@ -676,12 +715,13 @@ body {
   background: var(--info-blue-tint-bg);
   border: 1px solid var(--info-blue-tint-border);
   color: var(--info-blue);
-  font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
   font-size: 11px;
 }
 
 .message-agent a {
   color: var(--accent);
+  text-decoration: underline;
 }
 
 .message-agent code {
@@ -797,6 +837,16 @@ body {
     bottom: 0;
     z-index: 10;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .new-chat-button {
+    padding: 0;
+    width: 46px;
+    justify-content: center;
+  }
+
+  .new-chat-label {
+    display: none;
   }
 
   .greeting {
