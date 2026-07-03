@@ -120,6 +120,10 @@ function appendMessage(role, text) {
   return el;
 }
 
+function formatThoughtDuration(seconds) {
+  return `${seconds} second${seconds === 1 ? "" : "s"}`;
+}
+
 function appendLoadingMessage() {
   const el = document.createElement("div");
   el.className = "message message-agent loading";
@@ -127,18 +131,36 @@ function appendLoadingMessage() {
     '<span class="thinking">' +
     '<span class="thinking-label">Vera is thinking</span>' +
     '<span class="thinking-dots"><span></span><span></span><span></span></span>' +
+    '<span class="thinking-timer">0s</span>' +
     "</span>";
+
+  el._startedAt = Date.now();
+  const timerEl = el.querySelector(".thinking-timer");
+  el._timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - el._startedAt) / 1000);
+    timerEl.textContent = `${elapsed}s`;
+  }, 1000);
+
   els.messages.appendChild(el);
   els.messages.scrollTop = els.messages.scrollHeight;
   return el;
 }
 
+function stopThinkingTimer(el) {
+  clearInterval(el._timerInterval);
+  return Math.max(1, Math.round((Date.now() - el._startedAt) / 1000));
+}
+
 function resolveLoadingMessage(el, text) {
+  const elapsedSeconds = stopThinkingTimer(el);
   el.classList.remove("loading");
-  el.innerHTML = renderMarkdown(text);
+  el.innerHTML =
+    `<div class="thought-timer">Thought for ${formatThoughtDuration(elapsedSeconds)}</div>` +
+    renderMarkdown(text);
 }
 
 function resolveLoadingMessageAsError(el, text) {
+  stopThinkingTimer(el);
   el.classList.remove("loading");
   el.textContent = text;
 }
