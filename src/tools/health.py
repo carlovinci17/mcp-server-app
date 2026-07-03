@@ -22,7 +22,36 @@ _CAPABILITIES = {
     "meetings": ["search_meetings", "list_meetings", "summarize_meeting"],
     "employees": ["find_employee", "list_departments", "get_department_contacts"],
     "customers": ["search_customers", "get_customer", "list_customers"],
+    "search": ["keyword_search", "semantic_search", "global_search"],
     "health": ["server_health", "list_capabilities"],
+}
+
+# Kept in sync by hand with each tool's docstring in src/tools/*.py - condensed
+# to a single short sentence for display in the frontend's tools popup.
+_TOOL_DESCRIPTIONS = {
+    "search_customers": "Search customers by name, industry, or region.",
+    "get_customer": "Retrieve a customer's details by ID.",
+    "list_customers": "List customers, optionally filtered by status.",
+    "search_documents": "Search documents, policies, meeting notes, and project docs.",
+    "list_documents": "List documents, optionally filtered by type or department.",
+    "get_document": "Retrieve a document's full content and metadata by ID.",
+    "get_document_metadata": "Retrieve a document's metadata without its full content.",
+    "find_related_documents": "Find documents related to a given document ID.",
+    "summarize_document": "Retrieve a document's content for summarization.",
+    "find_employee": "Find employees by name, email, department, or title.",
+    "list_departments": "List all departments and their employee counts.",
+    "get_department_contacts": "List all employees in a given department.",
+    "server_health": "Report server health and Azure dependency connectivity.",
+    "list_capabilities": "List all MCP tool categories and their tools.",
+    "search_meetings": "Search meeting notes by title or department.",
+    "list_meetings": "List meeting notes, optionally filtered by department.",
+    "summarize_meeting": "Retrieve a meeting note's content for summarization.",
+    "search_policies": "Search company policies by title or department.",
+    "list_policies": "List company policies, optionally filtered by department.",
+    "get_policy": "Retrieve a company policy's full content and metadata.",
+    "keyword_search": "Full-text keyword search across all indexed content.",
+    "semantic_search": "Vector similarity search for conceptual or natural-language queries.",
+    "global_search": "Hybrid keyword + vector search across all indexed content.",
 }
 
 
@@ -98,3 +127,30 @@ def health_http(req: func.HttpRequest) -> func.HttpResponse:
 def list_capabilities() -> str:
     """List all MCP tool categories and the tools available in each."""
     return _list_capabilities()
+
+
+def _list_tools() -> str:
+    groups = [
+        {
+            "category": category,
+            "tools": [
+                {"name": name, "description": _TOOL_DESCRIPTIONS.get(name, "")}
+                for name in tool_names
+            ],
+        }
+        for category, tool_names in _CAPABILITIES.items()
+    ]
+    return json.dumps({"groups": groups})
+
+
+def _tools_http(req: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse(_list_tools(), status_code=200, mimetype="application/json")
+
+
+@bp.route(route="tools", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+def tools_http(req: func.HttpRequest) -> func.HttpResponse:
+    """HTTP endpoint for the chat frontend's "MCP Server Tools" popup. Not an
+    MCP tool itself - lists the real registered tools, grouped by category,
+    with brief descriptions. Anonymous auth level, same reasoning as the
+    other /api/* endpoints."""
+    return _tools_http(req)

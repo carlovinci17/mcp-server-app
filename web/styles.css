@@ -334,6 +334,151 @@ body {
   outline-offset: 2px;
 }
 
+.mcp-tools-trigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  letter-spacing: 0.14em;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.mcp-tools-trigger svg {
+  flex: none;
+  color: var(--accent);
+}
+
+.mcp-tools-trigger:hover {
+  color: var(--text-primary);
+}
+
+.mcp-tools-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 14, 30, 0.45);
+  padding: 24px;
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-raised);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(10, 14, 30, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex: none;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.modal-title svg {
+  color: var(--accent);
+  flex: none;
+}
+
+.modal-close {
+  flex: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-size: 16px;
+  padding: 4px;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+.modal-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding: 18px 22px 22px;
+}
+
+.tool-group {
+  margin-bottom: 18px;
+}
+
+.tool-group:last-child {
+  margin-bottom: 0;
+}
+
+.tool-group-title {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+
+.tool-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.tool-item:last-child {
+  border-bottom: none;
+}
+
+.tool-name {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--info-blue);
+}
+
+.tool-desc {
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-body);
+}
+
 .sidebar-spacer {
   flex: 1;
 }

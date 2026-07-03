@@ -21,6 +21,10 @@ const els = {
   sidebarTryAsking: document.getElementById("sidebar-try-asking"),
   sidebarTryDivider: document.getElementById("sidebar-try-divider"),
   sidebarChipList: document.getElementById("sidebar-chip-list"),
+  toolsTrigger: document.getElementById("mcp-tools-trigger"),
+  toolsModalBackdrop: document.getElementById("tools-modal-backdrop"),
+  toolsModalClose: document.getElementById("tools-modal-close"),
+  toolsModalBody: document.getElementById("tools-modal-body"),
 };
 
 function formatHeaderDate() {
@@ -323,6 +327,65 @@ function startNewChat() {
   els.composerInput.value = "";
   els.composerInput.focus();
 }
+
+const TOOL_CATEGORY_LABELS = {
+  documents: "Documents",
+  policies: "Policies",
+  meetings: "Meetings",
+  employees: "Employees",
+  customers: "Customers",
+  search: "Search",
+  health: "Health",
+};
+
+let toolsLoaded = false;
+
+function renderToolGroups(groups) {
+  els.toolsModalBody.innerHTML = groups
+    .map((group) => {
+      const label = TOOL_CATEGORY_LABELS[group.category] || group.category;
+      const items = group.tools
+        .map(
+          (tool) =>
+            `<div class="tool-item">` +
+            `<div class="tool-name">${tool.name}</div>` +
+            `<div class="tool-desc">${tool.description}</div>` +
+            `</div>`
+        )
+        .join("");
+      return `<div class="tool-group"><div class="tool-group-title">${label}</div>${items}</div>`;
+    })
+    .join("");
+}
+
+async function openToolsModal() {
+  els.toolsModalBackdrop.hidden = false;
+  if (toolsLoaded) return;
+
+  els.toolsModalBody.textContent = "Loading…";
+  try {
+    const response = await fetch("/api/tools");
+    if (!response.ok) throw new Error("request failed");
+    const data = await response.json();
+    renderToolGroups(data.groups);
+    toolsLoaded = true;
+  } catch (error) {
+    els.toolsModalBody.textContent = "Couldn't load tools. Please try again.";
+  }
+}
+
+function closeToolsModal() {
+  els.toolsModalBackdrop.hidden = true;
+}
+
+els.toolsTrigger.addEventListener("click", openToolsModal);
+els.toolsModalClose.addEventListener("click", closeToolsModal);
+els.toolsModalBackdrop.addEventListener("click", (event) => {
+  if (event.target === els.toolsModalBackdrop) closeToolsModal();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !els.toolsModalBackdrop.hidden) closeToolsModal();
+});
 
 els.sendButton.addEventListener("click", sendMessage);
 els.newChatButton.addEventListener("click", startNewChat);

@@ -85,6 +85,19 @@
             <span class="source-live pending">starting</span>
           </li>
         </ul>
+        <div class="divider"></div>
+        <button class="mcp-tools-trigger" id="mcp-tools-trigger" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span>MCP SERVER TOOLS</span>
+        </button>
         <div class="divider" id="sidebar-try-divider" hidden></div>
         <div class="sidebar-try-asking" id="sidebar-try-asking" hidden>
           <div class="try-asking-label">TRY ASKING</div>
@@ -160,6 +173,27 @@
           </div>
         </div>
       </main>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tools-modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tools-modal-title">
+      <div class="modal-header">
+        <div class="modal-title" id="tools-modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+          </svg>
+          MCP Server Tools
+        </div>
+        <button class="modal-close" id="tools-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="tools-modal-body"></div>
     </div>
   </div>
 
