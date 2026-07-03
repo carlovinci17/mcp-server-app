@@ -151,11 +151,24 @@ function stopThinkingTimer(el) {
   return Math.max(1, Math.round((Date.now() - el._startedAt) / 1000));
 }
 
-function resolveLoadingMessage(el, text) {
+function renderToolPills(toolCalls) {
+  if (!toolCalls || toolCalls.length === 0) return "";
+  const pills = toolCalls.map((name) => `<span class="tool-pill">${name}</span>`).join("");
+  return `<div class="tool-pills">${pills}</div>`;
+}
+
+function formatToolCallSummary(toolCalls) {
+  if (!toolCalls || toolCalls.length === 0) return "";
+  return ` · ${toolCalls.length} tool${toolCalls.length === 1 ? "" : "s"} called`;
+}
+
+function resolveLoadingMessage(el, text, toolCalls) {
   const elapsedSeconds = stopThinkingTimer(el);
   el.classList.remove("loading");
   el.innerHTML =
-    `<div class="thought-timer">Thought for ${formatThoughtDuration(elapsedSeconds)}</div>` +
+    `<div class="thought-timer">Thought for ${formatThoughtDuration(elapsedSeconds)}` +
+    `${formatToolCallSummary(toolCalls)}</div>` +
+    renderToolPills(toolCalls) +
     renderMarkdown(text);
 }
 
@@ -248,7 +261,7 @@ async function pollUntilDone(initialJob, loadingEl) {
 
   if (job.status === "completed") {
     state.previousResponseId = job.response_id;
-    resolveLoadingMessage(loadingEl, job.reply);
+    resolveLoadingMessage(loadingEl, job.reply, job.tool_calls);
   } else {
     resolveLoadingMessageAsError(loadingEl, job.error || "Something went wrong. Please try again.");
   }

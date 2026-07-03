@@ -1,12 +1,26 @@
 from src.services.chat_service import ChatService
 
 
+class FakeOutputItem:
+    def __init__(self, type: str, name: str | None = None):
+        self.type = type
+        self.name = name
+
+
 class FakeResponse:
-    def __init__(self, response_id: str, status: str, output_text: str | None = None, error=None):
+    def __init__(
+        self,
+        response_id: str,
+        status: str,
+        output_text: str | None = None,
+        error=None,
+        output: list | None = None,
+    ):
         self.id = response_id
         self.status = status
         self.output_text = output_text
         self.error = error
+        self.output = output or []
 
 
 class FakeResponses:
@@ -82,7 +96,36 @@ def test_get_message_status_returns_reply_when_completed():
     assert job.status == "completed"
     assert job.reply == "The office is in Melbourne."
     assert job.error is None
+    assert job.tool_calls == []
     assert fake_client.responses.retrieve_calls == ["resp-005"]
+
+
+def test_get_message_status_extracts_and_dedupes_tool_calls():
+    fake_client = FakeAgentClient(
+        create_response=FakeResponse("resp-008", "queued"),
+        retrieve_response=FakeResponse(
+            "resp-008",
+            "completed",
+            output_text="Two churned customers found.",
+            output=[
+                FakeOutputItem("mcp_list_tools"),
+                FakeOutputItem("reasoning"),
+                FakeOutputItem("mcp_call", name="search_customers"),
+                FakeOutputItem("reasoning"),
+                FakeOutputItem("mcp_call", name="get_customer"),
+                FakeOutputItem("mcp_call", name="get_customer"),
+                FakeOutputItem("mcp_call", name="get_department_contacts"),
+                FakeOutputItem("message"),
+            ],
+        ),
+    )
+    service = ChatService(agent_client=fake_client)
+
+    job = service.get_message_status("resp-008")
+
+    # get_customer called twice (different IDs) collapses to one pill; only
+    # mcp_call items count, not the reasoning/message/mcp_list_tools items.
+    assert job.tool_calls == ["search_customers", "get_customer", "get_department_contacts"]
 
 
 def test_get_message_status_returns_in_progress_without_reply():

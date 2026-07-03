@@ -36,7 +36,12 @@ class ChatService:
     def _to_job_status(self, response) -> ChatJobStatus:
         status = response.status
         if status == "completed":
-            return ChatJobStatus(response_id=response.id, status=status, reply=response.output_text)
+            return ChatJobStatus(
+                response_id=response.id,
+                status=status,
+                reply=response.output_text,
+                tool_calls=self._extract_tool_calls(response),
+            )
         if status in _TERMINAL_ERROR_STATUSES:
             error = getattr(response, "error", None)
             return ChatJobStatus(
@@ -46,3 +51,18 @@ class ChatService:
             )
         # queued / in_progress
         return ChatJobStatus(response_id=response.id, status=status)
+
+    def _extract_tool_calls(self, response) -> list[str]:
+        # response.output is only populated once the run reaches a terminal
+        # state (confirmed empirically - it stays empty through every poll
+        # while queued/in_progress), so this only ever runs on completion.
+        # Each mcp_call item is one tool invocation; de-duplicate by name so
+        # e.g. two get_customer calls for different IDs show as one pill.
+        seen: list[str] = []
+        for item in getattr(response, "output", None) or []:
+            if getattr(item, "type", None) != "mcp_call":
+                continue
+            name = getattr(item, "name", None)
+            if name and name not in seen:
+                seen.append(name)
+        return seen
