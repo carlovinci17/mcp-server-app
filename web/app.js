@@ -174,7 +174,8 @@ function stopThinkingTimer(el) {
 function renderToolPills(toolCalls) {
   if (!toolCalls || toolCalls.length === 0) return "";
   const pills = toolCalls.map((name) => `<span class="tool-pill">${name}</span>`).join("");
-  return `<div class="tool-pills">${pills}</div>`;
+  const moreInfo = `<button class="tools-more-info" type="button">More info</button>`;
+  return `<div class="tool-pills">${pills}${moreInfo}</div>`;
 }
 
 function formatToolCallSummary(toolCalls) {
@@ -380,6 +381,13 @@ function closeToolsModal() {
 
 els.toolsTrigger.addEventListener("click", openToolsModal);
 els.toolsModalClose.addEventListener("click", closeToolsModal);
+// Event delegation, not a direct listener: "More info" links are inserted
+// into reply bubbles dynamically (one per reply that used tools), so a
+// single listener on the messages container catches all of them, present
+// and future, without needing to re-bind on every new message.
+els.messages.addEventListener("click", (event) => {
+  if (event.target.closest(".tools-more-info")) openToolsModal();
+});
 els.toolsModalBackdrop.addEventListener("click", (event) => {
   if (event.target === els.toolsModalBackdrop) closeToolsModal();
 });
