@@ -104,7 +104,31 @@ func start
 ```
 
 The MCP endpoint is `http://localhost:7071/runtime/webhooks/mcp` (already configured
-in `.vscode/mcp.json` for use from VS Code / Claude Desktop).
+in `.vscode/mcp.json` for use from VS Code / Claude Desktop). `FOUNDRY_PROJECT_ENDPOINT`
+and `FOUNDRY_AGENT_NAME` must be set in `local.settings.json` for the `/api/chat`
+endpoint specifically (the MCP tools work without them).
+
+### Run the full chat frontend locally (Vera + Function App together)
+
+`func start` alone only exposes the Function App; `web/` is static files with no
+server of its own. To run the whole thing end-to-end - real UI, real Foundry
+agent, real MCP tools, real Azure data - with `/api/*` routed exactly the way
+Azure Static Web Apps routes it in production, use the SWA CLI as a second
+process alongside `func start`:
+
+```bash
+# terminal 1
+func start
+
+# terminal 2
+npx @azure/static-web-apps-cli start web --api-devserver-url http://localhost:7071
+```
+
+Then open `http://localhost:4280`. No install needed - `npx` fetches the CLI on
+demand. The SWA CLI will warn about "non-HTTP triggered functions" (the MCP
+tool triggers); that's expected and harmless, since SWA only ever proxies the
+three HTTP-triggered endpoints (`chat`, `chat/status`, `health`) - the MCP tools
+are reached directly via `func start`'s own webhook URL, not through SWA.
 
 ## Run tests
 
