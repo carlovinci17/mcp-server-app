@@ -12,7 +12,7 @@ const els = {
   sendButton: document.getElementById("send-button"),
   emptyState: document.getElementById("empty-state"),
   messages: document.getElementById("messages"),
-  startupBanner: document.getElementById("startup-banner"),
+  startupOverlay: document.getElementById("startup-overlay"),
   statusPill: document.getElementById("status-pill"),
   statusText: document.getElementById("status-text"),
   sourcesList: document.getElementById("sources-list"),
@@ -72,7 +72,7 @@ function beginInitialization() {
 
 function markReady() {
   state.initializing = false;
-  els.startupBanner.hidden = true;
+  els.startupOverlay.hidden = true;
 
   els.statusPill.classList.remove("pending");
   els.statusText.textContent = "All systems operational";
@@ -165,6 +165,23 @@ function resolveLoadingMessageAsError(el, text) {
   el.textContent = text;
 }
 
+// Azure Static Web Apps enforces a hard 45-second timeout on any single call
+// to the linked backend, not configurable at any plan tier - and a question
+// that chains several tool calls can easily run past a minute (confirmed: a
+// real request took 54s). Rather than race that clock, the backend starts
+// the agent run in the background and returns immediately; we poll a status
+// endpoint every couple of seconds (matching OpenAI's own recommended
+// interval for background Responses API polling) until it's done. No single
+// request in this flow ever approaches the timeout, however long the agent
+// actually takes.
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_MS = 5 * 60 * 1000;
+const MAX_CONSECUTIVE_POLL_ERRORS = 3;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function dispatchToBackend(text, loadingEl) {
   try {
     const response = await fetch("/api/chat", {
@@ -185,13 +202,56 @@ async function dispatchToBackend(text, loadingEl) {
       return;
     }
 
-    const data = await response.json();
-    state.previousResponseId = data.response_id;
-    resolveLoadingMessage(loadingEl, data.reply);
+    const job = await response.json();
+    await pollUntilDone(job, loadingEl);
   } catch (error) {
     resolveLoadingMessageAsError(loadingEl, "Couldn't reach Vera. Please try again.");
   }
   els.messages.scrollTop = els.messages.scrollHeight;
+}
+
+async function pollUntilDone(initialJob, loadingEl) {
+  let job = initialJob;
+  const startedAt = Date.now();
+  let consecutiveErrors = 0;
+
+  while (job.status === "queued" || job.status === "in_progress") {
+    if (Date.now() - startedAt > MAX_POLL_MS) {
+      resolveLoadingMessageAsError(loadingEl, "This is taking longer than expected. Please try again.");
+      return;
+    }
+
+    await sleep(POLL_INTERVAL_MS);
+
+    try {
+      const response = await fetch(`/api/chat/status?id=${encodeURIComponent(job.response_id)}`);
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        resolveLoadingMessageAsError(
+          loadingEl,
+          errorBody.error || "Something went wrong. Please try again."
+        );
+        return;
+      }
+      job = await response.json();
+      consecutiveErrors = 0;
+    } catch (error) {
+      // A transient network blip during polling shouldn't kill the whole
+      // exchange - only give up after a few consecutive failures.
+      consecutiveErrors += 1;
+      if (consecutiveErrors >= MAX_CONSECUTIVE_POLL_ERRORS) {
+        resolveLoadingMessageAsError(loadingEl, "Couldn't reach Vera. Please try again.");
+        return;
+      }
+    }
+  }
+
+  if (job.status === "completed") {
+    state.previousResponseId = job.response_id;
+    resolveLoadingMessage(loadingEl, job.reply);
+  } else {
+    resolveLoadingMessageAsError(loadingEl, job.error || "Something went wrong. Please try again.");
+  }
 }
 
 function sendMessage() {

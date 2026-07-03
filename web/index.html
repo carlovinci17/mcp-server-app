@@ -95,11 +95,30 @@
       </aside>
 
       <main class="main">
-        <div class="startup-banner" id="startup-banner">
-          <span class="startup-dot"></span>
-          Once-off startup — initializing the knowledge base. This can take up to a minute on a cold start.
-        </div>
         <div class="main-scroll" id="main-scroll">
+          <div class="startup-overlay" id="startup-overlay">
+            <div class="startup-avatar">
+              <svg width="86" height="86" viewBox="0 0 48 48" class="robot-svg" style="color: var(--accent)">
+                <line class="robot-antenna" x1="24" y1="9" x2="24" y2="4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle class="robot-antenna-tip" cx="24" cy="3.2" r="2" fill="#5eead4" />
+                <rect x="3.6" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+                <rect x="39" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+                <rect class="robot-head" x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
+                <ellipse cx="24" cy="16" rx="13" ry="6.5" fill="#ffffff" opacity="0.15" />
+                <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
+                <g class="robot-eyes">
+                  <rect class="robot-eye" x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+                  <rect class="robot-eye" x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+                </g>
+              </svg>
+            </div>
+            <div class="startup-title">Starting up</div>
+            <p class="startup-subtext">
+              Once-off startup — initializing the knowledge base. This can take up to a minute
+              on a cold start.
+            </p>
+            <span class="thinking-dots"><span></span><span></span><span></span></span>
+          </div>
           <div class="content-inner" id="empty-state">
             <h1 class="greeting">Hi, I'm Vera.</h1>
             <p class="subtext">Ask anything about Vortex Digital's people, customers, and knowledge base.</p>
