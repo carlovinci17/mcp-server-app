@@ -339,6 +339,7 @@ body {
 }
 
 .model-label {
+  margin-top: 14px;
   font-size: 11px;
   color: var(--text-faint-alt);
 }

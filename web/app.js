@@ -13,6 +13,7 @@ const els = {
   newChatButton: document.getElementById("new-chat-button"),
   emptyState: document.getElementById("empty-state"),
   messages: document.getElementById("messages"),
+  mainScroll: document.getElementById("main-scroll"),
   startupOverlay: document.getElementById("startup-overlay"),
   statusPill: document.getElementById("status-pill"),
   statusText: document.getElementById("status-text"),
@@ -41,16 +42,30 @@ els.chipRow.addEventListener("click", (event) => {
   applyChipQuestion(chip.dataset.q);
 });
 
+// Extra suggestions shown only in the sidebar - there's more room there than
+// in the empty-state chip row, so this is where the longer tail of "good
+// questions to try" lives once a conversation is already underway.
+const SIDEBAR_ONLY_QUESTIONS = [
+  "List our clients and their industries",
+  "Tell me about Cedar Holdings",
+  "List our prospect customers",
+  "Summarize the latest incident postmortem",
+  "Who's on the IT team?",
+];
+
+function addSidebarChip(text) {
+  const sidebarChip = document.createElement("button");
+  sidebarChip.className = "sidebar-chip";
+  sidebarChip.dataset.q = text;
+  sidebarChip.textContent = text;
+  els.sidebarChipList.appendChild(sidebarChip);
+}
+
 // The sidebar's "try asking" list mirrors the empty-state chips exactly -
 // clone from the chip row (single source of truth) instead of duplicating
 // the question text in the HTML, so the two stay in sync automatically.
-els.chipRow.querySelectorAll(".chip").forEach((chip) => {
-  const sidebarChip = document.createElement("button");
-  sidebarChip.className = "sidebar-chip";
-  sidebarChip.dataset.q = chip.dataset.q;
-  sidebarChip.textContent = chip.textContent;
-  els.sidebarChipList.appendChild(sidebarChip);
-});
+els.chipRow.querySelectorAll(".chip").forEach((chip) => addSidebarChip(chip.dataset.q));
+SIDEBAR_ONLY_QUESTIONS.forEach(addSidebarChip);
 
 els.sidebarChipList.addEventListener("click", (event) => {
   const chip = event.target.closest(".sidebar-chip");
@@ -117,7 +132,7 @@ function appendMessage(role, text) {
     el.textContent = text;
   }
   els.messages.appendChild(el);
-  els.messages.scrollTop = els.messages.scrollHeight;
+  els.mainScroll.scrollTop = els.mainScroll.scrollHeight;
   return el;
 }
 
@@ -143,7 +158,7 @@ function appendLoadingMessage() {
   }, 1000);
 
   els.messages.appendChild(el);
-  els.messages.scrollTop = els.messages.scrollHeight;
+  els.mainScroll.scrollTop = els.mainScroll.scrollHeight;
   return el;
 }
 
@@ -221,7 +236,7 @@ async function dispatchToBackend(text, loadingEl) {
   } catch (error) {
     resolveLoadingMessageAsError(loadingEl, "Couldn't reach Vera. Please try again.");
   }
-  els.messages.scrollTop = els.messages.scrollHeight;
+  els.mainScroll.scrollTop = els.mainScroll.scrollHeight;
 }
 
 async function pollUntilDone(initialJob, loadingEl) {
