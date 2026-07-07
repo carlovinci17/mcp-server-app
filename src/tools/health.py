@@ -1,4 +1,5 @@
 import json
+import threading
 
 import azure.functions as func
 from sqlalchemy import text
@@ -111,15 +112,25 @@ def server_health() -> str:
 
 
 def _health_http(req: func.HttpRequest) -> func.HttpResponse:
-    return func.HttpResponse(_server_health(), status_code=200, mimetype="application/json")
+    # Kick off the SQL/Blob connection attempts (what actually wakes a
+    # paused Azure SQL Serverless database) without waiting for them to
+    # finish - the caller (browser startup ping) discards the response
+    # either way, and blocking here risks exceeding SWA's ~45s hard timeout
+    # on its linked backend while SQL resumes from auto-pause.
+    threading.Thread(target=_check_sql, daemon=True).start()
+    threading.Thread(target=_check_blob, daemon=True).start()
+    body = json.dumps({"status": "warming"})
+    return func.HttpResponse(body, status_code=200, mimetype="application/json")
 
 
 @bp.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def health_http(req: func.HttpRequest) -> func.HttpResponse:
     """HTTP endpoint for the chat frontend's startup check. Not an MCP tool -
-    called by the browser on page load to warm up and report on SQL/Blob
-    connectivity before the visitor sends their first message. Anonymous
-    auth level, same reasoning as the /api/chat endpoint."""
+    called by the browser on page load to warm up SQL/Blob connectivity
+    before the visitor sends their first message. Returns immediately
+    without waiting for the checks to complete; the caller doesn't read the
+    response. Anonymous auth level, same reasoning as the /api/chat
+    endpoint."""
     return _health_http(req)
 
 

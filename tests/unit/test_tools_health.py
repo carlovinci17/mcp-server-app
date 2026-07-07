@@ -5,14 +5,25 @@ import azure.functions as func
 from src.tools import health
 
 
-def test_health_http_returns_server_health_json(monkeypatch):
-    monkeypatch.setattr(health, "_server_health", lambda: json.dumps({"status": "ok"}))
+def test_health_http_returns_immediately_without_waiting_on_checks(monkeypatch):
+    started_targets = []
+
+    class FakeThread:
+        def __init__(self, target, daemon=False):
+            self.target = target
+            self.daemon = daemon
+
+        def start(self):
+            started_targets.append(self.target)
+
+    monkeypatch.setattr(health.threading, "Thread", FakeThread)
 
     request = func.HttpRequest(method="GET", url="/api/health", body=b"")
     response = health._health_http(request)
 
     assert response.status_code == 200
-    assert json.loads(response.get_body()) == {"status": "ok"}
+    assert json.loads(response.get_body()) == {"status": "warming"}
+    assert started_targets == [health._check_sql, health._check_blob]
 
 
 def test_tools_http_groups_tools_by_category_with_descriptions():
