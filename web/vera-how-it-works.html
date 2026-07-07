@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How Vera works — Vortex Digital MCP Agent Console</title>
+  <link rel="icon" type="image/png" href="assets/vortex-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Page-specific styles only - everything else (tokens, avatar animation,
+       chip/status-pill styling) comes from styles.css, the real stylesheet,
+       so this page can't visually drift from the actual product. */
+    html, body { height: auto; overflow: auto; }
+    body { padding: 0; }
+    .explainer {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 70px;
+    }
+    .explainer-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .explainer h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(26px, 4vw, 34px);
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .explainer > p {
+      margin-top: 10px;
+      max-width: 62ch;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin: 34px 0 12px;
+    }
+
+    .prompt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 700px) { .prompt-grid { grid-template-columns: 1fr; } }
+    .prompt-col { display: flex; flex-direction: column; gap: 8px; }
+    .prompt-btn {
+      text-align: left;
+      background: #ffffff;
+      border: 1.5px solid var(--border-chip);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-family: 'IBM Plex Sans', sans-serif;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .prompt-btn:hover { border-color: var(--accent); }
+    .prompt-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .prompt-btn-q { font-size: 14.5px; font-weight: 600; color: var(--text-primary); }
+    .prompt-btn-kind { font-size: 11.5px; margin-top: 3px; font-weight: 600; }
+    .prompt-btn.active[data-kind="exact"] { border-color: var(--info-blue); background: var(--info-blue-tint-bg); }
+    .prompt-btn.active[data-kind="substring"] { border-color: var(--pending-text); background: var(--pending-tint-bg); }
+    .prompt-btn.active[data-kind="vector"] { border-color: var(--success-text); background: var(--success-tint-bg); }
+    .kind-exact { color: var(--info-blue); }
+    .kind-substring { color: var(--pending-text); }
+    .kind-vector { color: var(--success-text); }
+
+    .strategy-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-chip);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .strategy-card > p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+    .strategy-row { border-left: 3px solid; padding-left: 12px; }
+    .strategy-row .k { font-size: 12px; font-weight: 600; }
+    .strategy-row .d { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .steps { display: flex; flex-direction: column; gap: 12px; }
+    .step-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-chip);
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .step-card.active { border-color: var(--accent); box-shadow: 0 4px 14px rgba(20, 184, 166, 0.14); }
+    .step-card.done { border-color: #a7ded4; background: #f5fcfa; }
+    .step-top { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; align-items: start; }
+    @media (max-width: 700px) { .step-top { grid-template-columns: 1fr; } }
+    .step-head { display: flex; align-items: center; gap: 10px; }
+    .step-badge {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex: none;
+      background: var(--page-bg); color: var(--text-faint);
+      transition: background 0.25s, color 0.25s;
+    }
+    .step-card.active .step-badge, .step-card.done .step-badge { background: var(--accent); color: #ffffff; }
+    .step-title { font-size: 15.5px; font-weight: 600; color: var(--text-primary); }
+    .step-plain { margin-top: 6px; font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+    .step-tech {
+      background: var(--surface-main);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--text-body);
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+    .mini-avatar { flex: none; }
+
+    .controls-row { display: flex; align-items: center; gap: 14px; margin: 18px 0 4px; }
+    .replay-btn {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 12.5px;
+      color: var(--text-body);
+      background: #ffffff;
+      border: 1px solid var(--border-input);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .replay-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+    .replay-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .controls-hint { font-size: 12px; color: var(--text-faint); }
+
+    .source-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+    .source-footer code {
+      font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+      background: var(--surface-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .robot-head, .robot-eye, .robot-eyes, .robot-antenna-tip { animation: none !important; }
+      .step-card { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand-cluster">
+      <div class="logo-tile"><img src="assets/vortex-logo.png" alt="Vortex Digital" /></div>
+      <div class="brand-block">
+        <div class="brand-title">Vortex Digital</div>
+        <div class="brand-sub">MCP AGENT CONSOLE</div>
+      </div>
+    </div>
+    <a href="index.html" class="header-note" style="text-decoration: none;">← Back to Vera</a>
+  </header>
+
+  <div class="explainer">
+    <div class="explainer-eyebrow">// how a question reaches vera, and comes back</div>
+    <h1>Vera's request lifecycle</h1>
+    <p>What actually happens between typing a question and an answer coming back — including which of three different retrieval strategies the agent picks, on its own, for a given question.</p>
+
+    <div class="section-label">Try a prompt</div>
+    <div class="prompt-grid">
+      <div class="prompt-col">
+        <button class="prompt-btn" data-kind="exact" id="btnExact">
+          <div class="prompt-btn-q">“Who's the contact for the Design team?”</div>
+          <div class="prompt-btn-kind kind-exact">Exact lookup</div>
+        </button>
+        <button class="prompt-btn" data-kind="substring" id="btnSubstring">
+          <div class="prompt-btn-q">“Find documents about onboarding”</div>
+          <div class="prompt-btn-kind kind-substring">SQL substring search</div>
+        </button>
+        <button class="prompt-btn" data-kind="vector" id="btnVector">
+          <div class="prompt-btn-q">“What's our remote-work policy?”</div>
+          <div class="prompt-btn-kind kind-vector">Vector / hybrid RAG</div>
+        </button>
+      </div>
+      <div class="strategy-card">
+        <div class="section-label" style="margin: 0;">Retrieval strategies</div>
+        <p>Vera has three genuinely different ways to retrieve data — not one fixed pipeline. The agent decides which fits each question. Click a prompt to trace its actual path.</p>
+        <div class="strategy-row" style="border-color: var(--info-blue);">
+          <div class="k kind-exact">Exact lookup</div>
+          <div class="d">Fetch by ID or a simple filter — plain SQL, no matching logic at all.</div>
+        </div>
+        <div class="strategy-row" style="border-color: var(--pending-text);">
+          <div class="k kind-substring">SQL substring search</div>
+          <div class="d">SQL <code>ILIKE '%query%'</code> against specific columns — fuzzy, but not semantic.</div>
+        </div>
+        <div class="strategy-row" style="border-color: var(--success-text);">
+          <div class="k kind-vector">Vector / hybrid RAG</div>
+          <div class="d">Embeds the query, then BM25 + vector search together against Azure AI Search.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <button class="replay-btn" id="replayBtn">Reset</button>
+      <span class="controls-hint" id="controlsHint">Pick a prompt above to trace its request lifecycle.</span>
+    </div>
+
+    <div class="section-label">Request lifecycle</div>
+    <div class="steps" id="steps"></div>
+
+    <div class="source-footer">
+      Traced from <code>src/tools/chat.py</code>, <code>src/services/chat_service.py</code>,
+      <code>src/tools/search.py</code>, <code>src/services/search_service.py</code> and
+      <code>src/services/document_service.py</code> — Enterprise Knowledge Hub MCP Server.
+      23 MCP tools total: documents (6), policies (3), meetings (3), employees (3), customers (3), search (3), health (2).
+    </div>
+  </div>
+
+  <script>
+    function avatarSvg(active) {
+      const color = active ? 'var(--accent)' : '#c7cdd6';
+      return `<svg width="20" height="20" viewBox="0 0 48 48" class="mini-avatar">
+        <rect x="8" y="8" width="32" height="33" rx="12" fill="${color}"></rect>
+        <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
+        <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${active ? '#5eead4' : '#454b66'}"></rect>
+        <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${active ? '#5eead4' : '#454b66'}"></rect>
+      </svg>`;
+    }
+
+    // Shared steps 1-3 and 5-6 are identical across all three retrieval
+    // strategies; only step 4 (retrieval itself) differs - this mirrors the
+    // real code, where chat.py/chat_service.py don't know or care which
+    // tool gets called, only search.py vs document_service.py/etc. differ.
+    const RETRIEVAL_STEP = {
+      exact: {
+        title: 'Retrieval — exact lookup',
+        plain: 'A single, direct database query by ID or a simple filter. No text matching involved at all - this is the fastest, most deterministic path.',
+        tech: 'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
+      },
+      substring: {
+        title: 'Retrieval — SQL substring search',
+        plain: 'A fuzzy but literal text match against specific database columns (title, department, tags). Finds partial matches - but has no concept of meaning or synonyms.',
+        tech: 'search_documents(query="onboarding")\nsrc/services/document_service.py\nSQLAlchemy: WHERE title ILIKE \'%onboarding%\'\n  OR department ILIKE \'%onboarding%\'\nNo embeddings involved',
+      },
+      vector: {
+        title: 'Retrieval — vector / hybrid RAG',
+        plain: 'The question is embedded into a vector, then Azure AI Search runs keyword and vector matching together in one query, ranked by relevance across both.',
+        tech: 'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search: BM25 + vector\n  (HNSW), one hybrid query',
+      },
+    };
+
+    const REPLIES = {
+      exact: "The Design team's contact is Priya Chen (Design Lead) — reach her at priya.chen@vortexdigital.example or via the #design channel.",
+      substring: "Found 2 documents matching \"onboarding\": Onboarding Guide - Engineering, and New Hire Checklist - HR. Want the full content of either?",
+      vector: "Vortex's remote-work policy allows up to 3 days remote per week for eligible roles, with core collaboration hours 10am-3pm local time. Approval sits with your direct manager.",
+    };
+
+    function buildSteps(kind) {
+      const retrieval = RETRIEVAL_STEP[kind];
+      return [
+        {
+          title: 'Prompt sent',
+          plain: 'Your message is submitted to the backend, which starts an agent run and returns immediately rather than waiting for a full answer.',
+          tech: 'POST /api/chat\nbody: {message, previous_response_id}\nsrc/tools/chat.py: _start_chat()\n-> ChatService.start_message()',
+          agent: false,
+        },
+        {
+          title: 'Async run started',
+          plain: "The Foundry agent run starts in the background and hands back a job ID right away - this exists specifically to avoid a hard ~45s platform timeout on longer questions.",
+          tech: 'responses.create(\n  input=message,\n  background=True,\n  store=True,\n)\nstatus: "queued"',
+          agent: false,
+        },
+        {
+          title: 'Tool selection (agentic)',
+          plain: 'The agent itself - not fixed application logic - decides whether this question needs a tool call, and which one fits best.',
+          tech: `agent reasoning -> selects tool\nfor this example: ${kind === 'exact' ? 'get_department_contacts' : kind === 'substring' ? 'search_documents' : 'global_search'}`,
+          agent: true,
+        },
+        { ...retrieval, agent: true },
+        {
+          title: 'Synthesis',
+          plain: 'The agent composes a natural-language answer from whatever the tool returned. The run reaches its terminal status.',
+          tech: 'status: "completed"\nsrc/services/chat_service.py:\n  _to_job_status()',
+          agent: true,
+        },
+        {
+          title: 'Reply rendered',
+          plain: 'The browser, which has been polling in the background, receives the finished reply and renders it - plus a pill showing which tool was actually used.',
+          tech: 'GET /api/chat/status?id=...\n(polled ~every 1.5s)\nmarked.parse() -> DOMPurify.sanitize()',
+          agent: false,
+        },
+      ];
+    }
+
+    let state = { kind: null, doneUpTo: -1, activeStep: -1, timers: [] };
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stepsEl = document.getElementById('steps');
+    const hintEl = document.getElementById('controlsHint');
+
+    function render() {
+      if (!state.kind) {
+        stepsEl.innerHTML = '<div style="color: var(--text-faint); font-size: 13.5px; padding: 8px 2px;">No prompt selected yet.</div>';
+        return;
+      }
+      const steps = buildSteps(state.kind);
+      stepsEl.innerHTML = steps.map((s, i) => {
+        const cls = i === state.activeStep ? 'active' : (i <= state.doneUpTo ? 'done' : '');
+        const badge = i <= state.doneUpTo && i !== state.activeStep ? '✓' : String(i + 1);
+        return `<div class="step-card ${cls}">
+          <div class="step-top">
+            <div>
+              <div class="step-head">
+                <span class="step-badge">${badge}</span>
+                <span class="step-title">${s.title}</span>
+                ${s.agent ? avatarSvg(cls === 'active' || cls === 'done') : ''}
+              </div>
+              <div class="step-plain">${s.plain}</div>
+            </div>
+            <div class="step-tech">${s.tech}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function clearTimers() { state.timers.forEach(clearTimeout); state.timers = []; }
+
+    function playFrom(kind) {
+      clearTimers();
+      state.kind = kind; state.doneUpTo = -1; state.activeStep = -1;
+      render();
+      hintEl.textContent = 'Tracing request…';
+      const stepDelay = reduceMotion ? 80 : 900;
+      const steps = buildSteps(kind);
+      steps.forEach((_, i) => {
+        state.timers.push(setTimeout(() => {
+          state.activeStep = i; state.doneUpTo = i - 1;
+          render();
+        }, i * stepDelay));
+      });
+      state.timers.push(setTimeout(() => {
+        state.activeStep = -1; state.doneUpTo = steps.length - 1;
+        render();
+        hintEl.textContent = `Reply: "${REPLIES[kind]}"`;
+      }, steps.length * stepDelay));
+    }
+
+    function setActiveButton(kind) {
+      ['exact', 'substring', 'vector'].forEach(k => {
+        document.getElementById('btn' + k[0].toUpperCase() + k.slice(1)).classList.toggle('active', k === kind);
+      });
+    }
+
+    document.getElementById('btnExact').addEventListener('click', () => { setActiveButton('exact'); playFrom('exact'); });
+    document.getElementById('btnSubstring').addEventListener('click', () => { setActiveButton('substring'); playFrom('substring'); });
+    document.getElementById('btnVector').addEventListener('click', () => { setActiveButton('vector'); playFrom('vector'); });
+    document.getElementById('replayBtn').addEventListener('click', () => {
+      clearTimers();
+      state = { kind: null, doneUpTo: -1, activeStep: -1, timers: [] };
+      setActiveButton(null);
+      hintEl.textContent = 'Pick a prompt above to trace its request lifecycle.';
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
