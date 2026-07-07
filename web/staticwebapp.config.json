@@ -1,4 +1,10 @@
 {
+  "routes": [
+    {
+      "route": "/vera-how-it-works",
+      "rewrite": "/vera-how-it-works.html"
+    }
+  ],
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/*.{css,js,png,jpg,svg,ico}"]
