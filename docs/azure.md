@@ -131,9 +131,37 @@ repo's Python code. It can be set to `"Anonymous"` to remove the requirement,
 but that trades away the one thing currently preventing anonymous internet
 traffic from running up real Azure OpenAI usage costs — not done here.
 
-CI/CD (`.github/workflows/ci.yml` / `release.yml`) is not yet set up; deploys
-are manual via `func azure functionapp publish` for now.
+`.github/workflows/ci.yml` runs `pytest`/`ruff`/`black` on every push/PR to
+`main`, but there is no CD for the Function App itself; deploys are manual
+via `func azure functionapp publish` for now.
 
-A custom domain (`vortex-mcp.carlovinci.com.au`, via Crazy Domains DNS) is in
-progress — CNAME + TXT records added, pending propagation before the domain
-binding and free App Service Managed Certificate can be completed.
+A custom domain (`vortex-mcp.carlovinci.com.au`, via Crazy Domains DNS) is
+bound to the Static Web App, with the free App Service Managed Certificate.
+
+### The frontend and backend deploy through two entirely separate paths
+
+This is the single most important thing to know before touching deployment,
+and the thing that caused real confusion once in practice: **pushing to
+`main` does not deploy the MCP server / chat backend.**
+
+- `web/` (the Vera chat console) is deployed automatically by
+  `.github/workflows/azure-static-web-apps-black-dune-027faae00.yml` on every
+  push to `main`. That workflow's `api_location` is intentionally empty — it
+  uploads `web/` only, as static content to the Azure Static Web App
+  (`mcp-app-demo-swa`).
+- The actual MCP server / Function App (`mcp-app-demo-func`, Flex
+  Consumption plan) is a **separate Azure resource** with no CI/CD wired to
+  it at all. Changes to `src/`, `function_app.py`, etc. only reach
+  production when someone runs `func azure functionapp publish
+  mcp-app-demo-func` by hand.
+- The two are connected via a Static Web Apps **linked backend**
+  (`az staticwebapp backends link`, requires the Standard plan — the Free
+  tier only supports SWA's own bundled "Managed Functions," which is what
+  the reverted `80493a8` / `92b1244` commits attempted before this project
+  was moved to Standard). Any request to `vortex-mcp.carlovinci.com.au/api/*`
+  is proxied by the SWA edge straight to `mcp-app-demo-func`.
+
+Practical consequence: if you fix a bug in `src/tools/health.py` (for
+example) and only `git push`, the live site will keep serving the old
+backend behavior indefinitely — the fix needs its own explicit
+`func azure functionapp publish mcp-app-demo-func` before it's live.

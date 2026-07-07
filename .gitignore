@@ -53,3 +53,6 @@ __queuestorage__
 __tablestorage__/
 __azurite_db*__.json
 AzuriteConfig
+
+# Design handoff reference material - superseded by web/, kept locally only
+design_handoff_mcp_agent_console/

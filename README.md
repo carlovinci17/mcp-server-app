@@ -22,6 +22,15 @@ tools an LLM client (e.g. Claude Desktop) can call directly.
 Authentication to every Azure resource uses `DefaultAzureCredential` — no
 connection-string secrets in code. See [docs/azure.md](docs/azure.md) for details.
 
+## Frontend
+
+`web/` is Vera, a small vanilla-JS chat console that talks to an Azure AI
+Foundry agent (wired to this same MCP server) via three HTTP endpoints
+alongside the MCP tools: `/api/chat`, `/api/chat/status`, and `/api/health`
+(`src/tools/chat.py`, `src/tools/health.py`). It's deployed separately from
+the Function App backend — see "Deployment" in [docs/azure.md](docs/azure.md)
+for how the two pieces fit together in production.
+
 ## Status
 
 Phase 1 and 2 complete: Functions scaffold + SQL Database + Blob Storage +
@@ -56,7 +65,8 @@ src/database/ SQLAlchemy models + Azure SQL Database session management
 src/models/   Pydantic domain models
 src/services/ business logic, independent of the Functions host
 src/tools/    MCP tool definitions (thin Functions blueprint wrappers over services)
-tests/        unit tests (mocked/in-memory) and integration tests
+tests/        unit tests (mocked/in-memory) and integration tests (placeholder, see tests/integration/README.md)
+web/          Vera, the chat console frontend (static HTML/CSS/JS, no build step)
 function_app.py   Functions app entry point; registers all tool blueprints
 ```
 
