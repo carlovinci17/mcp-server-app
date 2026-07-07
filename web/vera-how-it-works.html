@@ -1,223 +1,653 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vera's Lifecycle — Vortex Digital</title>
-<link rel="icon" type="image/png" href="assets/vortex-logo.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<style>
-  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1.6px); } }
-  @keyframes blink { 0%,40% { transform: scaleY(1); } 43% { transform: scaleY(0.1); } 46%,100% { transform: scaleY(1); } }
-  @keyframes glow { 0%,100% { filter: drop-shadow(0 0 1px rgba(94,234,212,0.6)); } 50% { filter: drop-shadow(0 0 3.6px rgba(94,234,212,0.9)); } }
-  @keyframes pulse { 0%,100% { opacity:0.5; transform: scale(0.8); } 50% { opacity:1; transform: scale(1.15); } }
-  @keyframes veraGlowRing { 0%,100% { box-shadow: 0 0 0 0 rgba(20,184,166,.28); } 50% { box-shadow: 0 0 0 6px rgba(20,184,166,0); } }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vera's Lifecycle — Vortex Digital</title>
+    <link rel="icon" type="image/png" href="assets/vortex-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-1.6px);
+        }
+      }
+      @keyframes blink {
+        0%,
+        40% {
+          transform: scaleY(1);
+        }
+        43% {
+          transform: scaleY(0.1);
+        }
+        46%,
+        100% {
+          transform: scaleY(1);
+        }
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 1px rgba(94, 234, 212, 0.6));
+        }
+        50% {
+          filter: drop-shadow(0 0 3.6px rgba(94, 234, 212, 0.9));
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.5;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.15);
+        }
+      }
+      @keyframes veraGlowRing {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.28);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(20, 184, 166, 0);
+        }
+      }
 
-  #antenna { animation: pulse 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  #head { animation: bob 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  #eyes { animation: glow 2.6s ease-in-out infinite; }
-  #eye1, #eye2 { animation: blink 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      #antenna {
+        animation: pulse 2s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+      #head {
+        animation: bob 3.4s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+      #eyes {
+        animation: glow 2.6s ease-in-out infinite;
+      }
+      #eye1,
+      #eye2 {
+        animation: blink 4.2s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #eceef4; font-family: 'IBM Plex Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #eceef4;
+        font-family: 'IBM Plex Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
 
-  .step-card { background: #ffffff; border-radius: 12px; padding: 18px; box-sizing: border-box; transition: all 0.25s; border: 1.5px solid #e2e4ee; }
-  .step-card.active { border-color: #14b8a6; box-shadow: 0 4px 12px rgba(20,184,166,.16); animation: veraGlowRing 1.6s ease-in-out infinite; }
-  .step-card.done { border-color: #a7ded4; background: #f5fcfa; }
+      .step-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 18px;
+        box-sizing: border-box;
+        transition: all 0.25s;
+        border: 1.5px solid #e2e4ee;
+      }
+      .step-card.active {
+        border-color: #14b8a6;
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.16);
+        animation: veraGlowRing 1.6s ease-in-out infinite;
+      }
+      .step-card.done {
+        border-color: #a7ded4;
+        background: #f5fcfa;
+      }
 
-  .step-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; transition: all 0.25s; background: #eceef4; color: #8288a0; }
-  .step-card.active .step-badge, .step-card.done .step-badge { background: #14b8a6; color: #fff; }
+      .step-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+        transition: all 0.25s;
+        background: #eceef4;
+        color: #8288a0;
+      }
+      .step-card.active .step-badge,
+      .step-card.done .step-badge {
+        background: #14b8a6;
+        color: #fff;
+      }
 
-  @media (prefers-reduced-motion: reduce) {
-    #antenna, #head, #eyes, #eye1, #eye2, .step-card.active { animation: none !important; }
-  }
-</style>
-</head>
-<body>
-<div style="width:100%;min-height:100vh;box-sizing:border-box;padding:16px 20px;display:flex;flex-direction:column;gap:16px;color:#171a2b;overflow-y:auto;">
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;gap:12px;">
-    <div style="width:48px;height:48px;border-radius:999px;background:radial-gradient(125% 125% at 50% 8%, #1c2544 0%, #0c1223 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <svg width="40" height="40" viewBox="0 0 48 48">
-        <line x1="24" y1="9" x2="24" y2="4.6" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"></line>
-        <circle cx="24" cy="3.2" r="2" fill="#5eead4" id="antenna"></circle>
-        <rect x="3.6" y="21" width="5.4" height="11" rx="2.6" fill="#14b8a6" opacity="0.85"></rect>
-        <rect x="39" y="21" width="5.4" height="11" rx="2.6" fill="#14b8a6" opacity="0.85"></rect>
-        <rect x="8" y="8" width="32" height="33" rx="12" fill="#14b8a6" id="head"></rect>
-        <ellipse cx="24" cy="16" rx="13" ry="6.5" fill="#ffffff" opacity="0.15"></ellipse>
-        <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
-        <g id="eyes">
-          <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" id="eye1"></rect>
-          <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" id="eye2"></rect>
-        </g>
-      </svg>
-    </div>
-    <div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;">Vera's Lifecycle</div>
-      <div style="font-size:14px;color:#565c72;margin-top:2px;">Knowledge agent decisions in motion</div>
-    </div>
-  </div>
-
-  <!-- PROMPTS SECTION -->
-  <div style="display:flex;flex-direction:column;gap:8px;">
-    <div style="font-size:13px;font-weight:600;color:#8288a0;text-transform:uppercase;letter-spacing:.08em;">Try a prompt</div>
-    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:16px;">
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button id="exactBtn" style="text-align:left;background:#ffffff;border:1px solid #e2e4ee;border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;">
-          <div style="font-size:15px;font-weight:600;color:#171a2b;">"Who's the contact for the Design team?"</div>
-          <div style="font-size:12px;color:#4176e9;margin-top:3px;font-weight:600;">Exact lookup</div>
-        </button>
-        <button id="substringBtn" style="text-align:left;background:#ffffff;border:1px solid #e2e4ee;border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;">
-          <div style="font-size:15px;font-weight:600;color:#171a2b;">"Find documents about onboarding"</div>
-          <div style="font-size:12px;color:#b45309;margin-top:3px;font-weight:600;">SQL substring search</div>
-        </button>
-        <button id="vectorBtn" style="text-align:left;background:#ffffff;border:1px solid #e2e4ee;border-radius:10px;padding:12px 14px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;">
-          <div style="font-size:15px;font-weight:600;color:#171a2b;">"What's our remote work policy?"</div>
-          <div style="font-size:12px;color:#0f9d6b;margin-top:3px;font-weight:600;">Vector / hybrid RAG</div>
-        </button>
-      </div>
-
-      <div style="background:#ffffff;border:1px solid #e2e4ee;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
-        <div style="font-size:13px;font-weight:600;color:#8288a0;text-transform:uppercase;letter-spacing:.08em;">Retrieval strategies</div>
-        <div style="font-size:13px;color:#565c72;line-height:1.5;">Vera has three genuinely different ways to retrieve data — the agent decides which fits each question. Click a prompt to watch its actual path.</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="border-left:3px solid #4176e9;padding-left:12px;">
-            <div style="font-size:12px;font-weight:600;color:#4176e9;">Exact</div>
-            <div style="font-size:12px;color:#565c72;margin-top:2px;">Direct database lookup by ID or filter. Fast, deterministic, no matching logic.</div>
+      @media (prefers-reduced-motion: reduce) {
+        #antenna,
+        #head,
+        #eyes,
+        #eye1,
+        #eye2,
+        .step-card.active {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        width: 100%;
+        min-height: 100vh;
+        box-sizing: border-box;
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        color: #171a2b;
+        overflow-y: auto;
+      "
+    >
+      <!-- HEADER -->
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            background: radial-gradient(
+              125% 125% at 50% 8%,
+              #1c2544 0%,
+              #0c1223 100%
+            );
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
+        >
+          <svg width="40" height="40" viewBox="0 0 48 48">
+            <line
+              x1="24"
+              y1="9"
+              x2="24"
+              y2="4.6"
+              stroke="#14b8a6"
+              stroke-width="2"
+              stroke-linecap="round"
+            ></line>
+            <circle cx="24" cy="3.2" r="2" fill="#5eead4" id="antenna"></circle>
+            <rect
+              x="3.6"
+              y="21"
+              width="5.4"
+              height="11"
+              rx="2.6"
+              fill="#14b8a6"
+              opacity="0.85"
+            ></rect>
+            <rect
+              x="39"
+              y="21"
+              width="5.4"
+              height="11"
+              rx="2.6"
+              fill="#14b8a6"
+              opacity="0.85"
+            ></rect>
+            <rect
+              x="8"
+              y="8"
+              width="32"
+              height="33"
+              rx="12"
+              fill="#14b8a6"
+              id="head"
+            ></rect>
+            <ellipse
+              cx="24"
+              cy="16"
+              rx="13"
+              ry="6.5"
+              fill="#ffffff"
+              opacity="0.15"
+            ></ellipse>
+            <rect
+              x="12.5"
+              y="19"
+              width="23"
+              height="17.5"
+              rx="7.5"
+              fill="#081026"
+            ></rect>
+            <g id="eyes">
+              <rect
+                x="18"
+                y="23.5"
+                width="4.2"
+                height="8.6"
+                rx="2.1"
+                fill="#5eead4"
+                id="eye1"
+              ></rect>
+              <rect
+                x="25.8"
+                y="23.5"
+                width="4.2"
+                height="8.6"
+                rx="2.1"
+                fill="#5eead4"
+                id="eye2"
+              ></rect>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <div
+            style="
+              font-family: 'Space Grotesk', sans-serif;
+              font-weight: 600;
+              font-size: 22px;
+            "
+          >
+            Vera's Lifecycle
           </div>
-          <div style="border-left:3px solid #b45309;padding-left:12px;">
-            <div style="font-size:12px;font-weight:600;color:#b45309;">SQL Search</div>
-            <div style="font-size:12px;color:#565c72;margin-top:2px;">SQL ILIKE text-pattern matching on specific columns. Fuzzy, not semantic.</div>
-          </div>
-          <div style="border-left:3px solid #0f9d6b;padding-left:12px;">
-            <div style="font-size:12px;font-weight:600;color:#0f9d6b;">Vector / Hybrid</div>
-            <div style="font-size:12px;color:#565c72;margin-top:2px;">Embeds the query, then BM25 + vector search together via Azure AI Search.</div>
+          <div style="font-size: 14px; color: #565c72; margin-top: 2px">
+            Knowledge agent decisions in motion
           </div>
         </div>
       </div>
+
+      <!-- PROMPTS SECTION -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #8288a0;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+          "
+        >
+          Try a prompt
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <button
+              id="exactBtn"
+              style="
+                text-align: left;
+                background: #ffffff;
+                border: 1px solid #e2e4ee;
+                border-radius: 10px;
+                padding: 12px 14px;
+                cursor: pointer;
+                font-family: 'IBM Plex Sans', sans-serif;
+                transition: all 0.2s;
+              "
+            >
+              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
+                "Who's the contact for the Design team?"
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: #4176e9;
+                  margin-top: 3px;
+                  font-weight: 600;
+                "
+              >
+                Exact lookup
+              </div>
+            </button>
+            <button
+              id="substringBtn"
+              style="
+                text-align: left;
+                background: #ffffff;
+                border: 1px solid #e2e4ee;
+                border-radius: 10px;
+                padding: 12px 14px;
+                cursor: pointer;
+                font-family: 'IBM Plex Sans', sans-serif;
+                transition: all 0.2s;
+              "
+            >
+              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
+                "Find documents about onboarding"
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: #b45309;
+                  margin-top: 3px;
+                  font-weight: 600;
+                "
+              >
+                SQL substring search
+              </div>
+            </button>
+            <button
+              id="vectorBtn"
+              style="
+                text-align: left;
+                background: #ffffff;
+                border: 1px solid #e2e4ee;
+                border-radius: 10px;
+                padding: 12px 14px;
+                cursor: pointer;
+                font-family: 'IBM Plex Sans', sans-serif;
+                transition: all 0.2s;
+              "
+            >
+              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
+                "What's our remote work policy?"
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: #0f9d6b;
+                  margin-top: 3px;
+                  font-weight: 600;
+                "
+              >
+                Vector / hybrid RAG
+              </div>
+            </button>
+          </div>
+
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #e2e4ee;
+              border-radius: 12px;
+              padding: 14px 16px;
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+            "
+          >
+            <div
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: #8288a0;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+              "
+            >
+              Retrieval strategies
+            </div>
+            <div style="font-size: 13px; color: #565c72; line-height: 1.5">
+              Vera has three genuinely different ways to retrieve data — the
+              agent decides which fits each question. Click a prompt to watch
+              its actual path.
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div style="border-left: 3px solid #4176e9; padding-left: 12px">
+                <div style="font-size: 12px; font-weight: 600; color: #4176e9">
+                  Exact
+                </div>
+                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
+                  Direct database lookup by ID or filter. Fast, deterministic,
+                  no matching logic.
+                </div>
+              </div>
+              <div style="border-left: 3px solid #b45309; padding-left: 12px">
+                <div style="font-size: 12px; font-weight: 600; color: #b45309">
+                  SQL Search
+                </div>
+                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
+                  SQL ILIKE text-pattern matching on specific columns. Fuzzy,
+                  not semantic.
+                </div>
+              </div>
+              <div style="border-left: 3px solid #0f9d6b; padding-left: 12px">
+                <div style="font-size: 12px; font-weight: 600; color: #0f9d6b">
+                  Vector / Hybrid
+                </div>
+                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
+                  Embeds the query, then BM25 + vector search together via Azure
+                  AI Search.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLOW STEPS -->
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: flex-start">
+          <button
+            id="resetBtn"
+            style="
+              font-family: 'IBM Plex Sans', sans-serif;
+              font-size: 12.5px;
+              color: #565c72;
+              background: #ffffff;
+              border: 1px solid #e2e4ee;
+              border-radius: 8px;
+              padding: 6px 12px;
+              cursor: pointer;
+              transition: all 0.15s;
+            "
+          >
+            Reset Prompt
+          </button>
+        </div>
+        <div
+          style="
+            font-size: 13px;
+            font-weight: 600;
+            color: #8288a0;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+          "
+        >
+          PROMPT WORKFLOW STEPS
+        </div>
+      </div>
+      <div
+        id="stepsContainer"
+        style="display: flex; flex-direction: column; gap: 12px"
+      ></div>
+
+      <div
+        style="
+          margin-top: auto;
+          font-size: 11.5px;
+          color: #8288a0;
+          line-height: 1.6;
+          padding-top: 4px;
+        "
+      >
+        Traced from
+        <code
+          style="
+            font-family: ui-monospace, monospace;
+            background: #f6f7fb;
+            border: 1px solid #e2e4ee;
+            border-radius: 4px;
+            padding: 1px 5px;
+          "
+          >src/tools/chat.py</code
+        >,
+        <code
+          style="
+            font-family: ui-monospace, monospace;
+            background: #f6f7fb;
+            border: 1px solid #e2e4ee;
+            border-radius: 4px;
+            padding: 1px 5px;
+          "
+          >src/services/chat_service.py</code
+        >,
+        <code
+          style="
+            font-family: ui-monospace, monospace;
+            background: #f6f7fb;
+            border: 1px solid #e2e4ee;
+            border-radius: 4px;
+            padding: 1px 5px;
+          "
+          >src/services/search_service.py</code
+        >
+        and
+        <code
+          style="
+            font-family: ui-monospace, monospace;
+            background: #f6f7fb;
+            border: 1px solid #e2e4ee;
+            border-radius: 4px;
+            padding: 1px 5px;
+          "
+          >src/services/document_service.py</code
+        >
+        — Enterprise Knowledge Hub MCP Server. 23 MCP tools total: documents
+        (6), policies (3), meetings (3), employees (3), customers (3), search
+        (3), health (2).
+      </div>
     </div>
-  </div>
 
-  <!-- FLOW STEPS -->
-  <div style="display:flex;flex-direction:column;gap:8px;">
-    <div style="display:flex;justify-content:flex-end;">
-      <button id="resetBtn" style="font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:#565c72;background:#ffffff;border:1px solid #e2e4ee;border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .15s;">Reset</button>
-    </div>
-    <div style="font-size:13px;font-weight:600;color:#8288a0;text-transform:uppercase;letter-spacing:.08em;">PROMPT WORKFLOW STEPS</div>
-  </div>
-  <div id="stepsContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+    <script>
+      // Steps 1, 2, 5, 6 are identical no matter which tool gets called - only
+      // step 3 (tool choice) and step 4 (retrieval) actually differ per path,
+      // exactly mirroring the real code: chat.py/chat_service.py don't know or
+      // care which tool the agent picked, only the tool/service layer differs.
+      const RETRIEVAL_BY_KIND = {
+        exact: {
+          toolLine: '-> selects get_department_contacts',
+          title: 'Retrieval — exact lookup',
+          plainText:
+            'A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.',
+          techText:
+            'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
+        },
+        substring: {
+          toolLine: '-> selects search_documents',
+          title: 'Retrieval — SQL substring search',
+          plainText:
+            'A fuzzy but literal text match against specific database columns (title, department, tags). Finds partial matches, but has no concept of meaning or synonyms.',
+          techText:
+            'search_documents(query="onboarding")\nsrc/services/document_service.py\nSQLAlchemy: WHERE title ILIKE\n  \'%onboarding%\' OR department ILIKE ...\nNo embeddings involved',
+        },
+        vector: {
+          toolLine: '-> selects global_search',
+          title: 'Retrieval — vector / hybrid RAG',
+          plainText:
+            'The question is embedded into a vector, then Azure AI Search runs keyword and vector matching together in one query, ranked by relevance across both.',
+          techText:
+            'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search: BM25 + vector\n  (HNSW), one hybrid query',
+        },
+      };
 
-  <div style="margin-top:auto;font-size:11.5px;color:#8288a0;line-height:1.6;padding-top:4px;">
-    Traced from <code style="font-family:ui-monospace,monospace;background:#f6f7fb;border:1px solid #e2e4ee;border-radius:4px;padding:1px 5px;">src/tools/chat.py</code>,
-    <code style="font-family:ui-monospace,monospace;background:#f6f7fb;border:1px solid #e2e4ee;border-radius:4px;padding:1px 5px;">src/services/chat_service.py</code>,
-    <code style="font-family:ui-monospace,monospace;background:#f6f7fb;border:1px solid #e2e4ee;border-radius:4px;padding:1px 5px;">src/services/search_service.py</code> and
-    <code style="font-family:ui-monospace,monospace;background:#f6f7fb;border:1px solid #e2e4ee;border-radius:4px;padding:1px 5px;">src/services/document_service.py</code> —
-    Enterprise Knowledge Hub MCP Server. 23 MCP tools total: documents (6), policies (3), meetings (3), employees (3), customers (3), search (3), health (2).
-  </div>
-</div>
+      function buildStepData(kind) {
+        const retrieval = RETRIEVAL_BY_KIND[kind];
+        return [
+          {
+            title: 'Prompt sent',
+            plainText:
+              'Your message is submitted to the backend, which validates it and hands off to the agent service. No auth token needed - this endpoint is intentionally anonymous.',
+            techText:
+              'POST /api/chat\nContent-Type: application/json\nbody: {message, previous_response_id}\nsrc/tools/chat.py: _start_chat()\nResponse: {response_id, status:"queued"}\nHTTP 200',
+            showAgent: false,
+          },
+          {
+            title: 'Async kickoff',
+            plainText:
+              "The Foundry agent run starts in the background and returns a job ID right away, rather than blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout.",
+            techText:
+              'responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"',
+            showAgent: false,
+          },
+          {
+            title: 'Tool choice',
+            plainText:
+              'The agent itself decides whether this needs a tool at all, and which one - not fixed application logic. Choosing the wrong tool means a slower or less precise answer.',
+            techText: `Azure AI Foundry agent reasoning\n23 MCP tools available:\ndocuments(6) policies(3) meetings(3)\nemployees(3) customers(3) search(3)\nhealth(2)\n${retrieval.toolLine}`,
+            showAgent: true,
+          },
+          {
+            title: retrieval.title,
+            plainText: retrieval.plainText,
+            techText: retrieval.techText,
+            showAgent: false,
+          },
+          {
+            title: 'Synthesis',
+            plainText:
+              'The agent composes a natural-language answer from whatever the tool returned. The run reaches its terminal status.',
+            techText:
+              'Same agent run, no extra call\nsrc/services/chat_service.py\n_to_job_status()\nstatus: "completed"\nreply = response.output_text',
+            showAgent: true,
+          },
+          {
+            title: 'Reply',
+            plainText:
+              'The browser, which has been polling in the background, receives the finished reply and renders it - plus a pill showing which tool was actually used.',
+            techText:
+              'GET /api/chat/status?id=...\n(polled ~every 1.5s by the browser)\nmcp_call items de-duped by name\nmarked.parse() -> DOMPurify.sanitize()',
+            showAgent: false,
+          },
+        ];
+      }
 
-<script>
-  // Steps 1, 2, 5, 6 are identical no matter which tool gets called - only
-  // step 3 (tool choice) and step 4 (retrieval) actually differ per path,
-  // exactly mirroring the real code: chat.py/chat_service.py don't know or
-  // care which tool the agent picked, only the tool/service layer differs.
-  const RETRIEVAL_BY_KIND = {
-    exact: {
-      toolLine: '-> selects get_department_contacts',
-      title: 'Retrieval — exact lookup',
-      plainText: 'A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.',
-      techText: 'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
-    },
-    substring: {
-      toolLine: '-> selects search_documents',
-      title: 'Retrieval — SQL substring search',
-      plainText: 'A fuzzy but literal text match against specific database columns (title, department, tags). Finds partial matches, but has no concept of meaning or synonyms.',
-      techText: "search_documents(query=\"onboarding\")\nsrc/services/document_service.py\nSQLAlchemy: WHERE title ILIKE\n  '%onboarding%' OR department ILIKE ...\nNo embeddings involved",
-    },
-    vector: {
-      toolLine: '-> selects global_search',
-      title: 'Retrieval — vector / hybrid RAG',
-      plainText: 'The question is embedded into a vector, then Azure AI Search runs keyword and vector matching together in one query, ranked by relevance across both.',
-      techText: 'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search: BM25 + vector\n  (HNSW), one hybrid query',
-    },
-  };
+      let state = {
+        selected: null,
+        doneUpTo: 0,
+        activeStep: 0,
+        playing: false,
+        timers: [],
+      };
+      const reducedMotion =
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function buildStepData(kind) {
-    const retrieval = RETRIEVAL_BY_KIND[kind];
-    return [
-      {
-        title: 'Prompt sent',
-        plainText: 'Your message is submitted to the backend, which validates it and hands off to the agent service. No auth token needed - this endpoint is intentionally anonymous.',
-        techText: 'POST /api/chat\nContent-Type: application/json\nbody: {message, previous_response_id}\nsrc/tools/chat.py: _start_chat()\nResponse: {response_id, status:"queued"}\nHTTP 200',
-        showAgent: false,
-      },
-      {
-        title: 'Async kickoff',
-        plainText: "The Foundry agent run starts in the background and returns a job ID right away, rather than blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout.",
-        techText: 'responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"',
-        showAgent: false,
-      },
-      {
-        title: 'Tool choice',
-        plainText: 'The agent itself decides whether this needs a tool at all, and which one - not fixed application logic. Choosing the wrong tool means a slower or less precise answer.',
-        techText: `Azure AI Foundry agent reasoning\n23 MCP tools available:\ndocuments(6) policies(3) meetings(3)\nemployees(3) customers(3) search(3)\nhealth(2)\n${retrieval.toolLine}`,
-        showAgent: true,
-      },
-      {
-        title: retrieval.title,
-        plainText: retrieval.plainText,
-        techText: retrieval.techText,
-        showAgent: false,
-      },
-      {
-        title: 'Synthesis',
-        plainText: 'The agent composes a natural-language answer from whatever the tool returned. The run reaches its terminal status.',
-        techText: 'Same agent run, no extra call\nsrc/services/chat_service.py\n_to_job_status()\nstatus: "completed"\nreply = response.output_text',
-        showAgent: true,
-      },
-      {
-        title: 'Reply',
-        plainText: 'The browser, which has been polling in the background, receives the finished reply and renders it - plus a pill showing which tool was actually used.',
-        techText: 'GET /api/chat/status?id=...\n(polled ~every 1.5s by the browser)\nmcp_call items de-duped by name\nmarked.parse() -> DOMPurify.sanitize()',
-        showAgent: false,
-      },
-    ];
-  }
+      function stageState(n) {
+        if (state.activeStep === n) return 'active';
+        if (state.doneUpTo >= n) return 'done';
+        return 'pending';
+      }
 
-  let state = { selected: null, doneUpTo: 0, activeStep: 0, playing: false, timers: [] };
-  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  function stageState(n) {
-    if (state.activeStep === n) return 'active';
-    if (state.doneUpTo >= n) return 'done';
-    return 'pending';
-  }
-
-  function renderSteps() {
-    const container = document.getElementById('stepsContainer');
-    container.innerHTML = '';
-    if (!state.selected) return;
-    const stepData = buildStepData(state.selected);
-    stepData.forEach((step, idx) => {
-      const n = idx + 1;
-      const st = stageState(n);
-      const card = document.createElement('div');
-      card.className = `step-card ${st}`;
-      card.innerHTML = `
+      function renderSteps() {
+        const container = document.getElementById('stepsContainer');
+        container.innerHTML = '';
+        if (!state.selected) return;
+        const stepData = buildStepData(state.selected);
+        stepData.forEach((step, idx) => {
+          const n = idx + 1;
+          const st = stageState(n);
+          const card = document.createElement('div');
+          card.className = `step-card ${st}`;
+          card.innerHTML = `
         <div style="display:grid;grid-template-columns:3fr 1fr;gap:16px;align-items:start;">
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div class="step-badge">${st === 'done' ? '✓' : n}</div>
               <div style="font-size:16px;font-weight:600;color:#171a2b;">${step.title}</div>
-              ${step.showAgent ? `<svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0;">
+              ${
+                step.showAgent
+                  ? `<svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0;">
                 <rect x="8" y="8" width="32" height="33" rx="12" fill="${st === 'pending' ? '#c7cdd6' : '#14b8a6'}"></rect>
                 <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
                 <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
                 <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
-              </svg>` : ''}
+              </svg>`
+                  : ''
+              }
             </div>
             <div style="font-size:13px;color:#3f4557;line-height:1.5;font-weight:500;">${step.plainText}</div>
           </div>
@@ -226,77 +656,98 @@
           </div>
         </div>
       `;
-      container.appendChild(card);
-    });
-  }
+          container.appendChild(card);
+        });
+      }
 
-  function durationFor(n) {
-    if (reducedMotion) return 450;
-    return [900, 1100, 1200, 2200, 1000, 1400][n - 1] || 900;
-  }
+      function durationFor(n) {
+        if (reducedMotion) return 450;
+        return [900, 1100, 1200, 2200, 1000, 1400][n - 1] || 900;
+      }
 
-  function advance(n) {
-    const stepData = buildStepData(state.selected);
-    if (n > stepData.length) {
-      state.playing = false;
-      state.activeStep = 0;
-      state.doneUpTo = stepData.length;
+      function advance(n) {
+        const stepData = buildStepData(state.selected);
+        if (n > stepData.length) {
+          state.playing = false;
+          state.activeStep = 0;
+          state.doneUpTo = stepData.length;
+          renderSteps();
+          return;
+        }
+        state.activeStep = n;
+        state.playing = true;
+        renderSteps();
+        const dur = durationFor(n);
+        const timer = setTimeout(() => {
+          state.doneUpTo = n;
+          state.activeStep = 0;
+          renderSteps();
+          advance(n + 1);
+        }, dur);
+        state.timers.push(timer);
+      }
+
+      function startExample(key) {
+        state.timers.forEach(clearTimeout);
+        state.timers = [];
+        state.selected = key;
+        state.doneUpTo = 0;
+        state.activeStep = 0;
+        state.playing = true;
+        renderSteps();
+        const timer = setTimeout(() => advance(1), 300);
+        state.timers.push(timer);
+      }
+
+      function updateButtonStyles() {
+        const exactBtn = document.getElementById('exactBtn');
+        const substringBtn = document.getElementById('substringBtn');
+        const vectorBtn = document.getElementById('vectorBtn');
+
+        exactBtn.style.background =
+          state.selected === 'exact' ? '#eef2ff' : '#ffffff';
+        exactBtn.style.borderColor =
+          state.selected === 'exact' ? '#4176e9' : '#e2e4ee';
+
+        substringBtn.style.background =
+          state.selected === 'substring' ? '#fff7ec' : '#ffffff';
+        substringBtn.style.borderColor =
+          state.selected === 'substring' ? '#b45309' : '#e2e4ee';
+
+        vectorBtn.style.background =
+          state.selected === 'vector' ? '#e6fbf7' : '#ffffff';
+        vectorBtn.style.borderColor =
+          state.selected === 'vector' ? '#0f9d6b' : '#e2e4ee';
+      }
+
+      function resetAll() {
+        state.timers.forEach(clearTimeout);
+        state = {
+          selected: null,
+          doneUpTo: 0,
+          activeStep: 0,
+          playing: false,
+          timers: [],
+        };
+        updateButtonStyles();
+        renderSteps();
+      }
+
+      document.getElementById('exactBtn').addEventListener('click', () => {
+        startExample('exact');
+        updateButtonStyles();
+      });
+      document.getElementById('substringBtn').addEventListener('click', () => {
+        startExample('substring');
+        updateButtonStyles();
+      });
+      document.getElementById('vectorBtn').addEventListener('click', () => {
+        startExample('vector');
+        updateButtonStyles();
+      });
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+
       renderSteps();
-      return;
-    }
-    state.activeStep = n;
-    state.playing = true;
-    renderSteps();
-    const dur = durationFor(n);
-    const timer = setTimeout(() => {
-      state.doneUpTo = n;
-      state.activeStep = 0;
-      renderSteps();
-      advance(n + 1);
-    }, dur);
-    state.timers.push(timer);
-  }
-
-  function startExample(key) {
-    state.timers.forEach(clearTimeout);
-    state.timers = [];
-    state.selected = key;
-    state.doneUpTo = 0;
-    state.activeStep = 0;
-    state.playing = true;
-    renderSteps();
-    const timer = setTimeout(() => advance(1), 300);
-    state.timers.push(timer);
-  }
-
-  function updateButtonStyles() {
-    const exactBtn = document.getElementById('exactBtn');
-    const substringBtn = document.getElementById('substringBtn');
-    const vectorBtn = document.getElementById('vectorBtn');
-
-    exactBtn.style.background = state.selected === 'exact' ? '#eef2ff' : '#ffffff';
-    exactBtn.style.borderColor = state.selected === 'exact' ? '#4176e9' : '#e2e4ee';
-
-    substringBtn.style.background = state.selected === 'substring' ? '#fff7ec' : '#ffffff';
-    substringBtn.style.borderColor = state.selected === 'substring' ? '#b45309' : '#e2e4ee';
-
-    vectorBtn.style.background = state.selected === 'vector' ? '#e6fbf7' : '#ffffff';
-    vectorBtn.style.borderColor = state.selected === 'vector' ? '#0f9d6b' : '#e2e4ee';
-  }
-
-  function resetAll() {
-    state.timers.forEach(clearTimeout);
-    state = { selected: null, doneUpTo: 0, activeStep: 0, playing: false, timers: [] };
-    updateButtonStyles();
-    renderSteps();
-  }
-
-  document.getElementById('exactBtn').addEventListener('click', () => { startExample('exact'); updateButtonStyles(); });
-  document.getElementById('substringBtn').addEventListener('click', () => { startExample('substring'); updateButtonStyles(); });
-  document.getElementById('vectorBtn').addEventListener('click', () => { startExample('vector'); updateButtonStyles(); });
-  document.getElementById('resetBtn').addEventListener('click', resetAll);
-
-  renderSteps();
-</script>
-</body>
+    </script>
+  </body>
 </html>
