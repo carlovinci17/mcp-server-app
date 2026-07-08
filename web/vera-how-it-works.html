@@ -11,49 +11,121 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="styles.css" />
     <style>
-      @keyframes bob {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-1.6px);
-        }
+      /* Page-specific additions on top of styles.css - same design tokens,
+         same header/sidebar/main skeleton as the main console (index.html),
+         just extended with a tab-style nav and the animated step walkthrough. */
+      html,
+      body {
+        overflow: auto;
       }
-      @keyframes blink {
-        0%,
-        40% {
-          transform: scaleY(1);
-        }
-        43% {
-          transform: scaleY(0.1);
-        }
-        46%,
-        100% {
-          transform: scaleY(1);
-        }
+
+      .howitworks-content {
+        max-width: none;
+        width: 100%;
       }
-      @keyframes glow {
-        0%,
-        100% {
-          filter: drop-shadow(0 0 1px rgba(94, 234, 212, 0.6));
-        }
-        50% {
-          filter: drop-shadow(0 0 3.6px rgba(94, 234, 212, 0.9));
-        }
+
+      .panel-narrow {
+        max-width: 960px;
+        margin: 0 auto;
+        width: 100%;
       }
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 0.5;
-          transform: scale(0.8);
-        }
-        50% {
-          opacity: 1;
-          transform: scale(1.15);
-        }
+
+      .howitworks-footer {
+        flex: none;
+        border-top: 1px solid var(--border-subtle);
+        background: var(--surface-raised);
+        padding: 12px 44px;
+        font-size: 11.5px;
+        color: var(--text-faint);
+        line-height: 1.6;
       }
+
+      .howitworks-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 2px;
+      }
+      .howitworks-nav-btn {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        border-radius: 9px;
+        padding: 9px 10px;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: 12.5px;
+        line-height: 1.4;
+        color: var(--text-body);
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+      .howitworks-nav-btn:hover {
+        background: var(--surface-main);
+        color: var(--text-primary);
+      }
+      .howitworks-nav-btn.active {
+        background: var(--info-blue-tint-bg);
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .howitworks-nav-index {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--border-subtle);
+        color: var(--text-faint);
+        font-size: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .howitworks-nav-btn.active .howitworks-nav-index {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .howitworks-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .howitworks-card-title {
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+      }
+
+      .panel {
+        display: none;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .panel.active {
+        display: flex;
+      }
+
+      code {
+        font-family: ui-monospace, 'IBM Plex Mono', monospace;
+        background: var(--surface-main);
+        border: 1px solid var(--border-subtle);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.95em;
+      }
+
       @keyframes veraGlowRing {
         0%,
         100% {
@@ -64,47 +136,16 @@
         }
       }
 
-      #antenna {
-        animation: pulse 2s ease-in-out infinite;
-        transform-box: fill-box;
-        transform-origin: center;
-      }
-      #head {
-        animation: bob 3.4s ease-in-out infinite;
-        transform-box: fill-box;
-        transform-origin: center;
-      }
-      #eyes {
-        animation: glow 2.6s ease-in-out infinite;
-      }
-      #eye1,
-      #eye2 {
-        animation: blink 4.2s ease-in-out infinite;
-        transform-box: fill-box;
-        transform-origin: center;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        background: #eceef4;
-        font-family: 'IBM Plex Sans', sans-serif;
-        -webkit-font-smoothing: antialiased;
-      }
-
       .step-card {
-        background: #ffffff;
+        background: var(--surface-raised);
         border-radius: 12px;
         padding: 18px;
         box-sizing: border-box;
         transition: all 0.25s;
-        border: 1.5px solid #e2e4ee;
+        border: 1.5px solid var(--border-subtle);
       }
       .step-card.active {
-        border-color: #14b8a6;
+        border-color: var(--accent);
         box-shadow: 0 4px 12px rgba(20, 184, 166, 0.16);
         animation: veraGlowRing 1.6s ease-in-out infinite;
       }
@@ -124,401 +165,385 @@
         font-weight: 600;
         flex-shrink: 0;
         transition: all 0.25s;
-        background: #eceef4;
-        color: #8288a0;
+        background: var(--surface-main);
+        color: var(--text-faint);
       }
       .step-card.active .step-badge,
       .step-card.done .step-badge {
-        background: #14b8a6;
+        background: var(--accent);
         color: #fff;
       }
 
+      .prompt-btn {
+        text-align: left;
+        background: var(--surface-raised);
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
+        padding: 12px 14px;
+        cursor: pointer;
+        font-family: 'IBM Plex Sans', sans-serif;
+        transition: all 0.2s;
+      }
+
+      .tool-items-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px 16px;
+        margin-top: 8px;
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        #antenna,
-        #head,
-        #eyes,
-        #eye1,
-        #eye2,
+        .robot-head,
+        .robot-eyes,
+        .robot-eye,
+        .robot-antenna-tip,
         .step-card.active {
           animation: none !important;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .howitworks-content {
+          max-width: none;
+        }
+        .tool-items-grid {
+          grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
   <body>
-    <div
-      style="
-        width: 100%;
-        min-height: 100vh;
-        box-sizing: border-box;
-        padding: 16px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        color: #171a2b;
-        overflow-y: auto;
-      "
-    >
-      <!-- HEADER -->
-      <div style="display: flex; align-items: center; gap: 12px">
-        <div
-          style="
-            width: 48px;
-            height: 48px;
-            border-radius: 999px;
-            background: radial-gradient(
-              125% 125% at 50% 8%,
-              #1c2544 0%,
-              #0c1223 100%
-            );
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-          "
-        >
-          <svg width="40" height="40" viewBox="0 0 48 48">
-            <line
-              x1="24"
-              y1="9"
-              x2="24"
-              y2="4.6"
-              stroke="#14b8a6"
-              stroke-width="2"
-              stroke-linecap="round"
-            ></line>
-            <circle cx="24" cy="3.2" r="2" fill="#5eead4" id="antenna"></circle>
-            <rect
-              x="3.6"
-              y="21"
-              width="5.4"
-              height="11"
-              rx="2.6"
-              fill="#14b8a6"
-              opacity="0.85"
-            ></rect>
-            <rect
-              x="39"
-              y="21"
-              width="5.4"
-              height="11"
-              rx="2.6"
-              fill="#14b8a6"
-              opacity="0.85"
-            ></rect>
-            <rect
-              x="8"
-              y="8"
-              width="32"
-              height="33"
-              rx="12"
-              fill="#14b8a6"
-              id="head"
-            ></rect>
-            <ellipse
-              cx="24"
-              cy="16"
-              rx="13"
-              ry="6.5"
-              fill="#ffffff"
-              opacity="0.15"
-            ></ellipse>
-            <rect
-              x="12.5"
-              y="19"
-              width="23"
-              height="17.5"
-              rx="7.5"
-              fill="#081026"
-            ></rect>
-            <g id="eyes">
-              <rect
-                x="18"
-                y="23.5"
-                width="4.2"
-                height="8.6"
-                rx="2.1"
-                fill="#5eead4"
-                id="eye1"
-              ></rect>
-              <rect
-                x="25.8"
-                y="23.5"
-                width="4.2"
-                height="8.6"
-                rx="2.1"
-                fill="#5eead4"
-                id="eye2"
-              ></rect>
-            </g>
-          </svg>
-        </div>
-        <div>
-          <div
-            style="
-              font-family: 'Space Grotesk', sans-serif;
-              font-weight: 600;
-              font-size: 22px;
-            "
-          >
-            Vera's Lifecycle
+    <div class="app">
+      <header class="header">
+        <div class="brand-cluster">
+          <div class="logo-tile">
+            <img src="assets/vortex-logo.png" alt="Vortex Digital" />
           </div>
-          <div style="font-size: 14px; color: #565c72; margin-top: 2px">
-            Knowledge agent decisions in motion
+          <div class="brand-block">
+            <div class="brand-title">Vortex Digital</div>
+            <div class="brand-sub">VERA'S LIFECYCLE</div>
           </div>
         </div>
-      </div>
+        <span class="header-note">How a message becomes a reply — traced from the real backend code</span>
+        <div class="header-right">
+          <a class="header-link" href="index.html">← Back to console</a>
+        </div>
+      </header>
 
-      <!-- PROMPTS SECTION -->
-      <div style="display: flex; flex-direction: column; gap: 8px">
-        <div
-          style="
-            font-size: 13px;
-            font-weight: 600;
-            color: #8288a0;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-          "
-        >
-          Try a prompt
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px">
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <button
-              id="exactBtn"
-              style="
-                text-align: left;
-                background: #ffffff;
-                border: 1px solid #e2e4ee;
-                border-radius: 10px;
-                padding: 12px 14px;
-                cursor: pointer;
-                font-family: 'IBM Plex Sans', sans-serif;
-                transition: all 0.2s;
-              "
-            >
-              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
-                "Who's the contact for the Design team?"
-              </div>
-              <div
-                style="
-                  font-size: 12px;
-                  color: #4176e9;
-                  margin-top: 3px;
-                  font-weight: 600;
-                "
-              >
-                Exact lookup
-              </div>
+      <div class="body">
+        <aside class="sidebar">
+          <div class="agent-avatar">
+            <svg width="56" height="56" viewBox="0 0 48 48" class="robot-svg" style="color: var(--accent)">
+              <line class="robot-antenna" x1="24" y1="9" x2="24" y2="4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <circle class="robot-antenna-tip" cx="24" cy="3.2" r="2" fill="#5eead4" />
+              <rect x="3.6" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+              <rect x="39" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
+              <rect class="robot-head" x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
+              <ellipse cx="24" cy="16" rx="13" ry="6.5" fill="#ffffff" opacity="0.15" />
+              <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
+              <g class="robot-eyes">
+                <rect class="robot-eye" x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+                <rect class="robot-eye" x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+              </g>
+            </svg>
+          </div>
+          <div class="agent-name">Vera's Lifecycle</div>
+          <div class="agent-label">KNOWLEDGE AGENT DECISIONS IN MOTION</div>
+          <p class="agent-description">
+            Vera is a demo chat console for Vortex Digital that talks to an
+            Azure AI Foundry agent wired to 23 MCP tools. Ask about
+            employees, customers, documents, policies, or meeting notes, and
+            the agent decides which tool fits — an exact lookup, a fuzzy SQL
+            match, or a hybrid keyword + vector search. This page traces
+            exactly what happens between your message and its reply.
+          </p>
+          <div class="divider"></div>
+          <div class="sources-label">EXPLORE</div>
+          <nav class="howitworks-nav">
+            <button class="howitworks-nav-btn active" data-panel="prompt" type="button">
+              <span class="howitworks-nav-index">1</span>
+              <span>Try a prompt</span>
             </button>
-            <button
-              id="substringBtn"
-              style="
-                text-align: left;
-                background: #ffffff;
-                border: 1px solid #e2e4ee;
-                border-radius: 10px;
-                padding: 12px 14px;
-                cursor: pointer;
-                font-family: 'IBM Plex Sans', sans-serif;
-                transition: all 0.2s;
-              "
-            >
-              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
-                "Find documents about onboarding"
-              </div>
-              <div
-                style="
-                  font-size: 12px;
-                  color: #b45309;
-                  margin-top: 3px;
-                  font-weight: 600;
-                "
-              >
-                SQL substring search
-              </div>
+            <button class="howitworks-nav-btn" data-panel="infrastructure" type="button">
+              <span class="howitworks-nav-index">2</span>
+              <span>Infrastructure — exact services used</span>
             </button>
-            <button
-              id="vectorBtn"
-              style="
-                text-align: left;
-                background: #ffffff;
-                border: 1px solid #e2e4ee;
-                border-radius: 10px;
-                padding: 12px 14px;
-                cursor: pointer;
-                font-family: 'IBM Plex Sans', sans-serif;
-                transition: all 0.2s;
-              "
-            >
-              <div style="font-size: 15px; font-weight: 600; color: #171a2b">
-                "What's our remote work policy?"
-              </div>
-              <div
-                style="
-                  font-size: 12px;
-                  color: #0f9d6b;
-                  margin-top: 3px;
-                  font-weight: 600;
-                "
-              >
-                Vector / hybrid RAG
-              </div>
+            <button class="howitworks-nav-btn" data-panel="tools" type="button">
+              <span class="howitworks-nav-index">3</span>
+              <span>All 23 MCP tools, by category</span>
             </button>
+          </nav>
+          <div class="sidebar-spacer"></div>
+          <div class="model-label">traced from src/tools/chat.py &amp; friends</div>
+        </aside>
+
+        <main class="main">
+          <div class="main-scroll">
+            <div class="content-inner howitworks-content">
+              <!-- PANEL 2: INFRASTRUCTURE -->
+              <div class="panel panel-narrow" id="panel-infrastructure">
+                <div class="howitworks-card">
+                  <div class="howitworks-card-title">Infrastructure — exact services used</div>
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      gap: 16px;
+                    "
+                  >
+                    <div style="border-left: 3px solid var(--info-blue); padding-left: 12px">
+                      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary)">
+                        Database — Azure SQL Database
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5">
+                        Accessed via <b>SQLAlchemy 2.0</b> (<code>mssql+pyodbc</code>,
+                        ODBC Driver 18). No password in the connection string — auth is
+                        an Azure AD token from <code>DefaultAzureCredential</code>,
+                        injected per-connection. Tables:
+                        <code>EmployeeRecord</code>, <code>CustomerRecord</code>,
+                        <code>DocumentMetadataRecord</code>. Document
+                        <i>content</i> itself is not stored here, only metadata.
+                        <span style="color: var(--text-faint)">src/database/sql.py, src/database/models.py</span>
+                      </div>
+                    </div>
+                    <div style="border-left: 3px solid var(--info-blue); padding-left: 12px">
+                      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary)">
+                        Document storage — Azure Blob Storage
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5">
+                        Container <code>documents</code>. SQL only stores
+                        <code>blob_container</code> / <code>blob_path</code> pointers;
+                        <code>get_document</code>, <code>get_policy</code> and
+                        <code>summarize_meeting</code> fetch the actual text from here.
+                        <span style="color: var(--text-faint)">src/azure/blob_client.py</span>
+                      </div>
+                    </div>
+                    <div style="border-left: 3px solid var(--success-text); padding-left: 12px">
+                      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary)">
+                        Search index — Azure AI Search
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5">
+                        Fields: <code>title</code>, <code>content</code>,
+                        <code>content_vector</code> (HNSW, 1536-dim, cosine),
+                        <code>doc_type</code>, <code>department</code>,
+                        <code>tags</code>. Embeddings from Azure OpenAI
+                        <code>text-embedding-3-small</code>. No Azure "semantic ranker"
+                        is configured — the <code>semantic_search</code> tool name
+                        refers to vector similarity, not that product feature.
+                        <span style="color: var(--text-faint)">src/services/search_service.py, scripts/create_search_index.py</span>
+                      </div>
+                    </div>
+                    <div style="border-left: 3px solid var(--accent); padding-left: 12px">
+                      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary)">
+                        Agent runtime — Azure AI Foundry Agent Service
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5">
+                        Reached through the OpenAI-compatible Responses API:
+                        <code>client.responses.create(background=True, store=True)</code>,
+                        then polled with <code>client.responses.retrieve(id)</code>.
+                        One LLM call per turn covers both tool selection and answer
+                        synthesis — the agent's model, instructions and MCP connection
+                        are configured in Azure, not in this repo's code.
+                        <span style="color: var(--text-faint)">src/services/chat_service.py, src/azure/foundry_agent.py</span>
+                      </div>
+                    </div>
+                    <div style="border-left: 3px solid var(--accent); padding-left: 12px">
+                      <div style="font-size: 12.5px; font-weight: 600; color: var(--text-primary)">
+                        MCP tool registration — Azure Functions Remote MCP
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5">
+                        Each tool is a Python function decorated with
+                        <code>@bp.mcp_tool()</code>. 8 blueprints
+                        (documents, policies, meetings, employees, customers, search,
+                        health, chat) are registered in one
+                        <code>func.FunctionApp()</code>, exposing 23 MCP tools total.
+                        <span style="color: var(--text-faint)">function_app.py</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PANEL 3: ALL TOOLS -->
+              <div class="panel panel-narrow" id="panel-tools">
+                <div class="howitworks-card">
+                  <div class="howitworks-card-title">All 23 MCP tools, by category</div>
+                  <div
+                    id="allToolsGrid"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      gap: 16px;
+                    "
+                  ></div>
+                </div>
+              </div>
+
+              <!-- PANEL 1: TRY A PROMPT -->
+              <div class="panel panel-narrow active" id="panel-prompt">
+                <div class="howitworks-card">
+                  <div class="howitworks-card-title">Try a prompt</div>
+                  <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px">
+                    <div style="display: flex; flex-direction: column; gap: 8px">
+                      <button id="exactBtn" class="prompt-btn">
+                        <div style="font-size: 15px; font-weight: 600; color: var(--text-primary)">
+                          "Who's the contact for the Design team?"
+                        </div>
+                        <div style="font-size: 12px; color: var(--info-blue); margin-top: 3px; font-weight: 600">
+                          Exact lookup
+                        </div>
+                      </button>
+                      <button id="substringBtn" class="prompt-btn">
+                        <div style="font-size: 15px; font-weight: 600; color: var(--text-primary)">
+                          "Find documents about onboarding"
+                        </div>
+                        <div style="font-size: 12px; color: var(--pending-text); margin-top: 3px; font-weight: 600">
+                          SQL substring search
+                        </div>
+                      </button>
+                      <button id="vectorBtn" class="prompt-btn">
+                        <div style="font-size: 15px; font-weight: 600; color: var(--text-primary)">
+                          "What's our remote work policy?"
+                        </div>
+                        <div style="font-size: 12px; color: var(--success-text); margin-top: 3px; font-weight: 600">
+                          Vector / hybrid RAG
+                        </div>
+                      </button>
+                    </div>
+
+                    <div
+                      style="
+                        background: var(--surface-main);
+                        border: 1px solid var(--border-subtle);
+                        border-radius: 12px;
+                        padding: 14px 16px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 12px;
+                      "
+                    >
+                      <div class="howitworks-card-title">Retrieval strategies</div>
+                      <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5">
+                        Vera has three genuinely different ways to retrieve data — the
+                        agent decides which fits each question. Click a prompt to watch
+                        its actual path.
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 8px">
+                        <div style="border-left: 3px solid var(--info-blue); padding-left: 12px">
+                          <div style="font-size: 12px; font-weight: 600; color: var(--info-blue)">
+                            Exact
+                          </div>
+                          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px">
+                            Direct <code>SELECT ... WHERE column = :value</code> against
+                            Azure SQL. Fast, deterministic, no matching logic at all.
+                          </div>
+                        </div>
+                        <div style="border-left: 3px solid var(--pending-text); padding-left: 12px">
+                          <div style="font-size: 12px; font-weight: 600; color: var(--pending-text)">
+                            SQL Search
+                          </div>
+                          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px">
+                            SQL <code>ILIKE '%term%'</code> pattern matching against the
+                            <code>title</code> and <code>department</code> columns only.
+                            Fuzzy substring match, not semantic — no embeddings.
+                          </div>
+                        </div>
+                        <div style="border-left: 3px solid var(--success-text); padding-left: 12px">
+                          <div style="font-size: 12px; font-weight: 600; color: var(--success-text)">
+                            Vector / Hybrid
+                          </div>
+                          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px">
+                            Embeds the query with <code>text-embedding-3-small</code>
+                            (1536-dim), then Azure AI Search runs BM25 keyword search and
+                            HNSW vector search in one call and fuses the two rankings
+                            automatically.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="howitworks-card">
+                  <div style="display: flex; align-items: center; justify-content: space-between">
+                    <div class="howitworks-card-title">Prompt workflow steps</div>
+                    <button
+                      id="resetBtn"
+                      style="
+                        font-family: 'IBM Plex Sans', sans-serif;
+                        font-size: 12.5px;
+                        color: var(--text-secondary);
+                        background: var(--surface-raised);
+                        border: 1px solid var(--border-subtle);
+                        border-radius: 8px;
+                        padding: 6px 12px;
+                        cursor: pointer;
+                        transition: all 0.15s;
+                      "
+                    >
+                      Reset Prompt
+                    </button>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: flex-start;
+                      gap: 8px;
+                      font-size: 12px;
+                      color: var(--text-secondary);
+                      line-height: 1.5;
+                      background: var(--surface-main);
+                      border: 1px solid var(--border-subtle);
+                      border-radius: 8px;
+                      padding: 8px 12px;
+                    "
+                  >
+                    <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink: 0; margin-top: 1px">
+                      <rect x="8" y="8" width="32" height="33" rx="12" fill="var(--accent)"></rect>
+                      <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
+                      <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+                      <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+                    </svg>
+                    <span>
+                      <b>The robot icon marks the two moments the LLM is actually
+                      "thinking"</b> — deciding which tool to call ("Tool choice") and
+                      turning results into an answer ("Synthesis"). Steps without it
+                      (Prompt sent, Async kickoff, Retrieval, Reply) are plain backend
+                      code: HTTP handling, SQL/Azure AI Search queries, and frontend
+                      rendering — no language model involved. Under the hood these are
+                      actually one single API round trip
+                      (<code>responses.create</code> → the same run read back by
+                      <code>responses.retrieve</code>), not two separate model calls —
+                      the icon marks two conceptual phases of that one call, not two
+                      invocations.
+                    </span>
+                  </div>
+                  <div
+                    id="stepsContainer"
+                    style="display: flex; flex-direction: column; gap: 12px"
+                  ></div>
+                </div>
+              </div>
+
+            </div>
           </div>
-
-          <div
-            style="
-              background: #ffffff;
-              border: 1px solid #e2e4ee;
-              border-radius: 12px;
-              padding: 14px 16px;
-              display: flex;
-              flex-direction: column;
-              gap: 12px;
-            "
-          >
-            <div
-              style="
-                font-size: 13px;
-                font-weight: 600;
-                color: #8288a0;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-              "
-            >
-              Retrieval strategies
-            </div>
-            <div style="font-size: 13px; color: #565c72; line-height: 1.5">
-              Vera has three genuinely different ways to retrieve data — the
-              agent decides which fits each question. Click a prompt to watch
-              its actual path.
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 8px">
-              <div style="border-left: 3px solid #4176e9; padding-left: 12px">
-                <div style="font-size: 12px; font-weight: 600; color: #4176e9">
-                  Exact
-                </div>
-                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
-                  Direct database lookup by ID or filter. Fast, deterministic,
-                  no matching logic.
-                </div>
-              </div>
-              <div style="border-left: 3px solid #b45309; padding-left: 12px">
-                <div style="font-size: 12px; font-weight: 600; color: #b45309">
-                  SQL Search
-                </div>
-                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
-                  SQL ILIKE text-pattern matching on specific columns. Fuzzy,
-                  not semantic.
-                </div>
-              </div>
-              <div style="border-left: 3px solid #0f9d6b; padding-left: 12px">
-                <div style="font-size: 12px; font-weight: 600; color: #0f9d6b">
-                  Vector / Hybrid
-                </div>
-                <div style="font-size: 12px; color: #565c72; margin-top: 2px">
-                  Embeds the query, then BM25 + vector search together via Azure
-                  AI Search.
-                </div>
-              </div>
-            </div>
+          <div class="howitworks-footer">
+            Traced from
+            <code>src/tools/chat.py</code>,
+            <code>src/services/chat_service.py</code>,
+            <code>src/services/search_service.py</code>
+            and
+            <code>src/services/document_service.py</code>
+            (plus <code>src/database/sql.py</code>,
+            <code>src/azure/search_client.py</code>,
+            <code>src/azure/embeddings.py</code>
+            and
+            <code>src/tools/health.py</code>)
+            — Enterprise Knowledge Hub MCP Server. 23 MCP tools total: documents
+            (6), policies (3), meetings (3), employees (3), customers (3), search
+            (3), health (2).
           </div>
-        </div>
-      </div>
-
-      <!-- FLOW STEPS -->
-      <div style="display: flex; flex-direction: column; gap: 8px">
-        <div style="display: flex; justify-content: flex-start">
-          <button
-            id="resetBtn"
-            style="
-              font-family: 'IBM Plex Sans', sans-serif;
-              font-size: 12.5px;
-              color: #565c72;
-              background: #ffffff;
-              border: 1px solid #e2e4ee;
-              border-radius: 8px;
-              padding: 6px 12px;
-              cursor: pointer;
-              transition: all 0.15s;
-            "
-          >
-            Reset Prompt
-          </button>
-        </div>
-        <div
-          style="
-            font-size: 13px;
-            font-weight: 600;
-            color: #8288a0;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-          "
-        >
-          PROMPT WORKFLOW STEPS
-        </div>
-      </div>
-      <div
-        id="stepsContainer"
-        style="display: flex; flex-direction: column; gap: 12px"
-      ></div>
-
-      <div
-        style="
-          margin-top: auto;
-          font-size: 11.5px;
-          color: #8288a0;
-          line-height: 1.6;
-          padding-top: 4px;
-        "
-      >
-        Traced from
-        <code
-          style="
-            font-family: ui-monospace, monospace;
-            background: #f6f7fb;
-            border: 1px solid #e2e4ee;
-            border-radius: 4px;
-            padding: 1px 5px;
-          "
-          >src/tools/chat.py</code
-        >,
-        <code
-          style="
-            font-family: ui-monospace, monospace;
-            background: #f6f7fb;
-            border: 1px solid #e2e4ee;
-            border-radius: 4px;
-            padding: 1px 5px;
-          "
-          >src/services/chat_service.py</code
-        >,
-        <code
-          style="
-            font-family: ui-monospace, monospace;
-            background: #f6f7fb;
-            border: 1px solid #e2e4ee;
-            border-radius: 4px;
-            padding: 1px 5px;
-          "
-          >src/services/search_service.py</code
-        >
-        and
-        <code
-          style="
-            font-family: ui-monospace, monospace;
-            background: #f6f7fb;
-            border: 1px solid #e2e4ee;
-            border-radius: 4px;
-            padding: 1px 5px;
-          "
-          >src/services/document_service.py</code
-        >
-        — Enterprise Knowledge Hub MCP Server. 23 MCP tools total: documents
-        (6), policies (3), meetings (3), employees (3), customers (3), search
-        (3), health (2).
+        </main>
       </div>
     </div>
 
@@ -540,17 +565,17 @@
           toolLine: '-> selects search_documents',
           title: 'Retrieval — SQL substring search',
           plainText:
-            'A fuzzy but literal text match against specific database columns (title, department, tags). Finds partial matches, but has no concept of meaning or synonyms.',
+            'A fuzzy but literal text match against the title and department columns only. Finds partial matches, but has no concept of meaning or synonyms - and no embeddings are involved.',
           techText:
-            'search_documents(query="onboarding")\nsrc/services/document_service.py\nSQLAlchemy: WHERE title ILIKE\n  \'%onboarding%\' OR department ILIKE ...\nNo embeddings involved',
+            'search_documents(query="onboarding")\nsrc/services/document_service.py\nAzure SQL via SQLAlchemy:\nWHERE title ILIKE \'%onboarding%\'\n  OR department ILIKE \'%onboarding%\'\nNote: the tool\'s own docstring also\nmentions "tags", but that column is\nnot actually queried',
         },
         vector: {
           toolLine: '-> selects global_search',
           title: 'Retrieval — vector / hybrid RAG',
           plainText:
-            'The question is embedded into a vector, then Azure AI Search runs keyword and vector matching together in one query, ranked by relevance across both.',
+            'The question is embedded into a vector, then Azure AI Search runs BM25 keyword search and HNSW vector search together in one query and fuses the two rankings automatically.',
           techText:
-            'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search: BM25 + vector\n  (HNSW), one hybrid query',
+            'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search .search() called with\nboth search_text= (BM25) and\nvector_queries= (HNSW) -> automatic\nhybrid fusion, single round trip',
         },
       };
 
@@ -568,16 +593,16 @@
           {
             title: 'Async kickoff',
             plainText:
-              "The Foundry agent run starts in the background and returns a job ID right away, rather than blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout.",
+              "This is the one and only LLM call for the whole turn: the Azure AI Foundry agent run starts in the background and returns a job ID right away instead of blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
             techText:
-              'responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"',
+              'client.responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"\n(single API call for this whole turn)',
             showAgent: false,
           },
           {
             title: 'Tool choice',
             plainText:
-              'The agent itself decides whether this needs a tool at all, and which one - not fixed application logic. Choosing the wrong tool means a slower or less precise answer.',
-            techText: `Azure AI Foundry agent reasoning\n23 MCP tools available:\ndocuments(6) policies(3) meetings(3)\nemployees(3) customers(3) search(3)\nhealth(2)\n${retrieval.toolLine}`,
+              'The agent itself decides whether this needs a tool at all, and which one - not fixed application logic. This is the same call from step 2, now polled mid-flight; nothing new is sent to the model here.',
+            techText: `Same run as step 2, polled via\nresponses.retrieve(id)\n23 MCP tools available:\ndocuments(6) policies(3) meetings(3)\nemployees(3) customers(3) search(3)\nhealth(2)\n${retrieval.toolLine}`,
             showAgent: true,
           },
           {
@@ -589,9 +614,9 @@
           {
             title: 'Synthesis',
             plainText:
-              'The agent composes a natural-language answer from whatever the tool returned. The run reaches its terminal status.',
+              'The agent composes a natural-language answer from whatever the tool returned. Still the same single call from step 2 - just polled again once it reaches its terminal status.',
             techText:
-              'Same agent run, no extra call\nsrc/services/chat_service.py\n_to_job_status()\nstatus: "completed"\nreply = response.output_text',
+              'Same agent run, no extra call\nsrc/services/chat_service.py\nresponses.retrieve(id) -> _to_job_status()\nstatus: "completed"\nreply = response.output_text',
             showAgent: true,
           },
           {
@@ -633,15 +658,15 @@
           const card = document.createElement('div');
           card.className = `step-card ${st}`;
           card.innerHTML = `
-        <div style="display:grid;grid-template-columns:3fr 1fr;gap:16px;align-items:start;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div class="step-badge">${st === 'done' ? '✓' : n}</div>
-              <div style="font-size:16px;font-weight:600;color:#171a2b;">${step.title}</div>
+              <div style="font-size:16px;font-weight:600;color:var(--text-primary);">${step.title}</div>
               ${
                 step.showAgent
                   ? `<svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0;">
-                <rect x="8" y="8" width="32" height="33" rx="12" fill="${st === 'pending' ? '#c7cdd6' : '#14b8a6'}"></rect>
+                <rect x="8" y="8" width="32" height="33" rx="12" fill="${st === 'pending' ? '#c7cdd6' : 'var(--accent)'}"></rect>
                 <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
                 <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
                 <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
@@ -649,10 +674,10 @@
                   : ''
               }
             </div>
-            <div style="font-size:13px;color:#3f4557;line-height:1.5;font-weight:500;">${step.plainText}</div>
+            <div style="font-size:13px;color:var(--text-body);line-height:1.5;font-weight:500;">${step.plainText}</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:4px;text-align:left;background:#f9f9fb;border-radius:8px;padding:12px;border-left:3px solid #14b8a6;">
-            <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:#3f4557;line-height:1.7;font-weight:500;white-space:pre-line;">${step.techText}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--surface-main);border-radius:8px;padding:12px;border-left:3px solid var(--accent);">
+            <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-body);line-height:1.7;font-weight:500;white-space:pre-line;">${step.techText}</div>
           </div>
         </div>
       `;
@@ -705,19 +730,19 @@
         const vectorBtn = document.getElementById('vectorBtn');
 
         exactBtn.style.background =
-          state.selected === 'exact' ? '#eef2ff' : '#ffffff';
+          state.selected === 'exact' ? 'var(--info-blue-tint-bg)' : 'var(--surface-raised)';
         exactBtn.style.borderColor =
-          state.selected === 'exact' ? '#4176e9' : '#e2e4ee';
+          state.selected === 'exact' ? 'var(--info-blue)' : 'var(--border-subtle)';
 
         substringBtn.style.background =
-          state.selected === 'substring' ? '#fff7ec' : '#ffffff';
+          state.selected === 'substring' ? 'var(--pending-tint-bg)' : 'var(--surface-raised)';
         substringBtn.style.borderColor =
-          state.selected === 'substring' ? '#b45309' : '#e2e4ee';
+          state.selected === 'substring' ? 'var(--pending-text)' : 'var(--border-subtle)';
 
         vectorBtn.style.background =
-          state.selected === 'vector' ? '#e6fbf7' : '#ffffff';
+          state.selected === 'vector' ? 'var(--success-tint-bg)' : 'var(--surface-raised)';
         vectorBtn.style.borderColor =
-          state.selected === 'vector' ? '#0f9d6b' : '#e2e4ee';
+          state.selected === 'vector' ? 'var(--success-text)' : 'var(--border-subtle)';
       }
 
       function resetAll() {
@@ -747,6 +772,123 @@
       });
       document.getElementById('resetBtn').addEventListener('click', resetAll);
 
+      // Mirrors src/tools/health.py's _CAPABILITIES / _TOOL_DESCRIPTIONS
+      // (same source of truth as the app's own "MCP Server Tools" popup).
+      const TOOL_CATEGORY_COLORS = {
+        documents: 'var(--info-blue)',
+        policies: 'var(--pending-text)',
+        meetings: 'var(--success-text)',
+        employees: '#8b5cf6',
+        customers: '#dc2626',
+        search: 'var(--accent)',
+        health: 'var(--text-secondary)',
+      };
+      const ALL_TOOL_GROUPS = [
+        {
+          category: 'documents',
+          label: 'Documents',
+          tools: [
+            ['search_documents', 'Search documents, policies, meeting notes, and project docs.'],
+            ['list_documents', 'List documents, optionally filtered by type or department.'],
+            ['get_document', "Retrieve a document's full content and metadata by ID."],
+            ['get_document_metadata', "Retrieve a document's metadata without its full content."],
+            ['find_related_documents', 'Find documents related to a given document ID.'],
+            ['summarize_document', "Retrieve a document's content for summarization."],
+          ],
+        },
+        {
+          category: 'policies',
+          label: 'Policies',
+          tools: [
+            ['search_policies', 'Search company policies by title or department.'],
+            ['list_policies', 'List company policies, optionally filtered by department.'],
+            ['get_policy', "Retrieve a company policy's full content and metadata."],
+          ],
+        },
+        {
+          category: 'meetings',
+          label: 'Meetings',
+          tools: [
+            ['search_meetings', 'Search meeting notes by title or department.'],
+            ['list_meetings', 'List meeting notes, optionally filtered by department.'],
+            ['summarize_meeting', "Retrieve a meeting note's content for summarization."],
+          ],
+        },
+        {
+          category: 'employees',
+          label: 'Employees',
+          tools: [
+            ['find_employee', 'Find employees by name, email, department, or title.'],
+            ['list_departments', 'List all departments and their employee counts.'],
+            ['get_department_contacts', 'List all employees in a given department.'],
+          ],
+        },
+        {
+          category: 'customers',
+          label: 'Customers',
+          tools: [
+            ['search_customers', 'Search customers by name, industry, or region.'],
+            ['get_customer', "Retrieve a customer's details by ID."],
+            ['list_customers', 'List customers, optionally filtered by status.'],
+          ],
+        },
+        {
+          category: 'search',
+          label: 'Search',
+          tools: [
+            ['keyword_search', 'Full-text BM25 keyword search across all indexed content.'],
+            ['semantic_search', 'Vector-only similarity search for conceptual or natural-language queries.'],
+            ['global_search', 'Hybrid BM25 + vector search across all indexed content.'],
+          ],
+        },
+        {
+          category: 'health',
+          label: 'Health',
+          tools: [
+            ['server_health', 'Report server health and Azure dependency connectivity.'],
+            ['list_capabilities', 'List all MCP tool categories and their tools.'],
+          ],
+        },
+      ];
+
+      function renderAllTools() {
+        const grid = document.getElementById('allToolsGrid');
+        if (!grid) return;
+        grid.innerHTML = ALL_TOOL_GROUPS.map((group) => {
+          const color = TOOL_CATEGORY_COLORS[group.category];
+          const items = group.tools
+            .map(
+              ([name, desc]) => `
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-primary);">${name}</div>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px; line-height: 1.5;">${desc}</div>
+                </div>`
+            )
+            .join('');
+          return `
+            <div style="border-left: 3px solid ${color}; padding-left: 12px;">
+              <div style="font-size: 12.5px; font-weight: 600; color: ${color};">${group.label} (${group.tools.length})</div>
+              <div class="tool-items-grid">
+                ${items}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      // Sidebar tab switching
+      const navButtons = document.querySelectorAll('.howitworks-nav-btn');
+      const panels = document.querySelectorAll('.panel');
+      navButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-panel');
+          navButtons.forEach((b) => b.classList.toggle('active', b === btn));
+          panels.forEach((p) =>
+            p.classList.toggle('active', p.id === `panel-${target}`)
+          );
+        });
+      });
+
+      renderAllTools();
       renderSteps();
     </script>
   </body>

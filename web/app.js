@@ -339,7 +339,69 @@ const TOOL_CATEGORY_LABELS = {
   health: "Health",
 };
 
-let toolsLoaded = false;
+// Mirrors src/tools/health.py's _CAPABILITIES / _TOOL_DESCRIPTIONS. Hardcoded
+// here instead of fetched from /api/tools: this list is static, so there's
+// no need to round-trip the backend just to render a popup.
+const TOOL_GROUPS = [
+  {
+    category: "documents",
+    tools: [
+      { name: "search_documents", description: "Search documents, policies, meeting notes, and project docs." },
+      { name: "list_documents", description: "List documents, optionally filtered by type or department." },
+      { name: "get_document", description: "Retrieve a document's full content and metadata by ID." },
+      { name: "get_document_metadata", description: "Retrieve a document's metadata without its full content." },
+      { name: "find_related_documents", description: "Find documents related to a given document ID." },
+      { name: "summarize_document", description: "Retrieve a document's content for summarization." },
+    ],
+  },
+  {
+    category: "policies",
+    tools: [
+      { name: "search_policies", description: "Search company policies by title or department." },
+      { name: "list_policies", description: "List company policies, optionally filtered by department." },
+      { name: "get_policy", description: "Retrieve a company policy's full content and metadata." },
+    ],
+  },
+  {
+    category: "meetings",
+    tools: [
+      { name: "search_meetings", description: "Search meeting notes by title or department." },
+      { name: "list_meetings", description: "List meeting notes, optionally filtered by department." },
+      { name: "summarize_meeting", description: "Retrieve a meeting note's content for summarization." },
+    ],
+  },
+  {
+    category: "employees",
+    tools: [
+      { name: "find_employee", description: "Find employees by name, email, department, or title." },
+      { name: "list_departments", description: "List all departments and their employee counts." },
+      { name: "get_department_contacts", description: "List all employees in a given department." },
+    ],
+  },
+  {
+    category: "customers",
+    tools: [
+      { name: "search_customers", description: "Search customers by name, industry, or region." },
+      { name: "get_customer", description: "Retrieve a customer's details by ID." },
+      { name: "list_customers", description: "List customers, optionally filtered by status." },
+    ],
+  },
+  {
+    category: "search",
+    tools: [
+      { name: "keyword_search", description: "Full-text keyword search across all indexed content." },
+      { name: "semantic_search", description: "Vector similarity search for conceptual or natural-language queries." },
+      { name: "global_search", description: "Hybrid keyword + vector search across all indexed content." },
+    ],
+  },
+  {
+    category: "health",
+    tools: [
+      { name: "server_health", description: "Report server health and Azure dependency connectivity." },
+      { name: "list_capabilities", description: "List all MCP tool categories and their tools." },
+    ],
+  },
+];
 
 function renderToolGroups(groups) {
   els.toolsModalBody.innerHTML = groups
@@ -359,20 +421,9 @@ function renderToolGroups(groups) {
     .join("");
 }
 
-async function openToolsModal() {
+function openToolsModal() {
   els.toolsModalBackdrop.hidden = false;
-  if (toolsLoaded) return;
-
-  els.toolsModalBody.textContent = "Loading…";
-  try {
-    const response = await fetch("/api/tools");
-    if (!response.ok) throw new Error("request failed");
-    const data = await response.json();
-    renderToolGroups(data.groups);
-    toolsLoaded = true;
-  } catch (error) {
-    els.toolsModalBody.textContent = "Couldn't load tools. Please try again.";
-  }
+  renderToolGroups(TOOL_GROUPS);
 }
 
 function closeToolsModal() {
