@@ -152,33 +152,36 @@
           <ul class="sources-list" id="sources-list">
             <li>
               <span class="source-left"
-                ><span class="source-dot pending"></span>Employee &amp; Dept
-                Directory</span
+                ><span class="source-dot pending cat-employees"></span>Employee
+                &amp; Dept Directory</span
               >
               <span class="source-live pending">starting</span>
             </li>
             <li>
               <span class="source-left"
-                ><span class="source-dot pending"></span>Customer Records</span
+                ><span class="source-dot pending cat-customers"></span>Customer
+                Records</span
               >
               <span class="source-live pending">starting</span>
             </li>
             <li>
               <span class="source-left"
-                ><span class="source-dot pending"></span>Internal
+                ><span class="source-dot pending cat-documents"></span>Internal
                 Documents</span
               >
               <span class="source-live pending">starting</span>
             </li>
             <li>
               <span class="source-left"
-                ><span class="source-dot pending"></span>Company Policies</span
+                ><span class="source-dot pending cat-policies"></span>Company
+                Policies</span
               >
               <span class="source-live pending">starting</span>
             </li>
             <li>
               <span class="source-left"
-                ><span class="source-dot pending"></span>Meeting Notes</span
+                ><span class="source-dot pending cat-meetings"></span>Meeting
+                Notes</span
               >
               <span class="source-live pending">starting</span>
             </li>
@@ -206,7 +209,10 @@
             <div class="sidebar-chip-list" id="sidebar-chip-list"></div>
           </div>
           <div class="sidebar-spacer"></div>
-          <div class="model-label">model · vortex-mcp-1</div>
+          <div class="model-label">
+            model · vortex-mcp-1
+            <span class="model-version">gpt-5.4-nano</span>
+          </div>
         </aside>
 
         <main class="main">
@@ -323,44 +329,79 @@
                   <button
                     class="chip"
                     data-q="Who are you and what can you help with?"
+                    data-icon="vera"
                   >
+                    <svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hidden="true">
+                      <rect x="8" y="8" width="32" height="33" rx="12" fill="var(--accent)"></rect>
+                      <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
+                      <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+                      <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+                    </svg>
                     Who are you and what can you help with?
                   </button>
-                  <button class="chip" data-q="Who manages the Design team?">
-                    Who manages the Design team?
+                  <button
+                    class="chip"
+                    data-q="Who manages the Design team?"
+                    data-cat="employees"
+                  >
+                    <span class="chip-dot cat-employees"></span>Who manages the
+                    Design team?
+                  </button>
+                  <button
+                    class="chip"
+                    data-q="What departments does Vortex Digital have?"
+                    data-cat="employees"
+                  >
+                    <span class="chip-dot cat-employees"></span>What
+                    departments does Vortex Digital have?
                   </button>
                   <button
                     class="chip"
                     data-q="Show churned customers in fintech"
+                    data-cat="customers"
                   >
-                    Show churned customers in fintech
-                  </button>
-                  <button class="chip" data-q="Find the latest all-hands notes">
-                    Find the latest all-hands notes
-                  </button>
-                  <button class="chip" data-q="Show the remote-work policy">
-                    Show the remote-work policy
+                    <span class="chip-dot cat-customers"></span>Show churned
+                    customers in fintech
                   </button>
                   <button
                     class="chip"
-                    data-q="Which customers are up for renewal this quarter?"
+                    data-q="Tell me about Cedar Holdings"
+                    data-cat="customers"
                   >
-                    Which customers are up for renewal this quarter?
+                    <span class="chip-dot cat-customers"></span>Tell me about
+                    Cedar Holdings
                   </button>
                   <button
                     class="chip"
-                    data-q="Summarize the latest project brief"
+                    data-q="What's in the IT Team Charter, and what other documents relate to it?"
+                    data-cat="documents"
                   >
-                    Summarize the latest project brief
+                    <span class="chip-dot cat-documents"></span>What's in the
+                    IT Team Charter, and what other documents relate to it?
                   </button>
                   <button
                     class="chip"
-                    data-q="Tell me about Vortex Digital's mission and values"
+                    data-q="Show the remote-work policy"
+                    data-cat="policies"
                   >
-                    Tell me about Vortex Digital's mission and values
+                    <span class="chip-dot cat-policies"></span>Show the
+                    remote-work policy
                   </button>
-                  <button class="chip" data-q="Who's on the Engineering team?">
-                    Who's on the Engineering team?
+                  <button
+                    class="chip"
+                    data-q="Can I work from home a few days a week?"
+                    data-cat="policies"
+                  >
+                    <span class="chip-dot cat-policies"></span>Can I work from
+                    home a few days a week?
+                  </button>
+                  <button
+                    class="chip"
+                    data-q="Summarize the latest incident postmortem"
+                    data-cat="meetings"
+                  >
+                    <span class="chip-dot cat-meetings"></span>Summarize the
+                    latest incident postmortem
                   </button>
                 </div>
               </div>

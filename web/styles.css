@@ -28,6 +28,14 @@
   --robot-glow: #5eead4;
   /* Brand accent - single theme token, swap this to re-theme the console. */
   --accent: #14b8a6;
+  /* MCP tool-category colors - shared by the CONNECTED SOURCES legend dots
+     and the matching dot on each "try asking" chip, so a visitor can tell
+     which category a question will hit before clicking it. Employees
+     reuses --info-blue rather than a fifth new token. */
+  --cat-customers: #8b5cf6;
+  --cat-documents: #f97316;
+  --cat-policies: #ec4899;
+  --cat-meetings: #ca8a04;
 }
 
 * {
@@ -301,6 +309,26 @@ body {
   flex: none;
 }
 
+/* Tool-category colors, shared between the sidebar's CONNECTED SOURCES
+   dots (acting as the legend) and each chip's leading dot. Declared after
+   .source-dot/.chip-dot's default color so they win the cascade once
+   .pending is removed - see markReady() in app.js. */
+.cat-employees {
+  background: var(--info-blue);
+}
+.cat-customers {
+  background: var(--cat-customers);
+}
+.cat-documents {
+  background: var(--cat-documents);
+}
+.cat-policies {
+  background: var(--cat-policies);
+}
+.cat-meetings {
+  background: var(--cat-meetings);
+}
+
 .source-live {
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 11px;
@@ -323,7 +351,9 @@ body {
 }
 
 .sidebar-chip {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
   width: 100%;
   text-align: left;
   background: none;
@@ -335,6 +365,28 @@ body {
   color: var(--text-body);
   cursor: pointer;
   white-space: normal;
+}
+
+.chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex: none;
+  margin-top: 6px;
+}
+.chip .chip-dot {
+  margin-top: 0;
+}
+
+/* Static mini Vera avatar - used only on the "who are you" chip, in place
+   of a category dot, since that question calls no tool at all. */
+.chip-vera-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.sidebar-chip .chip-vera-icon {
+  margin-top: 1px;
 }
 
 .sidebar-chip:hover {
@@ -501,6 +553,14 @@ body {
   color: var(--text-faint-alt);
 }
 
+.model-version {
+  display: block;
+  margin-top: 2px;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
 /* Main column */
 .main {
   flex: 1;
@@ -601,6 +661,9 @@ body {
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 9px 14px;
   border-radius: 999px;
   border: 1px solid var(--border-chip);

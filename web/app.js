@@ -35,9 +35,13 @@ function formatHeaderDate() {
 }
 els.headerDate.textContent = formatHeaderDate();
 
+// Clicking a "try asking" chip both fills the composer and sends it
+// immediately - matching what a visitor would get by typing the same text
+// and hitting enter, just faster.
 function applyChipQuestion(text) {
   els.composerInput.value = text;
   els.composerInput.focus();
+  sendMessage();
 }
 
 els.chipRow.addEventListener("click", (event) => {
@@ -48,28 +52,65 @@ els.chipRow.addEventListener("click", (event) => {
 
 // Extra suggestions shown only in the sidebar - there's more room there than
 // in the empty-state chip row, so this is where the longer tail of "good
-// questions to try" lives once a conversation is already underway.
+// questions to try" lives once a conversation is already underway. `cat`
+// matches one of the CONNECTED SOURCES categories (see the cat-* classes in
+// styles.css) so each chip's leading dot tells you which tool it'll likely
+// use before you click it; omit `cat` for questions that call no tool.
 const SIDEBAR_ONLY_QUESTIONS = [
-  "List our clients and their industries",
-  "Tell me about Cedar Holdings",
-  "List our prospect customers",
-  "Summarize the latest incident postmortem",
-  "Who's on the IT team?",
+  { text: "Who's on the IT team?", cat: "employees" },
+  { text: "Which customers are up for renewal this quarter?", cat: "customers" },
+  { text: "List our clients and their industries", cat: "customers" },
+  { text: "Tell me about Vortex Digital's mission and values", cat: "documents" },
+  { text: "Summarize the latest project brief", cat: "documents" },
+  { text: "What documents do we have on file for the Engineering team?", cat: "documents" },
+  { text: "What policies does Vortex Digital have on file?", cat: "policies" },
+  { text: "What should I do if I lose my work laptop or badge?", cat: "policies" },
+  { text: "Find the latest all-hands notes", cat: "meetings" },
+  { text: "What meeting notes have been logged for the Product team?", cat: "meetings" },
 ];
 
-function addSidebarChip(text) {
+// Static mini Vera avatar markup, matching the one on the "who are you" chip
+// in index.html - shown in place of a category dot for questions that call
+// no tool at all.
+const VERA_CHIP_ICON = `<svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hidden="true">
+  <rect x="8" y="8" width="32" height="33" rx="12" fill="var(--accent)"></rect>
+  <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
+  <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+  <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
+</svg>`;
+
+function addSidebarChip(text, cat, icon) {
   const sidebarChip = document.createElement("button");
   sidebarChip.className = "sidebar-chip";
   sidebarChip.dataset.q = text;
-  sidebarChip.textContent = text;
+  if (icon === "vera") {
+    sidebarChip.insertAdjacentHTML("beforeend", VERA_CHIP_ICON);
+  } else if (cat) {
+    const dot = document.createElement("span");
+    dot.className = `chip-dot cat-${cat}`;
+    sidebarChip.appendChild(dot);
+  }
+  sidebarChip.appendChild(document.createTextNode(text));
   els.sidebarChipList.appendChild(sidebarChip);
 }
 
 // The sidebar's "try asking" list mirrors the empty-state chips exactly -
 // clone from the chip row (single source of truth) instead of duplicating
-// the question text in the HTML, so the two stay in sync automatically.
-els.chipRow.querySelectorAll(".chip").forEach((chip) => addSidebarChip(chip.dataset.q));
-SIDEBAR_ONLY_QUESTIONS.forEach(addSidebarChip);
+// the question text in the HTML - then merge with the sidebar-only
+// questions and sort the combined list by category (matching the
+// CONNECTED SOURCES order above), so the whole list reads as one
+// continuous color-grouped sequence instead of two separately-grouped
+// blocks. Array.prototype.sort is stable, so relative order within each
+// category (chip-row items before sidebar-only ones) is preserved.
+const CATEGORY_ORDER = ["employees", "customers", "documents", "policies", "meetings"];
+const chipRowQuestions = [...els.chipRow.querySelectorAll(".chip")].map((chip) => ({
+  text: chip.dataset.q,
+  cat: chip.dataset.cat,
+  icon: chip.dataset.icon,
+}));
+[...chipRowQuestions, ...SIDEBAR_ONLY_QUESTIONS]
+  .sort((a, b) => (a.cat ? CATEGORY_ORDER.indexOf(a.cat) : -1) - (b.cat ? CATEGORY_ORDER.indexOf(b.cat) : -1))
+  .forEach(({ text, cat, icon }) => addSidebarChip(text, cat, icon));
 
 els.sidebarChipList.addEventListener("click", (event) => {
   const chip = event.target.closest(".sidebar-chip");
