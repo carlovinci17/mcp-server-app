@@ -1,5 +1,8 @@
+from datetime import UTC, datetime
+
 import pytest
 
+from src.database.models import DocumentMetadataRecord
 from src.models.document import DocumentType
 from src.services.document_service import DocumentNotFoundError, DocumentService
 
@@ -81,3 +84,37 @@ def test_find_related_documents_resolves_ids(seeded_session_factory):
     related = service.find_related_documents("document-001")
 
     assert [r.id for r in related] == ["document-002"]
+
+
+def test_find_related_documents_skips_dangling_ids_instead_of_raising(seeded_session_factory):
+    now = datetime.now(UTC)
+    with seeded_session_factory() as session:
+        session.add(
+            DocumentMetadataRecord(
+                id="document-003",
+                title="Doc With A Stale Reference",
+                doc_type="document",
+                blob_container="documents",
+                blob_path="document-003.md",
+                content_type="text/markdown",
+                department="Engineering",
+                owner_id="emp-001",
+                tags=[],
+                related_document_ids=["document-002", "does-not-exist"],
+                created_at=now,
+                updated_at=now,
+            )
+        )
+    service = DocumentService(blob_client=FakeBlobClient(), session_factory=seeded_session_factory)
+
+    related = service.find_related_documents("document-003")
+
+    assert [r.id for r in related] == ["document-002"]
+
+
+def test_list_documents_caps_limit_at_max(seeded_session_factory):
+    service = DocumentService(blob_client=FakeBlobClient(), session_factory=seeded_session_factory)
+
+    docs = service.list_documents(limit=10_000)
+
+    assert len(docs) == 3  # every seeded document, not an error - the cap just bounds the query

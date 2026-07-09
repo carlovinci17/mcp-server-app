@@ -46,3 +46,25 @@ def test_get_document_reports_not_found_as_json_error(monkeypatch):
 
     payload = json.loads(result)
     assert "error" in payload
+
+
+def _unreachable_document_service():
+    raise AssertionError("get_document_service() should not be called for an invalid doc_type")
+
+
+def test_search_documents_reports_invalid_doc_type_as_json_error(monkeypatch):
+    monkeypatch.setattr(documents, "get_document_service", _unreachable_document_service)
+
+    result = documents._search_documents("onboarding", doc_type="not-a-real-type")
+
+    payload = json.loads(result)
+    assert "not-a-real-type" in payload["error"]
+
+
+def test_list_documents_reports_invalid_doc_type_as_json_error(monkeypatch):
+    monkeypatch.setattr(documents, "get_document_service", _unreachable_document_service)
+
+    result = documents._list_documents(doc_type="not-a-real-type")
+
+    payload = json.loads(result)
+    assert "not-a-real-type" in payload["error"]

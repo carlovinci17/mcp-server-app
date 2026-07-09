@@ -34,7 +34,13 @@ line-length = 100
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F", "I", "UP", "B", "S", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# `assert` is the standard pytest idiom, not a security concern in test code.
+"tests/**" = ["S101"]
+# `random` here generates fictional seed data, not used in any security context.
+"scripts/create_sample_data.py" = ["S311"]
 
 [tool.black]
 line-length = 100

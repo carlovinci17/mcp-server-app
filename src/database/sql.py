@@ -14,7 +14,7 @@ from src.core.settings import get_settings
 
 _SQL_COPT_SS_ACCESS_TOKEN = 1256
 _SQL_SCOPE = "https://database.windows.net/.default"
-_TOKEN_STRUCT_PREFIX_FMT = "<I"
+_TOKEN_STRUCT_PREFIX_FMT = "<I"  # noqa: S105 -- struct.pack format code, not a credential
 
 # Azure SQL Serverless rejects the first connection attempt fast while
 # resuming from auto-pause, rather than blocking a single attempt until the

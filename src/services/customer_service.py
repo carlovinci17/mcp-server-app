@@ -13,6 +13,9 @@ class CustomerNotFoundError(Exception):
     pass
 
 
+_MAX_LIST_LIMIT = 100
+
+
 def _to_customer(record: CustomerRecord) -> Customer:
     return Customer(
         id=record.id,
@@ -58,6 +61,7 @@ class CustomerService:
     def list_customers(
         self, status: CustomerStatus | None = None, limit: int = 20
     ) -> list[Customer]:
+        limit = max(1, min(limit, _MAX_LIST_LIMIT))
         with self._session_factory() as session:
             stmt = select(CustomerRecord)
             if status is not None:

@@ -52,3 +52,35 @@ def test_tools_http_covers_every_tool_in_capabilities():
     for group in payload["groups"]:
         for tool in group["tools"]:
             assert tool["description"], f"{tool['name']} has no description"
+
+
+class _EnabledSettings:
+    sql_enabled = True
+    blob_enabled = True
+
+
+def test_check_sql_reports_generic_message_without_leaking_exception_detail(monkeypatch):
+    monkeypatch.setattr(health, "get_settings", lambda: _EnabledSettings())
+
+    def _raise(*args, **kwargs):
+        raise RuntimeError("Login timeout expired for host sql-internal.example (10.0.4.12)")
+
+    monkeypatch.setattr(health, "get_session", _raise)
+
+    result = health._check_sql()
+
+    assert result == "error: unable to connect"
+
+
+def test_check_blob_reports_generic_message_without_leaking_exception_detail(monkeypatch):
+    monkeypatch.setattr(health, "get_settings", lambda: _EnabledSettings())
+
+    class _RaisingBlobClient:
+        def list_blobs(self, container):
+            raise RuntimeError("account key rejected for storage-internal.example")
+
+    monkeypatch.setattr(health, "BlobClient", _RaisingBlobClient)
+
+    result = health._check_blob()
+
+    assert result == "error: unable to connect"

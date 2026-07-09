@@ -2,18 +2,23 @@ import azure.functions as func
 
 from src.core.dependencies import get_search_service
 from src.models.document import DocumentType
+from src.tools._common import parse_enum_or_error
 
 bp = func.Blueprint()
 
 
 def _keyword_search(query: str, doc_type: str | None = None) -> str:
-    parsed_type = DocumentType(doc_type) if doc_type else None
+    parsed_type, error = parse_enum_or_error(DocumentType, doc_type)
+    if error:
+        return error
     results = get_search_service().keyword_search(query, doc_type=parsed_type)
     return results.model_dump_json()
 
 
 def _semantic_search(query: str, doc_type: str | None = None) -> str:
-    parsed_type = DocumentType(doc_type) if doc_type else None
+    parsed_type, error = parse_enum_or_error(DocumentType, doc_type)
+    if error:
+        return error
     results = get_search_service().semantic_search(query, doc_type=parsed_type)
     return results.model_dump_json()
 

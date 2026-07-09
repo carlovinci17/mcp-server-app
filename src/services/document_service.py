@@ -15,6 +15,9 @@ class DocumentNotFoundError(Exception):
     pass
 
 
+_MAX_LIST_LIMIT = 100
+
+
 def _to_metadata(record: DocumentMetadataRecord) -> DocumentMetadata:
     return DocumentMetadata(
         id=record.id,
@@ -47,6 +50,7 @@ class DocumentService:
         department: str | None = None,
         limit: int = 20,
     ) -> list[DocumentMetadata]:
+        limit = max(1, min(limit, _MAX_LIST_LIMIT))
         with self._session_factory() as session:
             stmt = select(DocumentMetadataRecord)
             if doc_type is not None:
@@ -97,4 +101,16 @@ class DocumentService:
 
     def find_related_documents(self, document_id: str) -> list[DocumentMetadata]:
         metadata = self.get_document_metadata(document_id)
-        return [self.get_document_metadata(rid) for rid in metadata.related_document_ids]
+        if not metadata.related_document_ids:
+            return []
+        # A single batched lookup instead of one query per related ID - and,
+        # unlike per-ID lookups, a related ID that no longer resolves (e.g.
+        # the target document was deleted) is silently omitted here rather
+        # than raising DocumentNotFoundError for the *original* document.
+        with self._session_factory() as session:
+            stmt = select(DocumentMetadataRecord).where(
+                DocumentMetadataRecord.id.in_(metadata.related_document_ids)
+            )
+            records = session.execute(stmt).scalars().all()
+        by_id = {r.id: _to_metadata(r) for r in records}
+        return [by_id[rid] for rid in metadata.related_document_ids if rid in by_id]

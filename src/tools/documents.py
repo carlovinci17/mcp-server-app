@@ -5,6 +5,7 @@ import azure.functions as func
 from src.core.dependencies import get_document_service
 from src.models.document import DocumentType
 from src.services.document_service import DocumentNotFoundError
+from src.tools._common import parse_enum_or_error
 
 bp = func.Blueprint()
 
@@ -14,7 +15,9 @@ def _not_found(document_id: str) -> str:
 
 
 def _search_documents(query: str, doc_type: str | None = None) -> str:
-    parsed_type = DocumentType(doc_type) if doc_type else None
+    parsed_type, error = parse_enum_or_error(DocumentType, doc_type)
+    if error:
+        return error
     results = get_document_service().search_documents(query, doc_type=parsed_type)
     return results.model_dump_json()
 
@@ -22,7 +25,9 @@ def _search_documents(query: str, doc_type: str | None = None) -> str:
 def _list_documents(
     doc_type: str | None = None, department: str | None = None, limit: int = 20
 ) -> str:
-    parsed_type = DocumentType(doc_type) if doc_type else None
+    parsed_type, error = parse_enum_or_error(DocumentType, doc_type)
+    if error:
+        return error
     docs = get_document_service().list_documents(
         doc_type=parsed_type, department=department, limit=limit
     )
@@ -66,9 +71,9 @@ def list_documents(
     doc_type: str | None = None, department: str | None = None, limit: int = 20
 ) -> str:
     """List documents, optionally filtered by document type or department.
-    Returns at most `limit` results (default 20); increase it if you need
-    more, but prefer search_documents for targeted lookups instead of
-    listing everything."""
+    Returns at most `limit` results (default 20, capped at 100); increase it
+    if you need more, but prefer search_documents for targeted lookups
+    instead of listing everything."""
     return _list_documents(doc_type, department, limit)
 
 

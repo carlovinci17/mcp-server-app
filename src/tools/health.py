@@ -5,10 +5,12 @@ import azure.functions as func
 from sqlalchemy import text
 
 from src.azure.blob_client import BlobClient
+from src.core.logging import get_logger
 from src.core.settings import get_settings
 from src.database.sql import get_session
 
 bp = func.Blueprint()
+_logger = get_logger(__name__)
 
 _CAPABILITIES = {
     "documents": [
@@ -64,8 +66,11 @@ def _check_sql() -> str:
         with get_session() as session:
             session.execute(text("SELECT 1"))
         return "ok"
-    except Exception as exc:  # noqa: BLE001
-        return f"error: {exc}"
+    except Exception:
+        # Full detail (hostnames, driver diagnostics) goes to the logs only -
+        # server_health is an MCP tool response, not a trusted-operator surface.
+        _logger.exception("SQL health check failed")
+        return "error: unable to connect"
 
 
 def _check_blob() -> str:
@@ -75,8 +80,9 @@ def _check_blob() -> str:
     try:
         BlobClient().list_blobs(container="documents")
         return "ok"
-    except Exception as exc:  # noqa: BLE001
-        return f"error: {exc}"
+    except Exception:
+        _logger.exception("Blob health check failed")
+        return "error: unable to connect"
 
 
 def _server_health() -> str:

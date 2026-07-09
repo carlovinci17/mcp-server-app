@@ -27,3 +27,11 @@ def test_list_customers_filters_by_status(seeded_session_factory):
 
     assert [c.id for c in active] == ["cust-001"]
     assert churned == []
+
+
+def test_list_customers_caps_limit_at_max(seeded_session_factory):
+    service = CustomerService(session_factory=seeded_session_factory)
+
+    customers = service.list_customers(limit=10_000)
+
+    assert [c.id for c in customers] == ["cust-001"]  # no error - the cap just bounds the query
