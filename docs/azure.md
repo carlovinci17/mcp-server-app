@@ -64,7 +64,8 @@ for the account that created the resource:
 |---|---|
 | Blob Storage | `Storage Blob Data Contributor` |
 | Azure AI Search | `Search Index Data Contributor` (read/write documents) + `Search Service Contributor` (create/manage indexes) |
-| Azure OpenAI / Foundry | `Cognitive Services OpenAI User` |
+| Azure OpenAI (embeddings, `mcp-app-demo-openai`) | `Cognitive Services OpenAI User` |
+| Azure AI Foundry project (chat agent, `mcp-app-demo-foundry` / `mcp-server-agent`) | `Foundry User`, scoped to the project |
 | Azure SQL Database | Not an RBAC role — the Microsoft Entra admin set on the logical server (or a contained database user granted via T-SQL) |
 
 This was discovered empirically while building this project: `az storage
