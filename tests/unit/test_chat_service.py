@@ -15,12 +15,14 @@ class FakeResponse:
         output_text: str | None = None,
         error=None,
         output: list | None = None,
+        model: str | None = None,
     ):
         self.id = response_id
         self.status = status
         self.output_text = output_text
         self.error = error
         self.output = output or []
+        self.model = model
 
 
 class FakeResponses:
@@ -98,6 +100,20 @@ def test_get_message_status_returns_reply_when_completed():
     assert job.error is None
     assert job.tool_calls == []
     assert fake_client.responses.retrieve_calls == ["resp-005"]
+
+
+def test_get_message_status_surfaces_the_actual_model_used():
+    fake_client = FakeAgentClient(
+        create_response=FakeResponse("resp-009", "queued"),
+        retrieve_response=FakeResponse(
+            "resp-009", "completed", output_text="Reply.", model="gpt-5.4-nano"
+        ),
+    )
+    service = ChatService(agent_client=fake_client)
+
+    job = service.get_message_status("resp-009")
+
+    assert job.model == "gpt-5.4-nano"
 
 
 def test_get_message_status_extracts_and_dedupes_tool_calls():

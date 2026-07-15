@@ -41,6 +41,9 @@ class ChatService:
                 status=status,
                 reply=response.output_text,
                 tool_calls=self._extract_tool_calls(response),
+                # response.model is whatever model the Foundry agent actually used for
+                # this run - surfaced as-is so the frontend never has to hardcode it.
+                model=response.model,
             )
         if status in _TERMINAL_ERROR_STATUSES:
             error = getattr(response, "error", None)

@@ -7,3 +7,4 @@ class ChatJobStatus(BaseModel):
     reply: str | None = None
     error: str | None = None
     tool_calls: list[str] = []
+    model: str | None = None

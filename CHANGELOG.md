@@ -4,6 +4,26 @@ All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/); this project doesn't
 use version tags, so entries are grouped by date instead.
 
+## 2026-07-15 (app copy accuracy pass)
+
+- The sidebar model label (`web/index.html`) no longer hardcodes a model
+  name; `ChatJobStatus` now carries the real `model` field from the
+  completed Foundry response (`response.model` in
+  `src/services/chat_service.py`), and the frontend renders whatever comes
+  back instead of a static guess.
+- Fixed `vera-how-it-works.html`'s Infrastructure panel: Blob Storage uses
+  4 containers (`documents`, `policies`, `meeting-notes`, `project-docs`),
+  not one `documents` container as previously stated.
+- Fixed the "Reply" step's polling interval claim (`vera-how-it-works.js`):
+  the browser polls `/api/chat/status` every ~2s, not ~1.5s.
+- Reworded the "8 blueprints ... exposing 23 MCP tools" claim to make clear
+  only 7 of the 8 registered blueprints contribute MCP tools; `chat`
+  registers two plain HTTP routes and no tools of its own.
+- Softened "the one and only LLM call for the whole turn" to "one API
+  call" in both the Infrastructure panel and the "Async kickoff" step -
+  this repo's code can see one API call per turn, not how many model
+  invocations the agent runs internally to get there.
+
 ## 2026-07-09 (code audit)
 
 - Tool inputs that fail to parse into a known enum (invalid `doc_type` on

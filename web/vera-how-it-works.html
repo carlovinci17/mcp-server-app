@@ -448,7 +448,10 @@
                           line-height: 1.5;
                         "
                       >
-                        Container <code>documents</code>. SQL only stores
+                        4 containers, one per document type —
+                        <code>documents</code>, <code>policies</code>,
+                        <code>meeting-notes</code>,
+                        <code>project-docs</code>. SQL only stores
                         <code>blob_container</code> /
                         <code>blob_path</code> pointers;
                         <code>get_document</code>, <code>get_policy</code> and
@@ -530,10 +533,16 @@
                           >client.responses.create(background=True,
                           store=True)</code
                         >, then polled with
-                        <code>client.responses.retrieve(id)</code>. One LLM call
-                        per turn covers both tool selection and answer synthesis
-                        — the agent's model, instructions and MCP connection are
-                        configured in Azure, not in this repo's code.
+                        <code>client.responses.retrieve(id)</code>. One API call
+                        per turn covers both tool selection and answer
+                        synthesis from this app's side — however many actual
+                        model invocations the agent runs internally to get
+                        there happens inside Azure and isn't visible here. The
+                        agent's model, instructions and MCP connection are
+                        configured in Azure, not in this repo's code; the
+                        model name shown in the console sidebar comes from
+                        <code>response.model</code> on the finished run, not a
+                        hardcoded value.
                         <span style="color: var(--text-faint)"
                           >src/services/chat_service.py,
                           src/azure/foundry_agent.py</span
@@ -567,8 +576,11 @@
                         <code>@bp.mcp_tool()</code>. 8 blueprints (documents,
                         policies, meetings, employees, customers, search,
                         health, chat) are registered in one
-                        <code>func.FunctionApp()</code>, exposing 23 MCP tools
-                        total.
+                        <code>func.FunctionApp()</code>. 7 of them expose 23
+                        MCP tools total; <code>chat</code> registers two plain
+                        HTTP routes instead (<code>/api/chat</code>,
+                        <code>/api/chat/status</code>) and contributes no MCP
+                        tools of its own.
                         <span style="color: var(--text-faint)"
                           >function_app.py</span
                         >

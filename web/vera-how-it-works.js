@@ -43,7 +43,7 @@
           {
             title: 'Async kickoff',
             plainText:
-              "This is the one and only LLM call for the whole turn: the Azure AI Foundry agent run starts in the background and returns a job ID right away instead of blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
+              "This is the one and only API call this app makes for the whole turn (however many actual model invocations the agent runs internally to pick tools happen inside Azure, invisible from here): the Azure AI Foundry agent run starts in the background and returns a job ID right away instead of blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
             techText:
               'client.responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"\n(single API call for this whole turn)',
             showAgent: false,
@@ -74,7 +74,7 @@
             plainText:
               'The browser, which has been polling in the background, receives the finished reply and renders it - plus a pill showing which tool was actually used.',
             techText:
-              'GET /api/chat/status?id=...\n(polled ~every 1.5s by the browser)\nmcp_call items de-duped by name\nmarked.parse() -> DOMPurify.sanitize()',
+              'GET /api/chat/status?id=...\n(polled ~every 2s by the browser)\nmcp_call items de-duped by name\nmarked.parse() -> DOMPurify.sanitize()',
             showAgent: false,
           },
         ];
