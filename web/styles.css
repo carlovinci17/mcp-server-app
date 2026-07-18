@@ -1977,12 +1977,14 @@ body {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
+  overflow-wrap: break-word;
 }
 
 .tdesc {
   font-size: 11.5px;
   color: var(--text-muted);
   line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 /* ---------------------------------------------------------------------- */
