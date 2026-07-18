@@ -19,44 +19,79 @@ const VERA_MINI = (s) => `<svg width="${s}" height="${s}" viewBox="0 0 48 48" st
 // Verified against the real backend code (src/tools/chat.py,
 // src/services/chat_service.py, function_app.py) - see docs/azure.md and
 // this repo's own audit history for how each fact was confirmed.
-const STEPS = [
-  {
-    t: "Prompt sent",
-    llm: false,
-    plain: "Your message is posted to the backend, validated, and handed to the agent service — anonymous, no login required.",
-    tech: 'POST /api/chat  { message, previous_response_id }\n→ { response_id, status: "queued" }\nsrc/tools/chat.py',
+//
+// Steps 1, 2, 5 & 6 are identical no matter which tool gets called - only
+// step 3 (tool choice) and step 4 (retrieval) actually differ per path,
+// exactly mirroring the real code: chat.py/chat_service.py don't know or
+// care which tool the agent picked, only the tool/service layer differs.
+const RETRIEVAL_BY_KIND = {
+  exact: {
+    toolLine: "→ selects get_department_contacts",
+    title: "Retrieval — exact lookup",
+    plain: "A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.",
+    tech: 'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
   },
-  {
-    t: "Async kickoff",
-    llm: false,
-    plain: "The agent run starts in the background and returns instantly. This is the one API call for the whole turn — built to dodge Static Web Apps' hard 45s request timeout.",
-    tech: "client.responses.create(background=True, store=True)\nsrc/services/chat_service.py",
+  substring: {
+    toolLine: "→ selects search_documents",
+    title: "Retrieval — SQL substring search",
+    plain: "A fuzzy but literal text match against the title and department columns only. Finds partial matches, but has no concept of meaning or synonyms - and no embeddings are involved.",
+    tech: 'search_documents(query="onboarding")\nsrc/services/document_service.py\nAzure SQL via SQLAlchemy:\nWHERE title ILIKE \'%onboarding%\'\n  OR department ILIKE \'%onboarding%\'',
   },
-  {
-    t: "Tool choice",
-    llm: true,
-    plain: "The agent itself decides whether a tool is needed and which of the 23 to call — not fixed app logic. Same run, now polled mid-flight.",
-    tech: "responses.retrieve(id)  ·  23 MCP tools available\ndocuments 6 · policies 3 · meetings 3 · employees 3\ncustomers 3 · search 3 · health 2",
+  vector: {
+    toolLine: "→ selects global_search",
+    title: "Retrieval — vector / hybrid RAG",
+    plain: "The question is embedded into a vector, then Azure AI Search runs BM25 keyword search and HNSW vector search together in one query and fuses the two rankings automatically.",
+    tech: 'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() → Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search .search() called with\nboth search_text= (BM25) and\nvector_queries= (HNSW) → automatic\nhybrid fusion, single round trip',
   },
-  {
-    t: "Retrieval",
-    llm: false,
-    plain: "The chosen tool fetches data via one of three paths — exact SQL lookup, fuzzy SQL substring, or vector/hybrid search (see the strategies above).",
-    tech: "src/services/*_service.py\n→ Azure SQL / Blob Storage / AI Search",
-  },
-  {
-    t: "Synthesis",
-    llm: true,
-    plain: "The agent writes a plain-language answer from whatever the tool returned. Still the same single run, polled once it reaches its terminal status.",
-    tech: 'responses.retrieve(id) → status "completed"\nreply = response.output_text',
-  },
-  {
-    t: "Reply",
-    llm: false,
-    plain: "The browser — polling every ~2s — receives the finished reply, de-dupes the tool calls into pills, and renders the markdown safely.",
-    tech: "GET /api/chat/status\n→ marked.parse() → DOMPurify.sanitize()",
-  },
+};
+
+const PROMPT_BUTTONS = [
+  { kind: "exact", q: "Who's the contact for the Design team?", label: "Exact lookup", c: C.blue },
+  { kind: "substring", q: "Find documents about onboarding", label: "SQL substring search", c: C.amber },
+  { kind: "vector", q: "What's our remote work policy?", label: "Vector / hybrid RAG", c: C.green },
 ];
+
+function buildStepData(kind) {
+  const retrieval = RETRIEVAL_BY_KIND[kind];
+  return [
+    {
+      t: "Prompt sent",
+      llm: false,
+      plain: "Your message is posted to the backend, validated, and handed to the agent service — anonymous, no login required.",
+      tech: 'POST /api/chat  { message, previous_response_id }\n→ { response_id, status: "queued" }\nsrc/tools/chat.py',
+    },
+    {
+      t: "Async kickoff",
+      llm: false,
+      plain: "This is the one API call for the whole turn: the agent run starts in the background and returns instantly - built to dodge Static Web Apps' hard 45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
+      tech: "client.responses.create(background=True, store=True)\nsrc/services/chat_service.py\n(single API call for this whole turn)",
+    },
+    {
+      t: "Tool choice",
+      llm: true,
+      plain: "The agent itself decides whether a tool is needed and which of the 23 to call — not fixed app logic. Same run as step 2, now polled mid-flight; nothing new is sent to the model here.",
+      tech: `responses.retrieve(id)  ·  23 MCP tools available\ndocuments 6 · policies 3 · meetings 3 · employees 3\ncustomers 3 · search 3 · health 2\n${retrieval.toolLine}`,
+    },
+    {
+      t: retrieval.title,
+      llm: false,
+      plain: retrieval.plain,
+      tech: retrieval.tech,
+    },
+    {
+      t: "Synthesis",
+      llm: true,
+      plain: "The agent writes a plain-language answer from whatever the tool returned. Still the same single run, polled once it reaches its terminal status.",
+      tech: 'responses.retrieve(id) → status "completed"\nreply = response.output_text',
+    },
+    {
+      t: "Reply",
+      llm: false,
+      plain: "The browser — polling every ~2s — receives the finished reply, de-dupes the tool calls into pills, and renders the markdown safely.",
+      tech: "GET /api/chat/status\n→ marked.parse() → DOMPurify.sanitize()",
+    },
+  ];
+}
 
 const RETR = [
   { c: C.blue, h: "Exact lookup", p: "Direct query by id or a simple filter. Deterministic, no matching logic at all.", code: "SELECT … WHERE col = :val" },
@@ -87,34 +122,125 @@ document.getElementById("branches").innerHTML = RETR.map(
   (r) => `<div class="branch glass" style="border-left-color:${r.c}"><h4 style="color:${r.c}">${r.h}</h4><p>${r.p}</p><code>${r.code}</code></div>`
 ).join("");
 
-// Render pipeline nodes
-let selectedStep = 1;
-document.getElementById("pipe").innerHTML = STEPS.map(
-  (s, i) =>
-    `<button class="node" data-i="${i}" type="button">` +
-    `<div class="dot ${s.llm ? "llm" : ""}">${i + 1}</div>` +
-    `<div class="nl">${s.t}${s.llm ? '<span class="llm-tag">LLM</span>' : ""}</div>` +
+// Render the 3 "try a prompt" buttons
+document.getElementById("prompt-buttons").innerHTML = PROMPT_BUTTONS.map(
+  (p) =>
+    `<button class="prompt-btn kind-${p.kind}" data-kind="${p.kind}" type="button">` +
+    `<div class="prompt-btn-q">"${p.q}"</div>` +
+    `<div class="prompt-btn-kind" style="color:${p.c}">${p.label}</div>` +
     `</button>`
 ).join("");
 
-function renderStepDetail(i) {
-  const s = STEPS[i];
-  document.getElementById("pipe-detail").innerHTML =
-    `<div class="detail-top"><div class="detail-badge ${s.llm ? "llm" : ""}">${i + 1}</div>` +
-    `<span class="detail-title">${s.t}</span>` +
-    `${s.llm ? `<span class="llm-chip">${VERA_MINI(12)} LLM thinking</span>` : ""}</div>` +
-    `<div class="detail-plain">${s.plain}</div><div class="detail-tech">${s.tech}</div>`;
-  document.querySelectorAll(".node").forEach((n, ni) => n.classList.toggle("sel", ni === i));
+// --- Animated step-sequence state machine -------------------------------
+// selected: which path (exact/substring/vector) is playing, or null.
+// doneUpTo: highest step index (1-based) marked complete.
+// activeStep: the step currently mid-animation (0 = none).
+const state = {
+  selected: null,
+  doneUpTo: 0,
+  activeStep: 0,
+  timers: [],
+};
+
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function stageState(n) {
+  if (state.activeStep === n) return "active";
+  if (state.doneUpTo >= n) return "done";
+  return "pending";
 }
 
-document.getElementById("pipe").addEventListener("click", (event) => {
-  const node = event.target.closest(".node");
-  if (!node) return;
-  selectedStep = +node.dataset.i;
-  renderStepDetail(selectedStep);
+function renderSteps() {
+  const container = document.getElementById("step-cards");
+  if (!state.selected) {
+    container.innerHTML = "";
+    return;
+  }
+  const stepData = buildStepData(state.selected);
+  container.innerHTML = stepData
+    .map((s, idx) => {
+      const n = idx + 1;
+      const st = stageState(n);
+      return (
+        `<div class="step-card ${st}">` +
+        `<div class="step-card-grid">` +
+        `<div>` +
+        `<div class="step-top">` +
+        `<div class="step-badge">${st === "done" ? "✓" : n}</div>` +
+        `<span class="step-title">${s.t}</span>` +
+        `${s.llm ? `<span class="llm-chip">${VERA_MINI(12)} LLM thinking</span>` : ""}` +
+        `</div>` +
+        `<div class="step-plain">${s.plain}</div>` +
+        `</div>` +
+        `<div class="step-tech">${s.tech}</div>` +
+        `</div>` +
+        `</div>`
+      );
+    })
+    .join("");
+}
+
+// Steps 1,2,3 are quick; retrieval (4) and synthesis (5) take the longest -
+// matching roughly how long each phase actually takes in a real run.
+function durationFor(n) {
+  if (reducedMotion) return 450;
+  return [900, 1100, 1200, 2200, 1000, 1400][n - 1] || 900;
+}
+
+function advance(n) {
+  const stepData = buildStepData(state.selected);
+  if (n > stepData.length) {
+    state.activeStep = 0;
+    state.doneUpTo = stepData.length;
+    renderSteps();
+    return;
+  }
+  state.activeStep = n;
+  renderSteps();
+  const timer = setTimeout(() => {
+    state.doneUpTo = n;
+    state.activeStep = 0;
+    renderSteps();
+    advance(n + 1);
+  }, durationFor(n));
+  state.timers.push(timer);
+}
+
+function updatePromptButtonStyles() {
+  document.querySelectorAll(".prompt-btn").forEach((btn) => {
+    btn.classList.toggle("selected", btn.dataset.kind === state.selected);
+  });
+}
+
+function startExample(kind) {
+  state.timers.forEach(clearTimeout);
+  state.timers = [];
+  state.selected = kind;
+  state.doneUpTo = 0;
+  state.activeStep = 0;
+  updatePromptButtonStyles();
+  renderSteps();
+  const timer = setTimeout(() => advance(1), 250);
+  state.timers.push(timer);
+}
+
+function resetPrompt() {
+  state.timers.forEach(clearTimeout);
+  state.timers = [];
+  state.selected = null;
+  state.doneUpTo = 0;
+  state.activeStep = 0;
+  updatePromptButtonStyles();
+  renderSteps();
+}
+
+document.getElementById("prompt-buttons").addEventListener("click", (event) => {
+  const btn = event.target.closest(".prompt-btn");
+  if (!btn) return;
+  startExample(btn.dataset.kind);
 });
 
-renderStepDetail(selectedStep);
+document.getElementById("reset-prompt").addEventListener("click", resetPrompt);
 
 // Render infrastructure cards
 document.getElementById("infra").innerHTML = INFRA.map(

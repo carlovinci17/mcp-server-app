@@ -62,11 +62,14 @@
           <div class="sec-label">Three retrieval strategies — the agent picks one at step 4</div>
           <div class="branches" id="branches"></div>
 
-          <div class="sec-label" style="margin-top: 26px">The pipeline — 6 stages, one API call</div>
-          <div class="pipe-card glass">
-            <div class="pipe" id="pipe"></div>
-            <div class="pipe-detail" id="pipe-detail"></div>
-            <div class="pipe-hint">Click any stage to see what happens ↑</div>
+          <div class="sec-label" style="margin-top: 26px">Try a prompt — watch the real path it takes</div>
+          <div class="try-prompt-card glass">
+            <div class="try-prompt-grid" id="prompt-buttons"></div>
+            <div class="try-prompt-foot">
+              <span class="try-prompt-hint">Steps 1, 2, 5 &amp; 6 are identical no matter which path runs — only tool choice and retrieval differ.</span>
+              <button class="reset-btn" id="reset-prompt" type="button">Reset Prompt</button>
+            </div>
+            <div class="step-cards" id="step-cards"></div>
           </div>
         </section>
 
