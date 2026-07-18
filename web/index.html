@@ -197,6 +197,8 @@
               <h1 class="greeting">Meet Vera.</h1>
               <p class="subtext">
                 Your AI assistant for everything Vortex Digital.
+                <br />
+                Some answers may take a few seconds to generate on a cold start.
               </p>
 
               <div class="cold-start-spinner" id="cold-start-spinner">
@@ -242,10 +244,31 @@
               <div class="try-asking" id="try-asking-section" hidden>
                 <div class="try-asking-row">
                   <div class="try-asking-label">TRY ASKING</div>
-                  <button class="more-questions" id="more-questions" type="button">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                      <path d="M18.5 3v4.5H14M5.5 21v-4.5H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <button
+                    class="more-questions"
+                    id="more-questions"
+                    type="button"
+                  >
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M18.5 3v4.5H14M5.5 21v-4.5H10"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
                     </svg>
                     More questions
                   </button>
@@ -530,8 +553,7 @@
         <h2 id="welcome-title">Vera MCP Server</h2>
         <p>
           Welcome to <b>Vera</b>, an AI agent powered by an MCP server with
-          access to 23 tools. Some answers may take a few seconds to generate on
-          a cold start.
+          access to 23 tools.
         </p>
         <div class="welcome-by">
           Built by
