@@ -9,914 +9,100 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <style>
-      /* Page-specific additions on top of styles.css - same design tokens,
-         same header/sidebar/main skeleton as the main console (index.html),
-         just extended with a tab-style nav and the animated step walkthrough. */
-      html,
-      body {
-        overflow: auto;
-      }
-
-      .howitworks-content {
-        max-width: none;
-        width: 100%;
-      }
-
-      .panel-narrow {
-        max-width: 960px;
-        margin: 0 auto;
-        width: 100%;
-      }
-
-      .howitworks-nav {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-top: 2px;
-      }
-      .howitworks-nav-btn {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        width: 100%;
-        text-align: left;
-        background: none;
-        border: none;
-        border-radius: 9px;
-        padding: 9px 10px;
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-size: 12.5px;
-        line-height: 1.4;
-        color: var(--text-body);
-        cursor: pointer;
-        transition:
-          background 0.15s ease,
-          color 0.15s ease;
-      }
-      .howitworks-nav-btn:hover {
-        background: var(--surface-main);
-        color: var(--text-primary);
-      }
-      .howitworks-nav-btn.active {
-        background: var(--info-blue-tint-bg);
-        color: var(--text-primary);
-        font-weight: 600;
-      }
-      .howitworks-nav-index {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: var(--border-subtle);
-        color: var(--text-faint);
-        font-size: 10px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      .howitworks-nav-btn.active .howitworks-nav-index {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      .howitworks-card {
-        background: var(--surface-raised);
-        border: 1px solid var(--border-subtle);
-        border-radius: 14px;
-        padding: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-      .howitworks-card-title {
-        font-size: 10.5px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--text-faint);
-      }
-
-      .panel {
-        display: none;
-        flex-direction: column;
-        gap: 18px;
-      }
-      .panel.active {
-        display: flex;
-      }
-
-      code {
-        font-family: ui-monospace, 'IBM Plex Mono', monospace;
-        background: #faf3e0;
-        border: 1px solid var(--border-subtle);
-        border-radius: 4px;
-        padding: 1px 5px;
-        font-size: 0.95em;
-      }
-
-      @keyframes veraGlowRing {
-        0%,
-        100% {
-          box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.28);
-        }
-        50% {
-          box-shadow: 0 0 0 6px rgba(20, 184, 166, 0);
-        }
-      }
-
-      .step-card {
-        background: var(--surface-raised);
-        border-radius: 12px;
-        padding: 18px;
-        box-sizing: border-box;
-        transition: all 0.25s;
-        border: 1.5px solid var(--border-subtle);
-      }
-      .step-card.active {
-        border-color: var(--accent);
-        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.16);
-        animation: veraGlowRing 1.6s ease-in-out infinite;
-      }
-      .step-card.done {
-        border-color: #a7ded4;
-        background: #f5fcfa;
-      }
-
-      .step-badge {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 600;
-        flex-shrink: 0;
-        transition: all 0.25s;
-        background: var(--surface-main);
-        color: var(--text-faint);
-      }
-      .step-card.active .step-badge,
-      .step-card.done .step-badge {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      .prompt-btn {
-        text-align: left;
-        background: var(--surface-raised);
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
-        padding: 12px 14px;
-        cursor: pointer;
-        font-family: 'IBM Plex Sans', sans-serif;
-        transition: all 0.2s;
-      }
-
-      .tool-items-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px 16px;
-        margin-top: 8px;
-      }
-
-      .doc-link {
-        color: var(--info-blue);
-        text-decoration: underline;
-      }
-      .doc-link:hover {
-        color: var(--text-primary);
-      }
-
-      /* The three retrieval-strategy rows (Exact / SQL Search /
-         Vector-Hybrid) repeat this shape identically - only the accent
-         color varies per row, so that's the only thing left inline. */
-      .strategy-row {
-        border-left: 3px solid;
-        padding-left: 12px;
-      }
-      .strategy-title {
-        font-size: 12px;
-        font-weight: 600;
-      }
-      .strategy-desc {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin-top: 2px;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .robot-head,
-        .robot-eyes,
-        .robot-eye,
-        .robot-antenna-tip,
-        .step-card.active {
-          animation: none !important;
-        }
-      }
-
-      @media (max-width: 860px) {
-        .howitworks-content {
-          max-width: none;
-        }
-        .tool-items-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
   </head>
-  <body>
-    <div class="app">
-      <header class="header">
+  <body style="display: flex; flex-direction: column; min-height: 100vh; overflow: auto">
+    <header class="header glass" style="position: sticky; top: 20px; margin: 20px auto 0; max-width: 952px; width: calc(100% - 48px)">
+      <div class="header-left">
         <div class="brand-cluster">
-          <div class="logo-tile">
-            <img src="assets/vortex-logo.png" alt="Vortex Digital" />
+          <div class="logo-tile" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none">
+              <defs>
+                <linearGradient id="vg-hiw" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#5eead4" />
+                  <stop offset="1" stop-color="#0d9488" />
+                </linearGradient>
+              </defs>
+              <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-hiw)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
+              <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+              <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
+            </svg>
           </div>
           <div class="brand-block">
             <div class="brand-title">Vortex Digital</div>
             <div class="brand-sub">VERA'S LIFECYCLE</div>
           </div>
         </div>
-        <span class="header-note"
-          >How a message becomes a reply — traced from the real backend
-          code</span
-        >
-        <div class="header-right">
-          <a class="header-link" href="index.html">← Back to console</a>
+      </div>
+      <a class="back-link" href="index.html">← Back to console</a>
+    </header>
+
+    <div class="hiw-wrap">
+      <div class="hiw-surface">
+        <div class="hero-tag">How it works</div>
+        <h1 class="hero-h">How a message becomes a reply</h1>
+        <p class="hero-p">
+          Vera is a demo agent wired to 23 MCP tools on Azure. Here's the
+          whole path — traced from the real backend code.
+        </p>
+
+        <div class="tabs glass" role="tablist">
+          <button class="tab active" data-tab="pipeline" role="tab" aria-selected="true">The pipeline</button>
+          <button class="tab" data-tab="infra" role="tab" aria-selected="false">Azure architecture</button>
+          <button class="tab" data-tab="tools" role="tab" aria-selected="false">All 23 MCP tools</button>
         </div>
-      </header>
 
-      <div class="body">
-        <aside class="sidebar">
-          <div class="agent-avatar">
-            <svg
-              width="56"
-              height="56"
-              viewBox="0 0 48 48"
-              class="robot-svg"
-              style="color: var(--accent)"
-            >
-              <line
-                class="robot-antenna"
-                x1="24"
-                y1="9"
-                x2="24"
-                y2="4.6"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-              <circle
-                class="robot-antenna-tip"
-                cx="24"
-                cy="3.2"
-                r="2"
-                fill="#5eead4"
-              />
-              <rect
-                x="3.6"
-                y="21"
-                width="5.4"
-                height="11"
-                rx="2.6"
-                fill="currentColor"
-                opacity="0.85"
-              />
-              <rect
-                x="39"
-                y="21"
-                width="5.4"
-                height="11"
-                rx="2.6"
-                fill="currentColor"
-                opacity="0.85"
-              />
-              <rect
-                class="robot-head"
-                x="8"
-                y="8"
-                width="32"
-                height="33"
-                rx="12"
-                fill="currentColor"
-              />
-              <ellipse
-                cx="24"
-                cy="16"
-                rx="13"
-                ry="6.5"
-                fill="#ffffff"
-                opacity="0.15"
-              />
-              <rect
-                x="12.5"
-                y="19"
-                width="23"
-                height="17.5"
-                rx="7.5"
-                fill="#081026"
-              />
-              <g class="robot-eyes">
-                <rect
-                  class="robot-eye"
-                  x="18"
-                  y="23.5"
-                  width="4.2"
-                  height="8.6"
-                  rx="2.1"
-                  fill="#5eead4"
-                />
-                <rect
-                  class="robot-eye"
-                  x="25.8"
-                  y="23.5"
-                  width="4.2"
-                  height="8.6"
-                  rx="2.1"
-                  fill="#5eead4"
-                />
-              </g>
-            </svg>
+        <section class="hiw-panel active" id="panel-pipeline">
+          <div class="sec-label">Three retrieval strategies — the agent picks one at step 4</div>
+          <div class="branches" id="branches"></div>
+
+          <div class="sec-label" style="margin-top: 26px">The pipeline — 6 stages, one API call</div>
+          <div class="pipe-card glass">
+            <div class="pipe" id="pipe"></div>
+            <div class="pipe-detail" id="pipe-detail"></div>
+            <div class="pipe-hint">Click any stage to see what happens ↑</div>
           </div>
-          <div class="agent-name">Vera's Lifecycle</div>
-          <div class="agent-label">KNOWLEDGE AGENT DECISIONS IN MOTION</div>
-          <p class="agent-description">
-            Vera is a demo chat console for Vortex Digital that talks to an
-            Azure AI Foundry agent wired to 23 MCP tools. Ask about employees,
-            customers, documents, policies, or meeting notes, and the agent
-            decides which tool fits — an exact lookup, a fuzzy SQL match, or a
-            hybrid keyword + vector search. This page traces exactly what
-            happens between your message and its reply.
-          </p>
-          <div class="divider"></div>
-          <div class="sources-label">EXPLORE</div>
-          <nav class="howitworks-nav">
-            <button
-              class="howitworks-nav-btn active"
-              data-panel="prompt"
-              type="button"
-            >
-              <span class="howitworks-nav-index">1</span>
-              <span>Try a prompt</span>
-            </button>
-            <button
-              class="howitworks-nav-btn"
-              data-panel="infrastructure"
-              type="button"
-            >
-              <span class="howitworks-nav-index">2</span>
-              <span>Azure Infrastructure</span>
-            </button>
-            <button class="howitworks-nav-btn" data-panel="tools" type="button">
-              <span class="howitworks-nav-index">3</span>
-              <span>All 23 MCP tools, by category</span>
-            </button>
-          </nav>
-          <div class="sidebar-spacer"></div>
-        </aside>
+        </section>
 
-        <main class="main">
-          <div class="main-scroll">
-            <div class="content-inner howitworks-content">
-              <!-- PANEL 2: INFRASTRUCTURE -->
-              <div class="panel panel-narrow" id="panel-infrastructure">
-                <div class="howitworks-card">
-                  <div class="howitworks-card-title">Azure Infrastructure</div>
-                  <div style="display: flex; flex-direction: column; gap: 16px">
-                    <div
-                      style="
-                        border-left: 3px solid var(--info-blue);
-                        padding-left: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          font-size: 12.5px;
-                          font-weight: 600;
-                          color: var(--text-primary);
-                        "
-                      >
-                        Database — Azure SQL Database
-                      </div>
-                      <div
-                        style="
-                          font-size: 12px;
-                          color: var(--text-secondary);
-                          margin-top: 3px;
-                          line-height: 1.5;
-                        "
-                      >
-                        Accessed via
-                        <b>SQLAlchemy 2.0</b> (<code>mssql+pyodbc</code>, ODBC
-                        Driver 18). No password in the connection string — auth
-                        is an Azure AD token from
-                        <code>DefaultAzureCredential</code>, injected
-                        per-connection. Tables: <code>EmployeeRecord</code>,
-                        <code>CustomerRecord</code>,
-                        <code>DocumentMetadataRecord</code>. Document
-                        <i>content</i> itself is not stored here, only metadata.
-                        <span style="color: var(--text-faint)"
-                          >src/database/sql.py, src/database/models.py</span
-                        >
-                      </div>
-                    </div>
-                    <div
-                      style="
-                        border-left: 3px solid var(--info-blue);
-                        padding-left: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          font-size: 12.5px;
-                          font-weight: 600;
-                          color: var(--text-primary);
-                        "
-                      >
-                        Document storage — Azure Blob Storage
-                      </div>
-                      <div
-                        style="
-                          font-size: 12px;
-                          color: var(--text-secondary);
-                          margin-top: 3px;
-                          line-height: 1.5;
-                        "
-                      >
-                        4 containers, one per document type —
-                        <code>documents</code>, <code>policies</code>,
-                        <code>meeting-notes</code>,
-                        <code>project-docs</code>. SQL only stores
-                        <code>blob_container</code> /
-                        <code>blob_path</code> pointers;
-                        <code>get_document</code>, <code>get_policy</code> and
-                        <code>summarize_meeting</code> fetch the actual text
-                        from here.
-                        <span style="color: var(--text-faint)"
-                          >src/azure/blob_client.py</span
-                        >
-                      </div>
-                    </div>
-                    <div
-                      style="
-                        border-left: 3px solid var(--success-text);
-                        padding-left: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          font-size: 12.5px;
-                          font-weight: 600;
-                          color: var(--text-primary);
-                        "
-                      >
-                        Search index — Azure AI Search
-                      </div>
-                      <div
-                        style="
-                          font-size: 12px;
-                          color: var(--text-secondary);
-                          margin-top: 3px;
-                          line-height: 1.5;
-                        "
-                      >
-                        Fields: <code>title</code>, <code>content</code>,
-                        <code>content_vector</code>
-                        (<a
-                          class="doc-link"
-                          href="https://learn.microsoft.com/en-us/azure/search/vector-search-ranking"
-                          target="_blank"
-                          rel="noopener"
-                          >HNSW</a
-                        >, 1536-dim, cosine), <code>doc_type</code>,
-                        <code>department</code>, <code>tags</code>. Embeddings
-                        from Azure OpenAI <code>text-embedding-3-small</code>.
-                        No Azure "semantic ranker" is configured — the
-                        <code>semantic_search</code> tool name refers to vector
-                        similarity, not that product feature.
-                        <span style="color: var(--text-faint)"
-                          >src/services/search_service.py,
-                          scripts/create_search_index.py</span
-                        >
-                      </div>
-                    </div>
-                    <div
-                      style="
-                        border-left: 3px solid var(--accent);
-                        padding-left: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          font-size: 12.5px;
-                          font-weight: 600;
-                          color: var(--text-primary);
-                        "
-                      >
-                        Agent runtime — Azure AI Foundry Agent Service
-                      </div>
-                      <div
-                        style="
-                          font-size: 12px;
-                          color: var(--text-secondary);
-                          margin-top: 3px;
-                          line-height: 1.5;
-                        "
-                      >
-                        Reached through the OpenAI-compatible Responses API:
-                        <code
-                          >client.responses.create(background=True,
-                          store=True)</code
-                        >, then polled with
-                        <code>client.responses.retrieve(id)</code>. One API call
-                        per turn covers both tool selection and answer
-                        synthesis from this app's side — however many actual
-                        model invocations the agent runs internally to get
-                        there happens inside Azure and isn't visible here. The
-                        agent's model, instructions and MCP connection are
-                        configured in Azure, not in this repo's code; the
-                        model name shown in the console sidebar comes from
-                        <code>response.model</code> on the finished run, not a
-                        hardcoded value.
-                        <span style="color: var(--text-faint)"
-                          >src/services/chat_service.py,
-                          src/azure/foundry_agent.py</span
-                        >
-                      </div>
-                    </div>
-                    <div
-                      style="
-                        border-left: 3px solid var(--accent);
-                        padding-left: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          font-size: 12.5px;
-                          font-weight: 600;
-                          color: var(--text-primary);
-                        "
-                      >
-                        MCP tool registration — Azure Functions Remote MCP
-                      </div>
-                      <div
-                        style="
-                          font-size: 12px;
-                          color: var(--text-secondary);
-                          margin-top: 3px;
-                          line-height: 1.5;
-                        "
-                      >
-                        Each tool is a Python function decorated with
-                        <code>@bp.mcp_tool()</code>. 8 blueprints (documents,
-                        policies, meetings, employees, customers, search,
-                        health, chat) are registered in one
-                        <code>func.FunctionApp()</code>. 7 of them expose 23
-                        MCP tools total; <code>chat</code> registers two plain
-                        HTTP routes instead (<code>/api/chat</code>,
-                        <code>/api/chat/status</code>) and contributes no MCP
-                        tools of its own.
-                        <span style="color: var(--text-faint)"
-                          >function_app.py</span
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <section class="hiw-panel" id="panel-infra">
+          <div class="sec-label">Azure architecture — five moving parts</div>
+          <div class="infra" id="infra"></div>
+        </section>
 
-              <!-- PANEL 3: ALL TOOLS -->
-              <div class="panel panel-narrow" id="panel-tools">
-                <div class="howitworks-card">
-                  <div class="howitworks-card-title">
-                    All 23 MCP tools, by category
-                  </div>
-                  <div
-                    id="allToolsGrid"
-                    style="display: flex; flex-direction: column; gap: 16px"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- PANEL 1: TRY A PROMPT -->
-              <div class="panel panel-narrow active" id="panel-prompt">
-                <div class="howitworks-card">
-                  <div class="howitworks-card-title">Try a prompt</div>
-                  <div
-                    style="
-                      display: grid;
-                      grid-template-columns: 1fr 1.3fr;
-                      gap: 16px;
-                    "
-                  >
-                    <div
-                      style="display: flex; flex-direction: column; gap: 8px"
-                    >
-                      <button id="exactBtn" class="prompt-btn">
-                        <div
-                          style="
-                            font-size: 15px;
-                            font-weight: 600;
-                            color: var(--text-primary);
-                          "
-                        >
-                          "Who's the contact for the Design team?"
-                        </div>
-                        <div
-                          style="
-                            font-size: 12px;
-                            color: var(--info-blue);
-                            margin-top: 3px;
-                            font-weight: 600;
-                          "
-                        >
-                          Exact lookup
-                        </div>
-                      </button>
-                      <button id="substringBtn" class="prompt-btn">
-                        <div
-                          style="
-                            font-size: 15px;
-                            font-weight: 600;
-                            color: var(--text-primary);
-                          "
-                        >
-                          "Find documents about onboarding"
-                        </div>
-                        <div
-                          style="
-                            font-size: 12px;
-                            color: var(--pending-text);
-                            margin-top: 3px;
-                            font-weight: 600;
-                          "
-                        >
-                          SQL substring search
-                        </div>
-                      </button>
-                      <button id="vectorBtn" class="prompt-btn">
-                        <div
-                          style="
-                            font-size: 15px;
-                            font-weight: 600;
-                            color: var(--text-primary);
-                          "
-                        >
-                          "What's our remote work policy?"
-                        </div>
-                        <div
-                          style="
-                            font-size: 12px;
-                            color: var(--success-text);
-                            margin-top: 3px;
-                            font-weight: 600;
-                          "
-                        >
-                          Vector / hybrid RAG
-                        </div>
-                      </button>
-                    </div>
-
-                    <div
-                      style="
-                        background: var(--surface-main);
-                        border: 1px solid var(--border-subtle);
-                        border-radius: 12px;
-                        padding: 14px 16px;
-                        display: flex;
-                        flex-direction: column;
-                        gap: 12px;
-                      "
-                    >
-                      <div class="howitworks-card-title">
-                        Retrieval strategies
-                      </div>
-                      <div
-                        style="
-                          font-size: 13px;
-                          color: var(--text-secondary);
-                          line-height: 1.5;
-                        "
-                      >
-                        Vera has three genuinely different ways to retrieve data
-                        — the agent decides which fits each question. Click a
-                        prompt to watch its actual path.
-                      </div>
-                      <div
-                        style="display: flex; flex-direction: column; gap: 8px"
-                      >
-                        <div
-                          class="strategy-row"
-                          style="border-left-color: var(--info-blue)"
-                        >
-                          <div
-                            class="strategy-title"
-                            style="color: var(--info-blue)"
-                          >
-                            Exact
-                          </div>
-                          <div class="strategy-desc">
-                            Direct
-                            <code>SELECT ... WHERE column = :value</code>
-                            against Azure SQL. Fast, deterministic, no matching
-                            logic at all.
-                          </div>
-                        </div>
-                        <div
-                          class="strategy-row"
-                          style="border-left-color: var(--pending-text)"
-                        >
-                          <div
-                            class="strategy-title"
-                            style="color: var(--pending-text)"
-                          >
-                            SQL Search
-                          </div>
-                          <div class="strategy-desc">
-                            SQL <code>ILIKE '%term%'</code> pattern matching
-                            against the <code>title</code> and
-                            <code>department</code> columns only. Fuzzy
-                            substring match, not semantic — no embeddings.
-                          </div>
-                        </div>
-                        <div
-                          class="strategy-row"
-                          style="border-left-color: var(--success-text)"
-                        >
-                          <div
-                            class="strategy-title"
-                            style="color: var(--success-text)"
-                          >
-                            Vector / Hybrid
-                          </div>
-                          <div class="strategy-desc">
-                            Embeds the query with
-                            <a
-                              class="doc-link"
-                              href="https://developers.openai.com/api/docs/models/text-embedding-3-small"
-                              target="_blank"
-                              rel="noopener"
-                              ><code>text-embedding-3-small</code></a
-                            >
-                            (<a
-                              class="doc-link"
-                              href="https://developers.openai.com/api/docs/guides/embeddings"
-                              target="_blank"
-                              rel="noopener"
-                              >1536-dim</a
-                            >), then Azure AI Search runs
-                            <a
-                              class="doc-link"
-                              href="https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring"
-                              target="_blank"
-                              rel="noopener"
-                              >BM25</a
-                            >
-                            keyword search and
-                            <a
-                              class="doc-link"
-                              href="https://learn.microsoft.com/en-us/azure/search/vector-search-ranking"
-                              target="_blank"
-                              rel="noopener"
-                              >HNSW</a
-                            >
-                            vector search in one call and fuses the two rankings
-                            automatically.
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="howitworks-card">
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      justify-content: space-between;
-                    "
-                  >
-                    <div class="howitworks-card-title">
-                      Prompt workflow steps
-                    </div>
-                    <button
-                      id="resetBtn"
-                      style="
-                        font-family: 'IBM Plex Sans', sans-serif;
-                        font-size: 12.5px;
-                        color: var(--text-secondary);
-                        background: var(--surface-raised);
-                        border: 1px solid var(--border-subtle);
-                        border-radius: 8px;
-                        padding: 6px 12px;
-                        cursor: pointer;
-                        transition: all 0.15s;
-                      "
-                    >
-                      Reset Prompt
-                    </button>
-                  </div>
-                  <div
-                    style="
-                      display: flex;
-                      align-items: flex-start;
-                      gap: 8px;
-                      font-size: 12px;
-                      color: var(--text-secondary);
-                      line-height: 1.5;
-                      background: var(--surface-main);
-                      border: 1px solid var(--border-subtle);
-                      border-radius: 8px;
-                      padding: 8px 12px;
-                    "
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 48 48"
-                      style="flex-shrink: 0; margin-top: 1px"
-                    >
-                      <rect
-                        x="8"
-                        y="8"
-                        width="32"
-                        height="33"
-                        rx="12"
-                        fill="var(--accent)"
-                      ></rect>
-                      <rect
-                        x="12.5"
-                        y="19"
-                        width="23"
-                        height="17.5"
-                        rx="7.5"
-                        fill="#081026"
-                      ></rect>
-                      <rect
-                        x="18"
-                        y="23.5"
-                        width="4.2"
-                        height="8.6"
-                        rx="2.1"
-                        fill="#5eead4"
-                      ></rect>
-                      <rect
-                        x="25.8"
-                        y="23.5"
-                        width="4.2"
-                        height="8.6"
-                        rx="2.1"
-                        fill="#5eead4"
-                      ></rect>
-                    </svg>
-                    <span>
-                      <b>Robot icon = the LLM actually "thinking."</b>
-                      <ul
-                        style="
-                          margin: 4px 0 0;
-                          padding-left: 16px;
-                          display: flex;
-                          flex-direction: column;
-                          gap: 3px;
-                        "
-                      >
-                        <li>
-                          Shown only on <b>Tool choice</b> and
-                          <b>Synthesis</b> — picking what to call, then turning
-                          results into an answer.
-                        </li>
-                        <li>
-                          Other steps (Prompt sent, Async kickoff, Retrieval,
-                          Reply) are plain backend code — HTTP, SQL/Azure AI
-                          Search, rendering. No model involved.
-                        </li>
-                        <li>
-                          Both moments are one API round trip (<code
-                            >responses.create</code
-                          >
-                          → <code>responses.retrieve</code>), not two calls —
-                          the icon marks two phases of it, not two invocations.
-                        </li>
-                      </ul>
-                    </span>
-                  </div>
-                  <div
-                    id="stepsContainer"
-                    style="display: flex; flex-direction: column; gap: 12px"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+        <section class="hiw-panel" id="panel-tools">
+          <div class="sec-label">All 23 MCP tools, by category</div>
+          <div class="tools-card glass" id="tools"></div>
+        </section>
       </div>
     </div>
+
+    <footer class="site-footer" style="margin-top: auto">
+      <div class="footer-inner glass" style="max-width: 952px">
+        <div class="footer-brand">
+          <div class="logo-tile" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none">
+              <defs>
+                <linearGradient id="vg-hiw-foot" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#5eead4" />
+                  <stop offset="1" stop-color="#0d9488" />
+                </linearGradient>
+              </defs>
+              <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-hiw-foot)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
+              <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+              <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
+            </svg>
+          </div>
+          <span>Vortex Digital · Vera's Lifecycle</span>
+        </div>
+        <nav class="footer-links">
+          <a href="index.html">Console</a>
+          <span class="footer-by">Built by <a href="https://carlovinci.com.au" target="_blank" rel="noopener">Carlo Vinci ↗</a></span>
+        </nav>
+      </div>
+    </footer>
 
     <script src="vera-how-it-works.js"></script>
   </body>
