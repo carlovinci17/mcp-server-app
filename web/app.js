@@ -31,7 +31,6 @@ const els = {
   toolsModalBackdrop: document.getElementById("tools-modal-backdrop"),
   toolsModalClose: document.getElementById("tools-modal-close"),
   toolsModalBody: document.getElementById("tools-modal-body"),
-  modelVersion: document.getElementById("model-version"),
 };
 
 // Clicking a "try asking" chip both fills the composer and sends it
@@ -431,9 +430,6 @@ async function pollUntilDone(initialJob, loadingEl) {
 
   if (job.status === "completed") {
     state.previousResponseId = job.response_id;
-    if (job.model) {
-      els.modelVersion.textContent = job.model;
-    }
     resolveLoadingMessage(loadingEl, job.reply, job.tool_calls);
   } else {
     resolveLoadingMessageAsError(loadingEl, job.error || "Something went wrong. Please try again.");
