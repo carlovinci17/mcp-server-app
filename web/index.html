@@ -199,7 +199,12 @@
                 Your AI assistant for everything Vortex Digital.
               </p>
 
-              <div class="composer-bar landing" id="composer-bar">
+              <div class="cold-start-spinner" id="cold-start-spinner">
+                <span class="loading-ring" aria-hidden="true"></span>
+                <span>Connecting to the server…</span>
+              </div>
+
+              <div class="composer-bar landing" id="composer-bar" hidden>
                 <div class="composer-inner">
                   <div class="composer-field glass">
                     <input
@@ -234,13 +239,7 @@
                 </div>
               </div>
 
-              <span class="cold-start-spinner" id="cold-start-spinner">
-                <span class="spinner-ring"></span>
-                Waking up the server — this can take up to a minute on a cold
-                start
-              </span>
-
-              <div class="try-asking">
+              <div class="try-asking" id="try-asking-section" hidden>
                 <div class="try-asking-row">
                   <div class="try-asking-label">TRY ASKING</div>
                   <button class="more-questions" id="more-questions" type="button">

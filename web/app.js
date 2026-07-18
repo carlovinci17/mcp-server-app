@@ -14,6 +14,7 @@ const els = {
   welcomeClose: document.getElementById("welcome-close"),
   welcomeEnter: document.getElementById("welcome-enter"),
   coldStartSpinner: document.getElementById("cold-start-spinner"),
+  tryAskingSection: document.getElementById("try-asking-section"),
   chipRow: document.getElementById("chip-row"),
   moreQuestions: document.getElementById("more-questions"),
   composerBar: document.getElementById("composer-bar"),
@@ -275,6 +276,8 @@ function beginInitialization() {
 function markReady() {
   state.initializing = false;
   els.coldStartSpinner.hidden = true;
+  els.composerBar.hidden = false;
+  els.tryAskingSection.hidden = false;
 
   els.statusPill.classList.remove("pending");
   els.statusText.textContent = "Live";
