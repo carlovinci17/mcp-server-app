@@ -15,6 +15,7 @@ const els = {
   welcomeEnter: document.getElementById("welcome-enter"),
   coldStartSpinner: document.getElementById("cold-start-spinner"),
   chipRow: document.getElementById("chip-row"),
+  moreQuestions: document.getElementById("more-questions"),
   composerBar: document.getElementById("composer-bar"),
   composerInput: document.getElementById("composer-input"),
   sendButton: document.getElementById("send-button"),
@@ -48,29 +49,6 @@ els.chipRow.addEventListener("click", (event) => {
   applyChipQuestion(chip.dataset.q);
 });
 
-// Extra suggestions shown only in the drawer - there's more room there than
-// in the landing chip row, so this is where the longer tail of "good
-// questions to try" lives once a conversation is already underway (or any
-// time the drawer is opened). `cat` matches one of the CONNECTED SOURCES
-// categories (see the cat-* classes in styles.css) so each chip's leading
-// dot tells you which tool it'll likely use before you click it; omit `cat`
-// for the one question that calls no tool at all (shown with the mini Vera
-// icon instead, same as before, just drawer-only now that the landing row
-// is a curated 5-category set).
-const DRAWER_ONLY_QUESTIONS = [
-  { text: "Who are you and what can you help with?", icon: "vera" },
-  { text: "Who's on the IT team?", cat: "employees" },
-  { text: "Which customers are up for renewal this quarter?", cat: "customers" },
-  { text: "List our clients and their industries", cat: "customers" },
-  { text: "Tell me about Vortex Digital's mission and values", cat: "documents" },
-  { text: "Summarize the latest project brief", cat: "documents" },
-  { text: "What documents do we have on file for the Engineering team?", cat: "documents" },
-  { text: "What policies does Vortex Digital have on file?", cat: "policies" },
-  { text: "What should I do if I lose my work laptop or badge?", cat: "policies" },
-  { text: "Find the latest all-hands notes", cat: "meetings" },
-  { text: "What meeting notes have been logged for the Product team?", cat: "meetings" },
-];
-
 // Static mini Vera avatar markup, shown in place of a category dot for
 // questions that call no tool at all.
 const VERA_CHIP_ICON = `<svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hidden="true">
@@ -80,39 +58,95 @@ const VERA_CHIP_ICON = `<svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hid
   <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
 </svg>`;
 
-function addSidebarChip(text, cat, icon) {
-  const sidebarChip = document.createElement("button");
-  sidebarChip.className = "sidebar-chip";
-  sidebarChip.dataset.q = text;
+// Every example question available - the single source of truth for both
+// the landing chip row (a handful shown at a time, reshuffled by "More
+// questions") and the drawer's fuller "try asking" list (shows all of
+// them, grouped by category). `cat` matches one of the CONNECTED SOURCES
+// categories (see the cat-* classes in styles.css); omit `cat` for the one
+// question that calls no tool at all (shown with the mini Vera icon).
+const ALL_EXAMPLE_QUESTIONS = [
+  { text: "Who are you and what can you help with?", icon: "vera" },
+  { text: "Who manages the Design team?", cat: "employees" },
+  { text: "What departments does Vortex Digital have?", cat: "employees" },
+  { text: "Who's on the IT team?", cat: "employees" },
+  { text: "Show churned customers in fintech", cat: "customers" },
+  { text: "Tell me about Cedar Holdings", cat: "customers" },
+  { text: "Which customers are up for renewal this quarter?", cat: "customers" },
+  { text: "List our clients and their industries", cat: "customers" },
+  { text: "What's in the IT Team Charter, and what other documents relate to it?", cat: "documents" },
+  { text: "Tell me about Vortex Digital's mission and values", cat: "documents" },
+  { text: "Summarize the latest project brief", cat: "documents" },
+  { text: "What documents do we have on file for the Engineering team?", cat: "documents" },
+  { text: "Show the remote-work policy", cat: "policies" },
+  { text: "Can I work from home a few days a week?", cat: "policies" },
+  { text: "What policies does Vortex Digital have on file?", cat: "policies" },
+  { text: "What should I do if I lose my work laptop or badge?", cat: "policies" },
+  { text: "Summarize the latest incident postmortem", cat: "meetings" },
+  { text: "Find the latest all-hands notes", cat: "meetings" },
+  { text: "What meeting notes have been logged for the Product team?", cat: "meetings" },
+];
+
+const CATEGORY_ORDER = ["employees", "customers", "documents", "policies", "meetings"];
+const LANDING_CHIP_COUNT = 6;
+
+function makeChip(className, { text, cat, icon }) {
+  const chip = document.createElement("button");
+  chip.className = className;
+  chip.type = "button";
+  chip.dataset.q = text;
   if (icon === "vera") {
-    sidebarChip.insertAdjacentHTML("beforeend", VERA_CHIP_ICON);
+    chip.insertAdjacentHTML("beforeend", VERA_CHIP_ICON);
   } else if (cat) {
     const dot = document.createElement("span");
     dot.className = `chip-dot cat-${cat}`;
-    sidebarChip.appendChild(dot);
+    chip.appendChild(dot);
   }
-  sidebarChip.appendChild(document.createTextNode(text));
-  els.sidebarChipList.appendChild(sidebarChip);
+  chip.appendChild(document.createTextNode(text));
+  return chip;
 }
 
-// The drawer's "try asking" list mirrors the landing chips exactly - clone
-// from the chip row (single source of truth) instead of duplicating the
-// question text in the HTML - then merge with the drawer-only questions and
-// sort the combined list by category (matching the CONNECTED SOURCES
-// order), so the whole list reads as one continuous color-grouped sequence.
-// Array.prototype.sort is stable, so relative order within each category
-// (chip-row items before drawer-only ones) is preserved; the no-category
-// "who are you" entry sorts first, same as its old position as the first
-// landing chip.
-const CATEGORY_ORDER = ["employees", "customers", "documents", "policies", "meetings"];
-const chipRowQuestions = [...els.chipRow.querySelectorAll(".chip")].map((chip) => ({
-  text: chip.dataset.q,
-  cat: chip.dataset.cat,
-  icon: chip.dataset.icon,
-}));
-[...chipRowQuestions, ...DRAWER_ONLY_QUESTIONS]
+function renderChipRow(questions) {
+  els.chipRow.innerHTML = "";
+  questions.forEach((q) => els.chipRow.appendChild(makeChip("chip glass", q)));
+}
+
+function shuffled(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// First load: "who are you" is always shown first, plus one representative
+// question from every category, so the full breadth of what Vera can do is
+// visible immediately without needing to click "More questions" first.
+function initialChips() {
+  const vera = ALL_EXAMPLE_QUESTIONS.find((q) => q.icon === "vera");
+  const firstPerCategory = CATEGORY_ORDER.map((cat) => ALL_EXAMPLE_QUESTIONS.find((q) => q.cat === cat));
+  return [vera, ...firstPerCategory];
+}
+
+renderChipRow(initialChips());
+
+// "More questions" reshuffles the landing row from the full pool, always
+// excluding whatever's currently shown so it reads as a genuinely fresh
+// set - once clicked, "who are you" is just part of the pool like any
+// other question and may or may not reappear.
+els.moreQuestions.addEventListener("click", () => {
+  const currentTexts = [...els.chipRow.querySelectorAll(".chip")].map((c) => c.dataset.q);
+  const pool = shuffled(ALL_EXAMPLE_QUESTIONS.filter((q) => !currentTexts.includes(q.text)));
+  renderChipRow(pool.slice(0, LANDING_CHIP_COUNT));
+});
+
+// The drawer's "try asking" list shows every example question, grouped by
+// category (matching the CONNECTED SOURCES order above) - independent of
+// whatever's currently shown in the landing row. The no-category "who are
+// you" entry sorts first.
+[...ALL_EXAMPLE_QUESTIONS]
   .sort((a, b) => (a.cat ? CATEGORY_ORDER.indexOf(a.cat) : -1) - (b.cat ? CATEGORY_ORDER.indexOf(b.cat) : -1))
-  .forEach(({ text, cat, icon }) => addSidebarChip(text, cat, icon));
+  .forEach((q) => els.sidebarChipList.appendChild(makeChip("sidebar-chip", q)));
 
 els.sidebarChipList.addEventListener("click", (event) => {
   const chip = event.target.closest(".sidebar-chip");

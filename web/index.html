@@ -6,8 +6,18 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Vortex Digital — MCP Agent Console</title>
     <link rel="icon" type="image/svg+xml" href="assets/vortex-mark.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon-16.png"
+    />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,7 +33,14 @@
     <div class="app">
       <header class="header glass">
         <div class="header-left">
-          <button class="hamburger" id="menu-trigger" type="button" aria-expanded="false" aria-controls="side-drawer" aria-label="Open menu">
+          <button
+            class="hamburger"
+            id="menu-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="side-drawer"
+            aria-label="Open menu"
+          >
             <span></span><span></span><span></span>
           </button>
           <div class="brand-cluster">
@@ -35,8 +52,28 @@
                     <stop offset="1" stop-color="#0d9488" />
                   </linearGradient>
                 </defs>
-                <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-header)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
-                <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="16"
+                  fill="none"
+                  stroke="url(#vg-header)"
+                  stroke-width="5.5"
+                  stroke-linecap="round"
+                  stroke-dasharray="75 26"
+                  transform="rotate(-90 24 24)"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="9.5"
+                  fill="none"
+                  stroke="#2dd4bf"
+                  stroke-width="5.5"
+                  stroke-linecap="round"
+                  stroke-dasharray="30 34"
+                  transform="rotate(120 24 24)"
+                />
                 <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
               </svg>
             </div>
@@ -47,7 +84,13 @@
           </div>
         </div>
         <div class="header-right">
-          <a class="header-link" href="vera-how-it-works" target="_blank" rel="noopener">How it works</a>
+          <a
+            class="header-link"
+            href="vera-how-it-works"
+            target="_blank"
+            rel="noopener"
+            >How it works</a
+          >
           <span class="status-pill pending" id="status-pill">
             <span class="status-dot"></span>
             <span id="status-text">Loading</span>
@@ -61,24 +104,99 @@
             <div class="content-inner" id="empty-state">
               <div class="vera-halo glass">
                 <div class="vera-inner">
-                  <svg width="52" height="52" viewBox="0 0 48 48" class="robot-svg" style="color: var(--accent)">
-                    <line class="robot-antenna" x1="24" y1="9" x2="24" y2="4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    <circle class="robot-antenna-tip" cx="24" cy="3.2" r="2" fill="#5eead4" />
-                    <rect x="3.6" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
-                    <rect x="39" y="21" width="5.4" height="11" rx="2.6" fill="currentColor" opacity="0.85" />
-                    <rect class="robot-head" x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
-                    <ellipse cx="24" cy="16" rx="13" ry="6.5" fill="#ffffff" opacity="0.15" />
-                    <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
+                  <svg
+                    width="52"
+                    height="52"
+                    viewBox="0 0 48 48"
+                    class="robot-svg"
+                    style="color: var(--accent)"
+                  >
+                    <line
+                      class="robot-antenna"
+                      x1="24"
+                      y1="9"
+                      x2="24"
+                      y2="4.6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <circle
+                      class="robot-antenna-tip"
+                      cx="24"
+                      cy="3.2"
+                      r="2"
+                      fill="#5eead4"
+                    />
+                    <rect
+                      x="3.6"
+                      y="21"
+                      width="5.4"
+                      height="11"
+                      rx="2.6"
+                      fill="currentColor"
+                      opacity="0.85"
+                    />
+                    <rect
+                      x="39"
+                      y="21"
+                      width="5.4"
+                      height="11"
+                      rx="2.6"
+                      fill="currentColor"
+                      opacity="0.85"
+                    />
+                    <rect
+                      class="robot-head"
+                      x="8"
+                      y="8"
+                      width="32"
+                      height="33"
+                      rx="12"
+                      fill="currentColor"
+                    />
+                    <ellipse
+                      cx="24"
+                      cy="16"
+                      rx="13"
+                      ry="6.5"
+                      fill="#ffffff"
+                      opacity="0.15"
+                    />
+                    <rect
+                      x="12.5"
+                      y="19"
+                      width="23"
+                      height="17.5"
+                      rx="7.5"
+                      fill="#081026"
+                    />
                     <g class="robot-eyes">
-                      <rect class="robot-eye" x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
-                      <rect class="robot-eye" x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+                      <rect
+                        class="robot-eye"
+                        x="18"
+                        y="23.5"
+                        width="4.2"
+                        height="8.6"
+                        rx="2.1"
+                        fill="#5eead4"
+                      />
+                      <rect
+                        class="robot-eye"
+                        x="25.8"
+                        y="23.5"
+                        width="4.2"
+                        height="8.6"
+                        rx="2.1"
+                        fill="#5eead4"
+                      />
                     </g>
                   </svg>
                 </div>
               </div>
               <h1 class="greeting">Meet Vera.</h1>
               <p class="subtext">
-                Your line into everything Vortex knows — people, customers, documents, policies, and meetings.
+                Your AI assistant for everything Vortex Digital.
               </p>
 
               <div class="composer-bar landing" id="composer-bar">
@@ -90,11 +208,26 @@
                       placeholder="Ask Vera anything…"
                       autocomplete="off"
                     />
-                    <button class="send-button" id="send-button" aria-label="Send message">↑</button>
+                    <button
+                      class="send-button"
+                      id="send-button"
+                      aria-label="Send message"
+                    >
+                      ↑
+                    </button>
                   </div>
-                  <button class="new-chat-button" id="new-chat-button" aria-label="Start a new chat">
+                  <button
+                    class="new-chat-button"
+                    id="new-chat-button"
+                    aria-label="Start a new chat"
+                  >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path d="M7 2.5V11.5M2.5 7H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                      <path
+                        d="M7 2.5V11.5M2.5 7H11.5"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                      />
                     </svg>
                     <span class="new-chat-label">New chat</span>
                   </button>
@@ -103,28 +236,22 @@
 
               <span class="cold-start-spinner" id="cold-start-spinner">
                 <span class="spinner-ring"></span>
-                Waking up the server — this can take up to a minute on a cold start
+                Waking up the server — this can take up to a minute on a cold
+                start
               </span>
 
               <div class="try-asking">
-                <div class="try-asking-label">TRY ASKING</div>
-                <div class="chip-row glass-row" id="chip-row">
-                  <button class="chip glass" data-q="Who manages the Design team?" data-cat="employees">
-                    <span class="chip-dot cat-employees"></span>Who manages the Design team?
-                  </button>
-                  <button class="chip glass" data-q="Tell me about Cedar Holdings" data-cat="customers">
-                    <span class="chip-dot cat-customers"></span>Tell me about Cedar Holdings
-                  </button>
-                  <button class="chip glass" data-q="What's in the IT Team Charter?" data-cat="documents">
-                    <span class="chip-dot cat-documents"></span>What's in the IT Team Charter?
-                  </button>
-                  <button class="chip glass" data-q="Show the remote-work policy" data-cat="policies">
-                    <span class="chip-dot cat-policies"></span>Show the remote-work policy
-                  </button>
-                  <button class="chip glass" data-q="Summarize the latest postmortem" data-cat="meetings">
-                    <span class="chip-dot cat-meetings"></span>Summarize the latest postmortem
+                <div class="try-asking-row">
+                  <div class="try-asking-label">TRY ASKING</div>
+                  <button class="more-questions" id="more-questions" type="button">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      <path d="M18.5 3v4.5H14M5.5 21v-4.5H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    More questions
                   </button>
                 </div>
+                <div class="chip-row" id="chip-row"></div>
               </div>
             </div>
             <div class="content-inner messages" id="messages" hidden></div>
@@ -133,11 +260,23 @@
       </div>
     </div>
 
-    <a class="corner-credit" href="https://carlovinci.com.au" target="_blank" rel="noopener">Built by Carlo Vinci ↗</a>
+    <a
+      class="corner-credit"
+      href="https://carlovinci.com.au"
+      target="_blank"
+      rel="noopener"
+      >Built by Carlo Vinci ↗</a
+    >
 
     <!-- Hidden side-panel drawer -->
     <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
-    <aside class="drawer" id="side-drawer" role="dialog" aria-modal="true" aria-label="Menu">
+    <aside
+      class="drawer"
+      id="side-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+    >
       <div class="drawer-top">
         <div class="drawer-brand">
           <div class="logo-tile" aria-hidden="true">
@@ -148,8 +287,28 @@
                   <stop offset="1" stop-color="#0d9488" />
                 </linearGradient>
               </defs>
-              <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-drawer)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
-              <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+              <circle
+                cx="24"
+                cy="24"
+                r="16"
+                fill="none"
+                stroke="url(#vg-drawer)"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="75 26"
+                transform="rotate(-90 24 24)"
+              />
+              <circle
+                cx="24"
+                cy="24"
+                r="9.5"
+                fill="none"
+                stroke="#2dd4bf"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="30 34"
+                transform="rotate(120 24 24)"
+              />
               <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
             </svg>
           </div>
@@ -158,50 +317,123 @@
             <div class="brand-sub">MCP AGENT CONSOLE</div>
           </div>
         </div>
-        <button class="close-btn" id="drawer-close" type="button" aria-label="Close menu">✕</button>
+        <button
+          class="close-btn"
+          id="drawer-close"
+          type="button"
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
       </div>
 
       <div class="agent-avatar">
-        <svg width="34" height="34" viewBox="0 0 48 48" class="robot-svg" style="color: var(--accent)">
-          <line class="robot-antenna" x1="24" y1="9" x2="24" y2="4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <circle class="robot-antenna-tip" cx="24" cy="3.2" r="2" fill="#5eead4" />
-          <rect class="robot-head" x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
-          <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
+        <svg
+          width="34"
+          height="34"
+          viewBox="0 0 48 48"
+          class="robot-svg"
+          style="color: var(--accent)"
+        >
+          <line
+            class="robot-antenna"
+            x1="24"
+            y1="9"
+            x2="24"
+            y2="4.6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <circle
+            class="robot-antenna-tip"
+            cx="24"
+            cy="3.2"
+            r="2"
+            fill="#5eead4"
+          />
+          <rect
+            class="robot-head"
+            x="8"
+            y="8"
+            width="32"
+            height="33"
+            rx="12"
+            fill="currentColor"
+          />
+          <rect
+            x="12.5"
+            y="19"
+            width="23"
+            height="17.5"
+            rx="7.5"
+            fill="#081026"
+          />
           <g class="robot-eyes">
-            <rect class="robot-eye" x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
-            <rect class="robot-eye" x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+            <rect
+              class="robot-eye"
+              x="18"
+              y="23.5"
+              width="4.2"
+              height="8.6"
+              rx="2.1"
+              fill="#5eead4"
+            />
+            <rect
+              class="robot-eye"
+              x="25.8"
+              y="23.5"
+              width="4.2"
+              height="8.6"
+              rx="2.1"
+              fill="#5eead4"
+            />
           </g>
         </svg>
       </div>
       <div class="agent-name">Vera</div>
       <div class="agent-label">KNOWLEDGE AGENT</div>
       <p class="agent-description">
-        I connect to Vortex's internal systems to answer questions about
-        people, customers, documents, policies, and meeting notes — in plain
-        language.
+        I connect to Vortex's internal systems to answer questions about people,
+        customers, documents, policies, and meeting notes — in plain language.
       </p>
 
       <div class="divider"></div>
       <div class="sources-label">CONNECTED SOURCES</div>
       <ul class="sources-list" id="sources-list">
         <li>
-          <span class="source-left"><span class="source-dot pending cat-employees"></span>Employee &amp; Dept Directory</span>
+          <span class="source-left"
+            ><span class="source-dot pending cat-employees"></span>Employee
+            &amp; Dept Directory</span
+          >
           <span class="source-live pending">starting</span>
         </li>
         <li>
-          <span class="source-left"><span class="source-dot pending cat-customers"></span>Customer Records</span>
+          <span class="source-left"
+            ><span class="source-dot pending cat-customers"></span>Customer
+            Records</span
+          >
           <span class="source-live pending">starting</span>
         </li>
         <li>
-          <span class="source-left"><span class="source-dot pending cat-documents"></span>Internal Documents</span>
+          <span class="source-left"
+            ><span class="source-dot pending cat-documents"></span>Internal
+            Documents</span
+          >
           <span class="source-live pending">starting</span>
         </li>
         <li>
-          <span class="source-left"><span class="source-dot pending cat-policies"></span>Company Policies</span>
+          <span class="source-left"
+            ><span class="source-dot pending cat-policies"></span>Company
+            Policies</span
+          >
           <span class="source-live pending">starting</span>
         </li>
         <li>
-          <span class="source-left"><span class="source-dot pending cat-meetings"></span>Meeting Notes</span>
+          <span class="source-left"
+            ><span class="source-dot pending cat-meetings"></span>Meeting
+            Notes</span
+          >
           <span class="source-live pending">starting</span>
         </li>
       </ul>
@@ -226,39 +458,102 @@
 
       <div class="drawer-foot">
         <div class="divider" style="margin-top: 0"></div>
-        <a class="foot-link" href="vera-how-it-works" target="_blank" rel="noopener">
-          <span>How it works</span><span style="color: var(--text-faint)">→</span>
+        <a
+          class="foot-link"
+          href="vera-how-it-works"
+          target="_blank"
+          rel="noopener"
+        >
+          <span>How it works</span
+          ><span style="color: var(--text-faint)">→</span>
         </a>
       </div>
     </aside>
 
     <!-- Welcome popup, shown on each page load -->
     <div class="welcome-backdrop" id="welcome-backdrop">
-      <div class="welcome-card" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
-        <button class="welcome-close" id="welcome-close" type="button" aria-label="Close">✕</button>
+      <div
+        class="welcome-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-title"
+      >
+        <button
+          class="welcome-close"
+          id="welcome-close"
+          type="button"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <div class="welcome-logo" aria-hidden="true">
-          <svg width="44" height="44" viewBox="0 0 48 48" style="color: #14b8a6">
-            <rect x="8" y="8" width="32" height="33" rx="12" fill="currentColor" />
-            <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026" />
-            <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
-            <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4" />
+          <svg
+            width="44"
+            height="44"
+            viewBox="0 0 48 48"
+            style="color: #14b8a6"
+          >
+            <rect
+              x="8"
+              y="8"
+              width="32"
+              height="33"
+              rx="12"
+              fill="currentColor"
+            />
+            <rect
+              x="12.5"
+              y="19"
+              width="23"
+              height="17.5"
+              rx="7.5"
+              fill="#081026"
+            />
+            <rect
+              x="18"
+              y="23.5"
+              width="4.2"
+              height="8.6"
+              rx="2.1"
+              fill="#5eead4"
+            />
+            <rect
+              x="25.8"
+              y="23.5"
+              width="4.2"
+              height="8.6"
+              rx="2.1"
+              fill="#5eead4"
+            />
           </svg>
         </div>
         <div class="welcome-tag">DEMO PROJECT</div>
         <h2 id="welcome-title">Vera MCP Server</h2>
         <p>
           Welcome to <b>Vera</b>, an AI agent powered by an MCP server with
-          access to 23 tools. Some answers may take a few seconds to generate
-          on a cold start.
+          access to 23 tools. Some answers may take a few seconds to generate on
+          a cold start.
         </p>
-        <div class="welcome-by">Built by <a href="https://carlovinci.com.au" target="_blank" rel="noopener">Carlo Vinci ↗</a></div>
-        <button class="enter-btn" id="welcome-enter" type="button">Enter the console</button>
+        <div class="welcome-by">
+          Built by
+          <a href="https://carlovinci.com.au" target="_blank" rel="noopener"
+            >Carlo Vinci ↗</a
+          >
+        </div>
+        <button class="enter-btn" id="welcome-enter" type="button">
+          Enter the console
+        </button>
       </div>
     </div>
 
     <!-- MCP Server Tools modal -->
     <div class="modal-backdrop" id="tools-modal-backdrop" hidden>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tools-modal-title">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tools-modal-title"
+      >
         <div class="modal-header">
           <div class="modal-title" id="tools-modal-title">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -272,7 +567,9 @@
             </svg>
             MCP Server Tools
           </div>
-          <button class="modal-close" id="tools-modal-close" aria-label="Close">✕</button>
+          <button class="modal-close" id="tools-modal-close" aria-label="Close">
+            ✕
+          </button>
         </div>
         <div class="modal-body" id="tools-modal-body"></div>
       </div>

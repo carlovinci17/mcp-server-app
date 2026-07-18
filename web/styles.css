@@ -515,10 +515,45 @@ body {
   width: 100%;
 }
 
+.try-asking-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
 .try-asking-label {
   font-size: 10.5px;
   color: var(--text-faint);
   letter-spacing: 0.14em;
+}
+
+.more-questions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-deep);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.more-questions svg {
+  flex: none;
+}
+
+.more-questions:hover {
+  color: var(--text-primary);
+}
+
+.more-questions:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .chip-row {
