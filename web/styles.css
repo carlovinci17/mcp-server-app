@@ -58,10 +58,26 @@ body {
   /* Aurora-mesh background: soft radial color washes over a light base,
      fixed so it doesn't scroll with content underneath the glass panels. */
   background:
-    radial-gradient(60% 55% at 15% 10%, rgba(94, 234, 212, 0.5) 0%, rgba(94, 234, 212, 0) 60%),
-    radial-gradient(55% 55% at 88% 18%, rgba(139, 92, 246, 0.42) 0%, rgba(139, 92, 246, 0) 62%),
-    radial-gradient(70% 60% at 78% 100%, rgba(65, 118, 233, 0.4) 0%, rgba(65, 118, 233, 0) 60%),
-    radial-gradient(50% 50% at 25% 92%, rgba(20, 184, 166, 0.34) 0%, rgba(20, 184, 166, 0) 60%),
+    radial-gradient(
+      60% 55% at 15% 10%,
+      rgba(94, 234, 212, 0.5) 0%,
+      rgba(94, 234, 212, 0) 60%
+    ),
+    radial-gradient(
+      55% 55% at 88% 18%,
+      rgba(139, 92, 246, 0.42) 0%,
+      rgba(139, 92, 246, 0) 62%
+    ),
+    radial-gradient(
+      70% 60% at 78% 100%,
+      rgba(65, 118, 233, 0.4) 0%,
+      rgba(65, 118, 233, 0) 60%
+    ),
+    radial-gradient(
+      50% 50% at 25% 92%,
+      rgba(20, 184, 166, 0.34) 0%,
+      rgba(20, 184, 166, 0) 60%
+    ),
     linear-gradient(180deg, #f8fafc 0%, #f2f5fa 100%);
   background-attachment: fixed;
 }
@@ -72,7 +88,9 @@ body {
 .glass {
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 0 12px 32px -18px rgba(20, 25, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 12px 32px -18px rgba(20, 25, 60, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
@@ -474,7 +492,9 @@ body {
   font-size: 14px;
   white-space: nowrap;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .new-chat-button:hover {
@@ -519,7 +539,10 @@ body {
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 13.5px;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease;
 }
 
 .chip:hover {
@@ -595,7 +618,9 @@ body {
   overflow-y: auto;
   background: rgba(255, 255, 255, 0.72);
   border-right: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 24px 0 60px -20px rgba(20, 25, 60, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    24px 0 60px -20px rgba(20, 25, 60, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(26px) saturate(170%);
   -webkit-backdrop-filter: blur(26px) saturate(170%);
   transform: translateX(-100%);
@@ -890,7 +915,9 @@ body {
   text-align: center;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 40px 90px -30px rgba(20, 25, 60, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 40px 90px -30px rgba(20, 25, 60, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
 }
@@ -1003,7 +1030,7 @@ body {
   padding: 12px 16px;
   border-radius: 18px;
   max-width: 780px;
-  margin: 0 auto;
+  margin: 20px auto;
 }
 
 .footer-brand {
@@ -1087,7 +1114,9 @@ body {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 26px;
-  box-shadow: 0 40px 90px -30px rgba(20, 25, 60, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 40px 90px -30px rgba(20, 25, 60, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   overflow: hidden;
@@ -1168,7 +1197,9 @@ body {
 }
 
 .tool-name {
-  font-family: ui-monospace, 'IBM Plex Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-family:
+    ui-monospace, 'IBM Plex Mono', 'SF Mono', 'Cascadia Code', Consolas,
+    monospace;
   font-size: 12.5px;
   color: var(--info-blue);
 }
@@ -1212,6 +1243,7 @@ body {
   background: var(--accent);
   color: #ffffff;
   white-space: pre-wrap;
+  box-shadow: 0 12px 28px -16px rgba(13, 148, 136, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .message-agent {
@@ -1219,6 +1251,7 @@ body {
   background: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.8);
   color: var(--text-primary);
+  box-shadow: 0 12px 32px -18px rgba(20, 25, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(14px) saturate(150%);
   -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
@@ -1266,7 +1299,9 @@ body {
   background: var(--info-blue-tint-bg);
   border: 1px solid var(--info-blue-tint-border);
   color: var(--info-blue);
-  font-family: ui-monospace, 'IBM Plex Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-family:
+    ui-monospace, 'IBM Plex Mono', 'SF Mono', 'Cascadia Code', Consolas,
+    monospace;
   font-size: 11px;
 }
 
@@ -1493,7 +1528,9 @@ body {
   padding: 32px 34px 38px;
   background: rgba(255, 255, 255, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 24px 70px -34px rgba(20, 25, 60, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 24px 70px -34px rgba(20, 25, 60, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
 }
@@ -1731,7 +1768,9 @@ body {
 .step-card.active {
   border-color: var(--accent);
   background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14), 0 10px 24px -14px rgba(20, 184, 166, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(20, 184, 166, 0.14),
+    0 10px 24px -14px rgba(20, 184, 166, 0.4);
   animation: step-glow 1.6s ease-in-out infinite;
 }
 
