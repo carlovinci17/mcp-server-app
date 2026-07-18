@@ -6,8 +6,18 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Vera's Lifecycle — Vortex Digital</title>
     <link rel="icon" type="image/svg+xml" href="assets/vortex-mark.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon-16.png"
+    />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,8 +27,24 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body style="display: flex; flex-direction: column; min-height: 100vh; overflow: auto">
-    <header class="header glass" style="position: sticky; top: 20px; margin: 20px auto 0; max-width: 952px; width: calc(100% - 48px)">
+  <body
+    style="
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: auto;
+    "
+  >
+    <header
+      class="header glass"
+      style="
+        position: sticky;
+        top: 20px;
+        margin: 20px auto 0;
+        max-width: 952px;
+        width: calc(100% - 48px);
+      "
+    >
       <div class="header-left">
         <div class="brand-cluster">
           <div class="logo-tile" aria-hidden="true">
@@ -29,8 +55,28 @@
                   <stop offset="1" stop-color="#0d9488" />
                 </linearGradient>
               </defs>
-              <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-hiw)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
-              <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+              <circle
+                cx="24"
+                cy="24"
+                r="16"
+                fill="none"
+                stroke="url(#vg-hiw)"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="75 26"
+                transform="rotate(-90 24 24)"
+              />
+              <circle
+                cx="24"
+                cy="24"
+                r="9.5"
+                fill="none"
+                stroke="#2dd4bf"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="30 34"
+                transform="rotate(120 24 24)"
+              />
               <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
             </svg>
           </div>
@@ -48,26 +94,46 @@
         <div class="hero-tag">How it works</div>
         <h1 class="hero-h">How a message becomes a reply</h1>
         <p class="hero-p">
-          Vera is a demo agent wired to 23 MCP tools on Azure. Here's the
-          whole path — traced from the real backend code.
+          Vera is a demo agent wired to 23 MCP tools on Azure. Here's the whole
+          path — traced from the real backend code.
         </p>
 
         <div class="tabs glass" role="tablist">
-          <button class="tab active" data-tab="pipeline" role="tab" aria-selected="true">The pipeline</button>
-          <button class="tab" data-tab="infra" role="tab" aria-selected="false">Azure architecture</button>
-          <button class="tab" data-tab="tools" role="tab" aria-selected="false">All 23 MCP tools</button>
+          <button
+            class="tab active"
+            data-tab="pipeline"
+            role="tab"
+            aria-selected="true"
+          >
+            The pipeline
+          </button>
+          <button class="tab" data-tab="infra" role="tab" aria-selected="false">
+            Azure architecture
+          </button>
+          <button class="tab" data-tab="tools" role="tab" aria-selected="false">
+            All 23 MCP tools
+          </button>
         </div>
 
         <section class="hiw-panel active" id="panel-pipeline">
-          <div class="sec-label">Three retrieval strategies — the agent picks one at step 4</div>
+          <div class="sec-label">
+            Three retrieval strategies — the agent picks one at step 4
+          </div>
           <div class="branches" id="branches"></div>
 
-          <div class="sec-label" style="margin-top: 26px">Try a prompt — watch the real path it takes</div>
+          <div class="sec-label" style="margin-top: 26px">
+            Try a prompt — watch the real path it takes
+          </div>
           <div class="try-prompt-card glass">
             <div class="try-prompt-grid" id="prompt-buttons"></div>
             <div class="try-prompt-foot">
-              <span class="try-prompt-hint">Steps 1, 2, 5 &amp; 6 are identical no matter which path runs — only tool choice and retrieval differ.</span>
-              <button class="reset-btn" id="reset-prompt" type="button">Reset Prompt</button>
+              <span class="try-prompt-hint"
+                >Steps 1, 2, 5 &amp; 6 are identical no matter which path runs —
+                only tool choice and retrieval differ.</span
+              >
+              <button class="reset-btn" id="reset-prompt" type="button">
+                Reset Prompt
+              </button>
             </div>
             <div class="step-cards" id="step-cards"></div>
           </div>
@@ -96,16 +162,40 @@
                   <stop offset="1" stop-color="#0d9488" />
                 </linearGradient>
               </defs>
-              <circle cx="24" cy="24" r="16" fill="none" stroke="url(#vg-hiw-foot)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="75 26" transform="rotate(-90 24 24)" />
-              <circle cx="24" cy="24" r="9.5" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="30 34" transform="rotate(120 24 24)" />
+              <circle
+                cx="24"
+                cy="24"
+                r="16"
+                fill="none"
+                stroke="url(#vg-hiw-foot)"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="75 26"
+                transform="rotate(-90 24 24)"
+              />
+              <circle
+                cx="24"
+                cy="24"
+                r="9.5"
+                fill="none"
+                stroke="#2dd4bf"
+                stroke-width="5.5"
+                stroke-linecap="round"
+                stroke-dasharray="30 34"
+                transform="rotate(120 24 24)"
+              />
               <circle cx="24" cy="24" r="3.6" fill="#5eead4" />
             </svg>
           </div>
           <span>Vortex Digital · Vera's Lifecycle</span>
         </div>
         <nav class="footer-links">
-          <a href="index.html">Console</a>
-          <span class="footer-by">Built by <a href="https://carlovinci.com.au" target="_blank" rel="noopener">Carlo Vinci ↗</a></span>
+          <span class="footer-by"
+            >Built by
+            <a href="https://carlovinci.com.au" target="_blank" rel="noopener"
+              >Carlo Vinci ↗</a
+            ></span
+          >
         </nav>
       </div>
     </footer>
