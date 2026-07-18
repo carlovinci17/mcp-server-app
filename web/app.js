@@ -6,35 +6,33 @@ const state = {
 };
 
 const els = {
-  headerDate: document.getElementById("header-date"),
+  menuTrigger: document.getElementById("menu-trigger"),
+  drawer: document.getElementById("side-drawer"),
+  drawerBackdrop: document.getElementById("drawer-backdrop"),
+  drawerClose: document.getElementById("drawer-close"),
+  welcomeBackdrop: document.getElementById("welcome-backdrop"),
+  welcomeClose: document.getElementById("welcome-close"),
+  welcomeEnter: document.getElementById("welcome-enter"),
+  coldStartSpinner: document.getElementById("cold-start-spinner"),
   chipRow: document.getElementById("chip-row"),
+  moreQuestions: document.getElementById("more-questions"),
+  composerBar: document.getElementById("composer-bar"),
   composerInput: document.getElementById("composer-input"),
   sendButton: document.getElementById("send-button"),
   newChatButton: document.getElementById("new-chat-button"),
   emptyState: document.getElementById("empty-state"),
   messages: document.getElementById("messages"),
   mainScroll: document.getElementById("main-scroll"),
-  startupOverlay: document.getElementById("startup-overlay"),
+  main: document.querySelector(".main"),
   statusPill: document.getElementById("status-pill"),
   statusText: document.getElementById("status-text"),
   sourcesList: document.getElementById("sources-list"),
-  sidebarTryAsking: document.getElementById("sidebar-try-asking"),
-  sidebarTryDivider: document.getElementById("sidebar-try-divider"),
   sidebarChipList: document.getElementById("sidebar-chip-list"),
   toolsTrigger: document.getElementById("mcp-tools-trigger"),
   toolsModalBackdrop: document.getElementById("tools-modal-backdrop"),
   toolsModalClose: document.getElementById("tools-modal-close"),
   toolsModalBody: document.getElementById("tools-modal-body"),
-  modelVersion: document.getElementById("model-version"),
 };
-
-function formatHeaderDate() {
-  const d = new Date();
-  const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
-  const month = d.toLocaleDateString("en-US", { month: "short" });
-  return `${weekday}, ${month} ${d.getDate()}`;
-}
-els.headerDate.textContent = formatHeaderDate();
 
 // Clicking a "try asking" chip both fills the composer and sends it
 // immediately - matching what a visitor would get by typing the same text
@@ -51,28 +49,8 @@ els.chipRow.addEventListener("click", (event) => {
   applyChipQuestion(chip.dataset.q);
 });
 
-// Extra suggestions shown only in the sidebar - there's more room there than
-// in the empty-state chip row, so this is where the longer tail of "good
-// questions to try" lives once a conversation is already underway. `cat`
-// matches one of the CONNECTED SOURCES categories (see the cat-* classes in
-// styles.css) so each chip's leading dot tells you which tool it'll likely
-// use before you click it; omit `cat` for questions that call no tool.
-const SIDEBAR_ONLY_QUESTIONS = [
-  { text: "Who's on the IT team?", cat: "employees" },
-  { text: "Which customers are up for renewal this quarter?", cat: "customers" },
-  { text: "List our clients and their industries", cat: "customers" },
-  { text: "Tell me about Vortex Digital's mission and values", cat: "documents" },
-  { text: "Summarize the latest project brief", cat: "documents" },
-  { text: "What documents do we have on file for the Engineering team?", cat: "documents" },
-  { text: "What policies does Vortex Digital have on file?", cat: "policies" },
-  { text: "What should I do if I lose my work laptop or badge?", cat: "policies" },
-  { text: "Find the latest all-hands notes", cat: "meetings" },
-  { text: "What meeting notes have been logged for the Product team?", cat: "meetings" },
-];
-
-// Static mini Vera avatar markup, matching the one on the "who are you" chip
-// in index.html - shown in place of a category dot for questions that call
-// no tool at all.
+// Static mini Vera avatar markup, shown in place of a category dot for
+// questions that call no tool at all.
 const VERA_CHIP_ICON = `<svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hidden="true">
   <rect x="8" y="8" width="32" height="33" rx="12" fill="var(--accent)"></rect>
   <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
@@ -80,38 +58,95 @@ const VERA_CHIP_ICON = `<svg class="chip-vera-icon" viewBox="0 0 48 48" aria-hid
   <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"></rect>
 </svg>`;
 
-function addSidebarChip(text, cat, icon) {
-  const sidebarChip = document.createElement("button");
-  sidebarChip.className = "sidebar-chip";
-  sidebarChip.dataset.q = text;
+// Every example question available - the single source of truth for both
+// the landing chip row (a handful shown at a time, reshuffled by "More
+// questions") and the drawer's fuller "try asking" list (shows all of
+// them, grouped by category). `cat` matches one of the CONNECTED SOURCES
+// categories (see the cat-* classes in styles.css); omit `cat` for the one
+// question that calls no tool at all (shown with the mini Vera icon).
+const ALL_EXAMPLE_QUESTIONS = [
+  { text: "Who are you and what can you help with?", icon: "vera" },
+  { text: "Who manages the Design team?", cat: "employees" },
+  { text: "What departments does Vortex Digital have?", cat: "employees" },
+  { text: "Who's on the IT team?", cat: "employees" },
+  { text: "Show churned customers in fintech", cat: "customers" },
+  { text: "Tell me about Cedar Holdings", cat: "customers" },
+  { text: "Which customers are up for renewal this quarter?", cat: "customers" },
+  { text: "List our clients and their industries", cat: "customers" },
+  { text: "What's in the IT Team Charter, and what other documents relate to it?", cat: "documents" },
+  { text: "Tell me about Vortex Digital's mission and values", cat: "documents" },
+  { text: "Summarize the latest project brief", cat: "documents" },
+  { text: "What documents do we have on file for the Engineering team?", cat: "documents" },
+  { text: "Show the remote-work policy", cat: "policies" },
+  { text: "Can I work from home a few days a week?", cat: "policies" },
+  { text: "What policies does Vortex Digital have on file?", cat: "policies" },
+  { text: "What should I do if I lose my work laptop or badge?", cat: "policies" },
+  { text: "Summarize the latest incident postmortem", cat: "meetings" },
+  { text: "Find the latest all-hands notes", cat: "meetings" },
+  { text: "What meeting notes have been logged for the Product team?", cat: "meetings" },
+];
+
+const CATEGORY_ORDER = ["employees", "customers", "documents", "policies", "meetings"];
+const LANDING_CHIP_COUNT = 6;
+
+function makeChip(className, { text, cat, icon }) {
+  const chip = document.createElement("button");
+  chip.className = className;
+  chip.type = "button";
+  chip.dataset.q = text;
   if (icon === "vera") {
-    sidebarChip.insertAdjacentHTML("beforeend", VERA_CHIP_ICON);
+    chip.insertAdjacentHTML("beforeend", VERA_CHIP_ICON);
   } else if (cat) {
     const dot = document.createElement("span");
     dot.className = `chip-dot cat-${cat}`;
-    sidebarChip.appendChild(dot);
+    chip.appendChild(dot);
   }
-  sidebarChip.appendChild(document.createTextNode(text));
-  els.sidebarChipList.appendChild(sidebarChip);
+  chip.appendChild(document.createTextNode(text));
+  return chip;
 }
 
-// The sidebar's "try asking" list mirrors the empty-state chips exactly -
-// clone from the chip row (single source of truth) instead of duplicating
-// the question text in the HTML - then merge with the sidebar-only
-// questions and sort the combined list by category (matching the
-// CONNECTED SOURCES order above), so the whole list reads as one
-// continuous color-grouped sequence instead of two separately-grouped
-// blocks. Array.prototype.sort is stable, so relative order within each
-// category (chip-row items before sidebar-only ones) is preserved.
-const CATEGORY_ORDER = ["employees", "customers", "documents", "policies", "meetings"];
-const chipRowQuestions = [...els.chipRow.querySelectorAll(".chip")].map((chip) => ({
-  text: chip.dataset.q,
-  cat: chip.dataset.cat,
-  icon: chip.dataset.icon,
-}));
-[...chipRowQuestions, ...SIDEBAR_ONLY_QUESTIONS]
+function renderChipRow(questions) {
+  els.chipRow.innerHTML = "";
+  questions.forEach((q) => els.chipRow.appendChild(makeChip("chip glass", q)));
+}
+
+function shuffled(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// First load: "who are you" is always shown first, plus one representative
+// question from every category, so the full breadth of what Vera can do is
+// visible immediately without needing to click "More questions" first.
+function initialChips() {
+  const vera = ALL_EXAMPLE_QUESTIONS.find((q) => q.icon === "vera");
+  const firstPerCategory = CATEGORY_ORDER.map((cat) => ALL_EXAMPLE_QUESTIONS.find((q) => q.cat === cat));
+  return [vera, ...firstPerCategory];
+}
+
+renderChipRow(initialChips());
+
+// "More questions" reshuffles the landing row from the full pool, always
+// excluding whatever's currently shown so it reads as a genuinely fresh
+// set - once clicked, "who are you" is just part of the pool like any
+// other question and may or may not reappear.
+els.moreQuestions.addEventListener("click", () => {
+  const currentTexts = [...els.chipRow.querySelectorAll(".chip")].map((c) => c.dataset.q);
+  const pool = shuffled(ALL_EXAMPLE_QUESTIONS.filter((q) => !currentTexts.includes(q.text)));
+  renderChipRow(pool.slice(0, LANDING_CHIP_COUNT));
+});
+
+// The drawer's "try asking" list shows every example question, grouped by
+// category (matching the CONNECTED SOURCES order above) - independent of
+// whatever's currently shown in the landing row. The no-category "who are
+// you" entry sorts first.
+[...ALL_EXAMPLE_QUESTIONS]
   .sort((a, b) => (a.cat ? CATEGORY_ORDER.indexOf(a.cat) : -1) - (b.cat ? CATEGORY_ORDER.indexOf(b.cat) : -1))
-  .forEach(({ text, cat, icon }) => addSidebarChip(text, cat, icon));
+  .forEach((q) => els.sidebarChipList.appendChild(makeChip("sidebar-chip", q)));
 
 els.sidebarChipList.addEventListener("click", (event) => {
   const chip = event.target.closest(".sidebar-chip");
@@ -119,10 +154,115 @@ els.sidebarChipList.addEventListener("click", (event) => {
   applyChipQuestion(chip.dataset.q);
 });
 
-// Once-off startup check: fired the instant the page loads (not on first
-// message) so the SQL/Blob cold-start window - up to ~40s if the database
-// had auto-paused - happens up front, with an honest "starting up" message,
-// instead of silently eating the visitor's first real question.
+// ---------------------------------------------------------------------
+// Side drawer: overlay menu (was the always-visible sidebar). Opens via
+// the header hamburger, closes via its own close button, backdrop click,
+// or Escape - same pattern as the MCP tools modal below, plus a focus trap
+// and restoring focus to the trigger on close.
+// ---------------------------------------------------------------------
+let drawerLastFocused = null;
+
+function getFocusable(container) {
+  return [...container.querySelectorAll('a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])')].filter(
+    (el) => el.offsetParent !== null
+  );
+}
+
+function trapFocus(container, event) {
+  if (event.key !== "Tab") return;
+  const focusable = getFocusable(container);
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function openDrawer() {
+  drawerLastFocused = document.activeElement;
+  els.drawerBackdrop.hidden = false;
+  requestAnimationFrame(() => {
+    els.drawerBackdrop.classList.add("open");
+    els.drawer.classList.add("open");
+  });
+  els.menuTrigger.setAttribute("aria-expanded", "true");
+  els.drawerClose.focus();
+}
+
+function closeDrawer() {
+  els.drawerBackdrop.classList.remove("open");
+  els.drawer.classList.remove("open");
+  els.menuTrigger.setAttribute("aria-expanded", "false");
+  setTimeout(() => {
+    els.drawerBackdrop.hidden = true;
+  }, 280);
+  (drawerLastFocused || els.menuTrigger).focus();
+}
+
+function isDrawerOpen() {
+  return els.drawer.classList.contains("open");
+}
+
+els.menuTrigger.addEventListener("click", () => {
+  if (isDrawerOpen()) closeDrawer();
+  else openDrawer();
+});
+els.drawerClose.addEventListener("click", closeDrawer);
+els.drawerBackdrop.addEventListener("click", closeDrawer);
+els.drawer.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeDrawer();
+  else trapFocus(els.drawer, event);
+});
+
+// ---------------------------------------------------------------------
+// Welcome popup: shown on every page load (product decision - not gated
+// on localStorage), independent of the cold-start warming below. Dismiss
+// via the enter button, close button, backdrop click, or Escape.
+// ---------------------------------------------------------------------
+function closeWelcome() {
+  els.welcomeBackdrop.hidden = true;
+  els.composerInput.focus();
+}
+
+els.welcomeEnter.addEventListener("click", closeWelcome);
+els.welcomeClose.addEventListener("click", closeWelcome);
+els.welcomeBackdrop.addEventListener("click", (event) => {
+  if (event.target === els.welcomeBackdrop) closeWelcome();
+});
+els.welcomeBackdrop.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeWelcome();
+  else trapFocus(els.welcomeBackdrop, event);
+});
+els.welcomeClose.focus();
+
+// ---------------------------------------------------------------------
+// Composer reparenting: the same input/button pair is used for both the
+// centered landing prompt box and the pinned-bottom active-conversation
+// composer - moved between the two positions (not duplicated) so there's
+// still exactly one #composer-input for all the send/focus logic below.
+// ---------------------------------------------------------------------
+function pinComposerToBottom() {
+  els.composerBar.classList.remove("landing");
+  els.composerBar.classList.add("pinned");
+  els.main.appendChild(els.composerBar);
+}
+
+function moveComposerToLanding() {
+  els.composerBar.classList.remove("pinned");
+  els.composerBar.classList.add("landing");
+  els.emptyState.insertBefore(els.composerBar, els.coldStartSpinner);
+}
+
+// Once-off startup check: fired the instant the page loads (not gated on
+// the welcome popup being dismissed) so the SQL/Blob cold-start window - up
+// to ~40s if the database had auto-paused - happens up front, with an
+// honest "waking up" indicator, instead of silently eating the visitor's
+// first real question.
 function beginInitialization() {
   fetch("/api/health")
     .catch(() => {
@@ -134,10 +274,10 @@ function beginInitialization() {
 
 function markReady() {
   state.initializing = false;
-  els.startupOverlay.hidden = true;
+  els.coldStartSpinner.hidden = true;
 
   els.statusPill.classList.remove("pending");
-  els.statusText.textContent = "All systems operational";
+  els.statusText.textContent = "Live";
 
   els.sourcesList.querySelectorAll(".source-dot.pending").forEach((dot) => {
     dot.classList.remove("pending");
@@ -324,9 +464,6 @@ async function pollUntilDone(initialJob, loadingEl) {
 
   if (job.status === "completed") {
     state.previousResponseId = job.response_id;
-    if (job.model) {
-      els.modelVersion.textContent = job.model;
-    }
     resolveLoadingMessage(loadingEl, job.reply, job.tool_calls);
   } else {
     resolveLoadingMessageAsError(loadingEl, job.error || "Something went wrong. Please try again.");
@@ -341,8 +478,7 @@ function sendMessage() {
     state.hasStartedConversation = true;
     els.emptyState.hidden = true;
     els.messages.hidden = false;
-    els.sidebarTryDivider.hidden = false;
-    els.sidebarTryAsking.hidden = false;
+    pinComposerToBottom();
   }
 
   els.composerInput.value = "";
@@ -367,8 +503,7 @@ function startNewChat() {
   els.messages.innerHTML = "";
   els.messages.hidden = true;
   els.emptyState.hidden = false;
-  els.sidebarTryDivider.hidden = true;
-  els.sidebarTryAsking.hidden = true;
+  moveComposerToLanding();
 
   els.composerInput.value = "";
   els.composerInput.focus();

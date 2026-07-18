@@ -1,417 +1,268 @@
-      // Steps 1, 2, 5, 6 are identical no matter which tool gets called - only
-      // step 3 (tool choice) and step 4 (retrieval) actually differ per path,
-      // exactly mirroring the real code: chat.py/chat_service.py don't know or
-      // care which tool the agent picked, only the tool/service layer differs.
-      const RETRIEVAL_BY_KIND = {
-        exact: {
-          toolLine: '-> selects get_department_contacts',
-          title: 'Retrieval — exact lookup',
-          plainText:
-            'A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.',
-          techText:
-            'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
-        },
-        substring: {
-          toolLine: '-> selects search_documents',
-          title: 'Retrieval — SQL substring search',
-          plainText:
-            'A fuzzy but literal text match against the title and department columns only. Finds partial matches, but has no concept of meaning or synonyms - and no embeddings are involved.',
-          techText:
-            "search_documents(query=\"onboarding\")\nsrc/services/document_service.py\nAzure SQL via SQLAlchemy:\nWHERE title ILIKE '%onboarding%'\n  OR department ILIKE '%onboarding%'\nNote: the tool's own docstring also\nmentions \"tags\", but that column is\nnot actually queried",
-        },
-        vector: {
-          toolLine: '-> selects global_search',
-          title: 'Retrieval — vector / hybrid RAG',
-          plainText:
-            'The question is embedded into a vector, then Azure AI Search runs <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring" target="_blank" rel="noopener">BM25</a> keyword search and <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/search/vector-search-ranking" target="_blank" rel="noopener">HNSW</a> vector search together in one query and fuses the two rankings automatically.',
-          techText:
-            'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() -> Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search .search() called with\nboth search_text= (BM25) and\nvector_queries= (HNSW) -> automatic\nhybrid fusion, single round trip',
-        },
-      };
+const C = {
+  blue: "#4176e9",
+  amber: "#b45309",
+  green: "#0f9d6b",
+  violet: "#8b5cf6",
+  red: "#dc2626",
+  grey: "#565c72",
+  teal: "#14b8a6",
+  deep: "#0d9488",
+};
 
-      function buildStepData(kind) {
-        const retrieval = RETRIEVAL_BY_KIND[kind];
-        return [
-          {
-            title: 'Prompt sent',
-            plainText:
-              'Your message is submitted to the backend, which validates it and hands off to the agent service. No auth token needed - this endpoint is intentionally anonymous.',
-            techText:
-              'POST /api/chat\nContent-Type: application/json\nbody: {message, previous_response_id}\nsrc/tools/chat.py: _start_chat()\nResponse: {response_id, status:"queued"}\nHTTP 200',
-            showAgent: false,
-          },
-          {
-            title: 'Async kickoff',
-            plainText:
-              "This is the one and only API call this app makes for the whole turn (however many actual model invocations the agent runs internally to pick tools happen inside Azure, invisible from here): the Azure AI Foundry agent run starts in the background and returns a job ID right away instead of blocking - built specifically to dodge Static Web Apps' hard ~45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
-            techText:
-              'client.responses.create(\n  background=True, store=True)\nsrc/services/chat_service.py\nReturns immediately: status="queued"\n(single API call for this whole turn)',
-            showAgent: false,
-          },
-          {
-            title: 'Tool choice',
-            plainText:
-              'The agent itself decides whether this needs a tool at all, and which one - not fixed application logic. This is the same call from step 2, now polled mid-flight; nothing new is sent to the model here.',
-            techText: `Same run as step 2, polled via\nresponses.retrieve(id)\n23 MCP tools available:\ndocuments(6) policies(3) meetings(3)\nemployees(3) customers(3) search(3)\nhealth(2)\n${retrieval.toolLine}`,
-            showAgent: true,
-          },
-          {
-            title: retrieval.title,
-            plainText: retrieval.plainText,
-            techText: retrieval.techText,
-            showAgent: false,
-          },
-          {
-            title: 'Synthesis',
-            plainText:
-              'The agent composes a natural-language answer from whatever the tool returned. Still the same single call from step 2 - just polled again once it reaches its terminal status.',
-            techText:
-              'Same agent run, no extra call\nsrc/services/chat_service.py\nresponses.retrieve(id) -> _to_job_status()\nstatus: "completed"\nreply = response.output_text',
-            showAgent: true,
-          },
-          {
-            title: 'Reply',
-            plainText:
-              'The browser, which has been polling in the background, receives the finished reply and renders it - plus a pill showing which tool was actually used.',
-            techText:
-              'GET /api/chat/status?id=...\n(polled ~every 2s by the browser)\nmcp_call items de-duped by name\nmarked.parse() -> DOMPurify.sanitize()',
-            showAgent: false,
-          },
-        ];
-      }
+const VERA_MINI = (s) => `<svg width="${s}" height="${s}" viewBox="0 0 48 48" style="color:#14b8a6" fill="none">
+  <rect x="8" y="8" width="32" height="33" rx="12" fill="currentColor"/>
+  <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"/>
+  <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"/>
+  <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="#5eead4"/>
+</svg>`;
 
-      let state = {
-        selected: null,
-        doneUpTo: 0,
-        activeStep: 0,
-        playing: false,
-        timers: [],
-      };
-      const reducedMotion =
-        window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Verified against the real backend code (src/tools/chat.py,
+// src/services/chat_service.py, function_app.py) - see docs/azure.md and
+// this repo's own audit history for how each fact was confirmed.
+//
+// Steps 1, 2, 5 & 6 are identical no matter which tool gets called - only
+// step 3 (tool choice) and step 4 (retrieval) actually differ per path,
+// exactly mirroring the real code: chat.py/chat_service.py don't know or
+// care which tool the agent picked, only the tool/service layer differs.
+const RETRIEVAL_BY_KIND = {
+  exact: {
+    toolLine: "→ selects get_department_contacts",
+    title: "Retrieval — exact lookup",
+    plain: "A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.",
+    tech: 'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
+  },
+  substring: {
+    toolLine: "→ selects search_documents",
+    title: "Retrieval — SQL substring search",
+    plain: "A fuzzy but literal text match against the title and department columns only. Finds partial matches, but has no concept of meaning or synonyms - and no embeddings are involved.",
+    tech: 'search_documents(query="onboarding")\nsrc/services/document_service.py\nAzure SQL via SQLAlchemy:\nWHERE title ILIKE \'%onboarding%\'\n  OR department ILIKE \'%onboarding%\'',
+  },
+  vector: {
+    toolLine: "→ selects global_search",
+    title: "Retrieval — vector / hybrid RAG",
+    plain: "The question is embedded into a vector, then Azure AI Search runs BM25 keyword search and HNSW vector search together in one query and fuses the two rankings automatically.",
+    tech: 'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() → Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search .search() called with\nboth search_text= (BM25) and\nvector_queries= (HNSW) → automatic\nhybrid fusion, single round trip',
+  },
+};
 
-      function stageState(n) {
-        if (state.activeStep === n) return 'active';
-        if (state.doneUpTo >= n) return 'done';
-        return 'pending';
-      }
+const PROMPT_BUTTONS = [
+  { kind: "exact", q: "Who's the contact for the Design team?", label: "Exact lookup", c: C.blue },
+  { kind: "substring", q: "Find documents about onboarding", label: "SQL substring search", c: C.amber },
+  { kind: "vector", q: "What's our remote work policy?", label: "Vector / hybrid RAG", c: C.green },
+];
 
-      function renderSteps() {
-        const container = document.getElementById('stepsContainer');
-        container.innerHTML = '';
-        if (!state.selected) return;
-        const stepData = buildStepData(state.selected);
-        stepData.forEach((step, idx) => {
-          const n = idx + 1;
-          const st = stageState(n);
-          const card = document.createElement('div');
-          card.className = `step-card ${st}`;
-          card.innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div class="step-badge">${st === 'done' ? '✓' : n}</div>
-              <div style="font-size:16px;font-weight:600;color:var(--text-primary);">${step.title}</div>
-              ${
-                step.showAgent
-                  ? `<svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0;">
-                <rect x="8" y="8" width="32" height="33" rx="12" fill="${st === 'pending' ? '#c7cdd6' : 'var(--accent)'}"></rect>
-                <rect x="12.5" y="19" width="23" height="17.5" rx="7.5" fill="#081026"></rect>
-                <rect x="18" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
-                <rect x="25.8" y="23.5" width="4.2" height="8.6" rx="2.1" fill="${st === 'pending' ? '#454b66' : '#5eead4'}"></rect>
-              </svg>`
-                  : ''
-              }
-            </div>
-            <div style="font-size:13px;color:var(--text-body);line-height:1.5;font-weight:500;">${step.plainText}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--surface-main);border-radius:8px;padding:12px;border-left:3px solid var(--accent);">
-            <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-body);line-height:1.7;font-weight:500;white-space:pre-line;">${step.techText}</div>
-          </div>
-        </div>
-      `;
-          container.appendChild(card);
-        });
-      }
+function buildStepData(kind) {
+  const retrieval = RETRIEVAL_BY_KIND[kind];
+  return [
+    {
+      t: "Prompt sent",
+      llm: false,
+      plain: "Your message is posted to the backend, validated, and handed to the agent service — anonymous, no login required.",
+      tech: 'POST /api/chat  { message, previous_response_id }\n→ { response_id, status: "queued" }\nsrc/tools/chat.py',
+    },
+    {
+      t: "Async kickoff",
+      llm: false,
+      plain: "This is the one API call for the whole turn: the agent run starts in the background and returns instantly - built to dodge Static Web Apps' hard 45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
+      tech: "client.responses.create(background=True, store=True)\nsrc/services/chat_service.py\n(single API call for this whole turn)",
+    },
+    {
+      t: "Tool choice",
+      llm: true,
+      plain: "The agent itself decides whether a tool is needed and which of the 23 to call — not fixed app logic. Same run as step 2, now polled mid-flight; nothing new is sent to the model here.",
+      tech: `responses.retrieve(id)  ·  23 MCP tools available\ndocuments 6 · policies 3 · meetings 3 · employees 3\ncustomers 3 · search 3 · health 2\n${retrieval.toolLine}`,
+    },
+    {
+      t: retrieval.title,
+      llm: false,
+      plain: retrieval.plain,
+      tech: retrieval.tech,
+    },
+    {
+      t: "Synthesis",
+      llm: true,
+      plain: "The agent writes a plain-language answer from whatever the tool returned. Still the same single run, polled once it reaches its terminal status.",
+      tech: 'responses.retrieve(id) → status "completed"\nreply = response.output_text',
+    },
+    {
+      t: "Reply",
+      llm: false,
+      plain: "The browser — polling every ~2s — receives the finished reply, de-dupes the tool calls into pills, and renders the markdown safely.",
+      tech: "GET /api/chat/status\n→ marked.parse() → DOMPurify.sanitize()",
+    },
+  ];
+}
 
-      function durationFor(n) {
-        if (reducedMotion) return 450;
-        return [900, 1100, 1200, 2200, 1000, 1400][n - 1] || 900;
-      }
+const RETR = [
+  { c: C.blue, h: "Exact lookup", p: "Direct query by id or a simple filter. Deterministic, no matching logic at all.", code: "SELECT … WHERE col = :val" },
+  { c: C.amber, h: "SQL substring", p: "Fuzzy but literal match on title & department columns only — no embeddings.", code: "WHERE title ILIKE '%term%'" },
+  { c: C.green, h: "Vector / hybrid", p: "Embeds the query, then BM25 + HNSW vector search fused in a single call.", code: "text-embedding-3-small → Azure AI Search" },
+];
 
-      function advance(n) {
-        const stepData = buildStepData(state.selected);
-        if (n > stepData.length) {
-          state.playing = false;
-          state.activeStep = 0;
-          state.doneUpTo = stepData.length;
-          renderSteps();
-          return;
-        }
-        state.activeStep = n;
-        state.playing = true;
-        renderSteps();
-        const dur = durationFor(n);
-        const timer = setTimeout(() => {
-          state.doneUpTo = n;
-          state.activeStep = 0;
-          renderSteps();
-          advance(n + 1);
-        }, dur);
-        state.timers.push(timer);
-      }
+const INFRA = [
+  { c: C.blue, h: "Azure SQL Database", p: "EmployeeRecord, CustomerRecord & DocumentMetadataRecord. AAD-token auth via DefaultAzureCredential — no password in the connection string.", src: "src/database/sql.py" },
+  { c: C.blue, h: "Azure Blob Storage", p: "4 containers (documents, policies, meeting-notes, project-docs). SQL stores pointers; the document text is fetched here.", src: "src/azure/blob_client.py" },
+  { c: C.green, h: "Azure AI Search", p: "Fields: title · content · content_vector (HNSW, 1536-dim, cosine). Embeddings from text-embedding-3-small.", src: "src/services/search_service.py" },
+  { c: C.teal, h: "Azure AI Foundry Agent", p: "Reached via the OpenAI-compatible Responses API (background + store). The model name comes from response.model, never hardcoded.", src: "src/azure/foundry_agent.py" },
+  { c: C.teal, h: "Azure Functions Remote MCP", p: "Each tool is an @bp.mcp_tool(). 8 blueprints register one FunctionApp; 7 expose 23 tools, chat adds 2 HTTP routes.", src: "function_app.py" },
+];
 
-      function startExample(key) {
-        state.timers.forEach(clearTimeout);
-        state.timers = [];
-        state.selected = key;
-        state.doneUpTo = 0;
-        state.activeStep = 0;
-        state.playing = true;
-        renderSteps();
-        const timer = setTimeout(() => advance(1), 300);
-        state.timers.push(timer);
-      }
+const TOOLS = [
+  { c: C.blue, l: "Documents", items: [["search_documents", "Search all doc types"], ["list_documents", "List by type / dept"], ["get_document", "Full content by id"], ["get_document_metadata", "Metadata only"], ["find_related_documents", "Related by id"], ["summarize_document", "Content to summarize"]] },
+  { c: C.amber, l: "Policies", items: [["search_policies", "By title / dept"], ["list_policies", "List by dept"], ["get_policy", "Full content + metadata"]] },
+  { c: C.green, l: "Meetings", items: [["search_meetings", "By title / dept"], ["list_meetings", "List by dept"], ["summarize_meeting", "Content to summarize"]] },
+  { c: C.violet, l: "Employees", items: [["find_employee", "By name / email / dept"], ["list_departments", "Depts + counts"], ["get_department_contacts", "People in a dept"]] },
+  { c: C.red, l: "Customers", items: [["search_customers", "By name / industry"], ["get_customer", "Details by id"], ["list_customers", "List by status"]] },
+  { c: C.teal, l: "Search", items: [["keyword_search", "BM25 full-text"], ["semantic_search", "Vector similarity"], ["global_search", "Hybrid fusion"]] },
+  { c: C.grey, l: "Health", items: [["server_health", "Deps connectivity"], ["list_capabilities", "All tool categories"]] },
+];
 
-      function updateButtonStyles() {
-        const exactBtn = document.getElementById('exactBtn');
-        const substringBtn = document.getElementById('substringBtn');
-        const vectorBtn = document.getElementById('vectorBtn');
+// Render retrieval-strategy cards
+document.getElementById("branches").innerHTML = RETR.map(
+  (r) => `<div class="branch glass" style="border-left-color:${r.c}"><h4 style="color:${r.c}">${r.h}</h4><p>${r.p}</p><code>${r.code}</code></div>`
+).join("");
 
-        exactBtn.style.background =
-          state.selected === 'exact'
-            ? 'var(--info-blue-tint-bg)'
-            : 'var(--surface-raised)';
-        exactBtn.style.borderColor =
-          state.selected === 'exact'
-            ? 'var(--info-blue)'
-            : 'var(--border-subtle)';
+// Render the 3 "try a prompt" buttons
+document.getElementById("prompt-buttons").innerHTML = PROMPT_BUTTONS.map(
+  (p) =>
+    `<button class="prompt-btn kind-${p.kind}" data-kind="${p.kind}" type="button">` +
+    `<div class="prompt-btn-q">"${p.q}"</div>` +
+    `<div class="prompt-btn-kind" style="color:${p.c}">${p.label}</div>` +
+    `</button>`
+).join("");
 
-        substringBtn.style.background =
-          state.selected === 'substring'
-            ? 'var(--pending-tint-bg)'
-            : 'var(--surface-raised)';
-        substringBtn.style.borderColor =
-          state.selected === 'substring'
-            ? 'var(--pending-text)'
-            : 'var(--border-subtle)';
+// --- Animated step-sequence state machine -------------------------------
+// selected: which path (exact/substring/vector) is playing, or null.
+// doneUpTo: highest step index (1-based) marked complete.
+// activeStep: the step currently mid-animation (0 = none).
+const state = {
+  selected: null,
+  doneUpTo: 0,
+  activeStep: 0,
+  timers: [],
+};
 
-        vectorBtn.style.background =
-          state.selected === 'vector'
-            ? 'var(--success-tint-bg)'
-            : 'var(--surface-raised)';
-        vectorBtn.style.borderColor =
-          state.selected === 'vector'
-            ? 'var(--success-text)'
-            : 'var(--border-subtle)';
-      }
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      function resetAll() {
-        state.timers.forEach(clearTimeout);
-        state = {
-          selected: null,
-          doneUpTo: 0,
-          activeStep: 0,
-          playing: false,
-          timers: [],
-        };
-        updateButtonStyles();
-        renderSteps();
-      }
+function stageState(n) {
+  if (state.activeStep === n) return "active";
+  if (state.doneUpTo >= n) return "done";
+  return "pending";
+}
 
-      document.getElementById('exactBtn').addEventListener('click', () => {
-        startExample('exact');
-        updateButtonStyles();
-      });
-      document.getElementById('substringBtn').addEventListener('click', () => {
-        startExample('substring');
-        updateButtonStyles();
-      });
-      document.getElementById('vectorBtn').addEventListener('click', () => {
-        startExample('vector');
-        updateButtonStyles();
-      });
-      document.getElementById('resetBtn').addEventListener('click', resetAll);
+function renderSteps() {
+  const container = document.getElementById("step-cards");
+  if (!state.selected) {
+    container.innerHTML = "";
+    return;
+  }
+  const stepData = buildStepData(state.selected);
+  container.innerHTML = stepData
+    .map((s, idx) => {
+      const n = idx + 1;
+      const st = stageState(n);
+      return (
+        `<div class="step-card ${st}">` +
+        `<div class="step-card-grid">` +
+        `<div>` +
+        `<div class="step-top">` +
+        `<div class="step-badge">${st === "done" ? "✓" : n}</div>` +
+        `<span class="step-title">${s.t}</span>` +
+        `${s.llm ? `<span class="llm-chip">${VERA_MINI(12)} LLM thinking</span>` : ""}` +
+        `</div>` +
+        `<div class="step-plain">${s.plain}</div>` +
+        `</div>` +
+        `<div class="step-tech">${s.tech}</div>` +
+        `</div>` +
+        `</div>`
+      );
+    })
+    .join("");
+}
 
-      // Mirrors src/tools/health.py's _CAPABILITIES / _TOOL_DESCRIPTIONS
-      // (same source of truth as the app's own "MCP Server Tools" popup).
-      const TOOL_CATEGORY_COLORS = {
-        documents: 'var(--info-blue)',
-        policies: 'var(--pending-text)',
-        meetings: 'var(--success-text)',
-        employees: '#8b5cf6',
-        customers: '#dc2626',
-        search: 'var(--accent)',
-        health: 'var(--text-secondary)',
-      };
-      const ALL_TOOL_GROUPS = [
-        {
-          category: 'documents',
-          label: 'Documents',
-          tools: [
-            [
-              'search_documents',
-              'Search documents, policies, meeting notes, and project docs.',
-            ],
-            [
-              'list_documents',
-              'List documents, optionally filtered by type or department.',
-            ],
-            [
-              'get_document',
-              "Retrieve a document's full content and metadata by ID.",
-            ],
-            [
-              'get_document_metadata',
-              "Retrieve a document's metadata without its full content.",
-            ],
-            [
-              'find_related_documents',
-              'Find documents related to a given document ID.',
-            ],
-            [
-              'summarize_document',
-              "Retrieve a document's content for summarization.",
-            ],
-          ],
-        },
-        {
-          category: 'policies',
-          label: 'Policies',
-          tools: [
-            [
-              'search_policies',
-              'Search company policies by title or department.',
-            ],
-            [
-              'list_policies',
-              'List company policies, optionally filtered by department.',
-            ],
-            [
-              'get_policy',
-              "Retrieve a company policy's full content and metadata.",
-            ],
-          ],
-        },
-        {
-          category: 'meetings',
-          label: 'Meetings',
-          tools: [
-            ['search_meetings', 'Search meeting notes by title or department.'],
-            [
-              'list_meetings',
-              'List meeting notes, optionally filtered by department.',
-            ],
-            [
-              'summarize_meeting',
-              "Retrieve a meeting note's content for summarization.",
-            ],
-          ],
-        },
-        {
-          category: 'employees',
-          label: 'Employees',
-          tools: [
-            [
-              'find_employee',
-              'Find employees by name, email, department, or title.',
-            ],
-            [
-              'list_departments',
-              'List all departments and their employee counts.',
-            ],
-            [
-              'get_department_contacts',
-              'List all employees in a given department.',
-            ],
-          ],
-        },
-        {
-          category: 'customers',
-          label: 'Customers',
-          tools: [
-            [
-              'search_customers',
-              'Search customers by name, industry, or region.',
-            ],
-            ['get_customer', "Retrieve a customer's details by ID."],
-            [
-              'list_customers',
-              'List customers, optionally filtered by status.',
-            ],
-          ],
-        },
-        {
-          category: 'search',
-          label: 'Search',
-          tools: [
-            [
-              'keyword_search',
-              'Full-text <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring" target="_blank" rel="noopener">BM25</a> keyword search across all indexed content.',
-            ],
-            [
-              'semantic_search',
-              'Vector-only similarity search for conceptual or natural-language queries.',
-            ],
-            [
-              'global_search',
-              'Hybrid <a class="doc-link" href="https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring" target="_blank" rel="noopener">BM25</a> + vector search across all indexed content.',
-            ],
-          ],
-        },
-        {
-          category: 'health',
-          label: 'Health',
-          tools: [
-            [
-              'server_health',
-              'Report server health and Azure dependency connectivity.',
-            ],
-            [
-              'list_capabilities',
-              'List all MCP tool categories and their tools.',
-            ],
-          ],
-        },
-      ];
+// Steps 1,2,3 are quick; retrieval (4) and synthesis (5) take the longest -
+// matching roughly how long each phase actually takes in a real run.
+function durationFor(n) {
+  if (reducedMotion) return 450;
+  return [900, 1100, 1200, 2200, 1000, 1400][n - 1] || 900;
+}
 
-      function renderAllTools() {
-        const grid = document.getElementById('allToolsGrid');
-        if (!grid) return;
-        grid.innerHTML = ALL_TOOL_GROUPS.map((group) => {
-          const color = TOOL_CATEGORY_COLORS[group.category];
-          const items = group.tools
-            .map(
-              ([name, desc]) => `
-                <div>
-                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-primary);">${name}</div>
-                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px; line-height: 1.5;">${desc}</div>
-                </div>`,
-            )
-            .join('');
-          return `
-            <div style="border-left: 3px solid ${color}; padding-left: 12px;">
-              <div style="font-size: 12.5px; font-weight: 600; color: ${color};">${group.label} (${group.tools.length})</div>
-              <div class="tool-items-grid">
-                ${items}
-              </div>
-            </div>`;
-        }).join('');
-      }
+function advance(n) {
+  const stepData = buildStepData(state.selected);
+  if (n > stepData.length) {
+    state.activeStep = 0;
+    state.doneUpTo = stepData.length;
+    renderSteps();
+    return;
+  }
+  state.activeStep = n;
+  renderSteps();
+  const timer = setTimeout(() => {
+    state.doneUpTo = n;
+    state.activeStep = 0;
+    renderSteps();
+    advance(n + 1);
+  }, durationFor(n));
+  state.timers.push(timer);
+}
 
-      // Sidebar tab switching
-      const navButtons = document.querySelectorAll('.howitworks-nav-btn');
-      const panels = document.querySelectorAll('.panel');
-      navButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const target = btn.getAttribute('data-panel');
-          navButtons.forEach((b) => b.classList.toggle('active', b === btn));
-          panels.forEach((p) =>
-            p.classList.toggle('active', p.id === `panel-${target}`),
-          );
-        });
-      });
+function updatePromptButtonStyles() {
+  document.querySelectorAll(".prompt-btn").forEach((btn) => {
+    btn.classList.toggle("selected", btn.dataset.kind === state.selected);
+  });
+}
 
-      renderAllTools();
-      renderSteps();
+function startExample(kind) {
+  state.timers.forEach(clearTimeout);
+  state.timers = [];
+  state.selected = kind;
+  state.doneUpTo = 0;
+  state.activeStep = 0;
+  updatePromptButtonStyles();
+  renderSteps();
+  const timer = setTimeout(() => advance(1), 250);
+  state.timers.push(timer);
+}
+
+function resetPrompt() {
+  state.timers.forEach(clearTimeout);
+  state.timers = [];
+  state.selected = null;
+  state.doneUpTo = 0;
+  state.activeStep = 0;
+  updatePromptButtonStyles();
+  renderSteps();
+}
+
+document.getElementById("prompt-buttons").addEventListener("click", (event) => {
+  const btn = event.target.closest(".prompt-btn");
+  if (!btn) return;
+  startExample(btn.dataset.kind);
+});
+
+document.getElementById("reset-prompt").addEventListener("click", resetPrompt);
+
+// Render infrastructure cards
+document.getElementById("infra").innerHTML = INFRA.map(
+  (x) => `<div class="icard glass" style="border-left-color:${x.c}"><h4>${x.h}</h4><p>${x.p}</p><span class="src">${x.src}</span></div>`
+).join("");
+
+// Render the 23-tool catalog, grouped by category
+document.getElementById("tools").innerHTML = TOOLS.map(
+  (g) =>
+    `<div class="tgroup" style="border-left-color:${g.c}"><div class="gt" style="color:${g.c}">${g.l} (${g.items.length})</div>` +
+    `<div class="tgrid">${g.items.map(([n, d]) => `<div><div class="tname">${n}</div><div class="tdesc">${d}</div></div>`).join("")}</div></div>`
+).join("");
+
+// Tab switching
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll(".tab").forEach((b) => {
+      const active = b === tab;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll(".hiw-panel").forEach((p) => p.classList.toggle("active", p.id === `panel-${target}`));
+  });
+});
