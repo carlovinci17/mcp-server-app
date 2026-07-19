@@ -87,7 +87,7 @@
           </div>
         </div>
       </div>
-      <a class="back-link" href="index.html">← Back to console</a>
+      <a class="back-link" href="./">← Back to console</a>
     </header>
 
     <div class="hiw-wrap">
@@ -125,14 +125,17 @@
           <div class="sec-label" style="margin-top: 26px">
             Try a prompt — watch the real path it takes
           </div>
-          <div class="try-prompt-card glass">
+          <div class="try-prompt-card glass tech-hidden" id="try-prompt-card">
             <div class="try-prompt-grid" id="prompt-buttons"></div>
             <div class="try-prompt-foot">
-              <span class="try-prompt-hint"
-                >Steps 1, 2, 5 &amp; 6 are identical no matter which path runs —
-                only tool choice and retrieval differ.</span
-              >
-              <button class="reset-btn" id="reset-prompt" type="button">
+              <label class="tech-toggle" id="tech-toggle-wrap" hidden>
+                <input type="checkbox" id="tech-toggle" />
+                <span class="tech-toggle-track"
+                  ><span class="tech-toggle-thumb"></span
+                ></span>
+                <span class="tech-toggle-label">API &amp; query details</span>
+              </label>
+              <button class="reset-btn" id="reset-prompt" type="button" hidden>
                 Reset Prompt
               </button>
             </div>

@@ -28,19 +28,37 @@ const RETRIEVAL_BY_KIND = {
   exact: {
     toolLine: "→ selects get_department_contacts",
     title: "Retrieval — exact lookup",
-    plain: "A single, direct database query by ID or a simple filter. No text matching involved at all - the fastest, most deterministic path.",
+    pill: "Exact lookup",
+    color: C.blue,
+    plain: [
+      "A single, direct database query by ID or a simple filter",
+      "No text matching involved at all",
+      "The fastest, most deterministic path",
+    ],
     tech: 'get_department_contacts(department="Design")\nsrc/services/employee_service.py\nSQLAlchemy: SELECT * FROM employees\n  WHERE department = :department\nNo embeddings, no ranking',
   },
   substring: {
     toolLine: "→ selects search_documents",
     title: "Retrieval — SQL substring search",
-    plain: "A fuzzy but literal text match against the title and department columns only. Finds partial matches, but has no concept of meaning or synonyms - and no embeddings are involved.",
+    pill: "SQL substring search",
+    color: C.amber,
+    plain: [
+      "A fuzzy but literal text match against the title and department columns only",
+      "Finds partial matches, but has no concept of meaning or synonyms",
+      "No embeddings are involved",
+    ],
     tech: 'search_documents(query="onboarding")\nsrc/services/document_service.py\nAzure SQL via SQLAlchemy:\nWHERE title ILIKE \'%onboarding%\'\n  OR department ILIKE \'%onboarding%\'',
   },
   vector: {
     toolLine: "→ selects global_search",
     title: "Retrieval — vector / hybrid RAG",
-    plain: "The question is embedded into a vector, then Azure AI Search runs BM25 keyword search and HNSW vector search together in one query and fuses the two rankings automatically.",
+    pill: "Vector / hybrid RAG",
+    color: C.green,
+    plain: [
+      "The question is embedded into a vector",
+      "Azure AI Search runs BM25 keyword search and HNSW vector search together, in one query",
+      "The two rankings are fused automatically",
+    ],
     tech: 'global_search(query="remote work policy")\nsrc/services/search_service.py\nembed_text() → Azure OpenAI\n  text-embedding-3-small (1536-dim)\nAzure AI Search .search() called with\nboth search_text= (BM25) and\nvector_queries= (HNSW) → automatic\nhybrid fusion, single round trip',
   },
 };
@@ -57,37 +75,58 @@ function buildStepData(kind) {
     {
       t: "Prompt sent",
       llm: false,
-      plain: "Your message is posted to the backend, validated, and handed to the agent service — anonymous, no login required.",
+      plain: [
+        "Your message is posted to the backend, validated, and handed to the agent service",
+        "Anonymous — no login required",
+      ],
       tech: 'POST /api/chat  { message, previous_response_id }\n→ { response_id, status: "queued" }\nsrc/tools/chat.py',
     },
     {
       t: "Async kickoff",
       llm: false,
-      plain: "This is the one API call for the whole turn: the agent run starts in the background and returns instantly - built to dodge Static Web Apps' hard 45s request timeout. No icon yet because the backend can't see what the model decided until it polls.",
+      plain: [
+        "The agent run starts in the background and returns instantly — the one API call for the whole turn",
+        "Built to dodge Static Web Apps' hard 45s request timeout",
+        "No icon yet — the backend can't see what the model decided until it polls",
+      ],
       tech: "client.responses.create(background=True, store=True)\nsrc/services/chat_service.py\n(single API call for this whole turn)",
     },
     {
       t: "Tool choice",
-      llm: true,
-      plain: "The agent itself decides whether a tool is needed and which of the 23 to call — not fixed app logic. Same run as step 2, now polled mid-flight; nothing new is sent to the model here.",
+      llm: "LLM choosing tool",
+      toolsLink: true,
+      plain: [
+        "The agent itself decides whether a tool is needed, and which of the 23 to call — not fixed app logic",
+        "Same run as step 2, just polled mid-flight",
+        "Nothing new is sent to the model here",
+      ],
       tech: `responses.retrieve(id)  ·  23 MCP tools available\ndocuments 6 · policies 3 · meetings 3 · employees 3\ncustomers 3 · search 3 · health 2\n${retrieval.toolLine}`,
     },
     {
       t: retrieval.title,
       llm: false,
+      pill: retrieval.pill,
+      pillColor: retrieval.color,
       plain: retrieval.plain,
       tech: retrieval.tech,
     },
     {
       t: "Synthesis",
-      llm: true,
-      plain: "The agent writes a plain-language answer from whatever the tool returned. Still the same single run, polled once it reaches its terminal status.",
+      llm: "LLM writing reply",
+      plain: [
+        "The agent writes a plain-language answer from whatever the tool returned",
+        "Still the same single run — polled once it reaches its terminal status",
+      ],
       tech: 'responses.retrieve(id) → status "completed"\nreply = response.output_text',
     },
     {
       t: "Reply",
       llm: false,
-      plain: "The browser — polling every ~2s — receives the finished reply, de-dupes the tool calls into pills, and renders the markdown safely.",
+      plain: [
+        "The browser polls every ~2s for the finished reply",
+        "Tool calls are de-duped into pills",
+        "The markdown reply is rendered safely",
+      ],
       tech: "GET /api/chat/status\n→ marked.parse() → DOMPurify.sanitize()",
     },
   ];
@@ -152,6 +191,8 @@ function stageState(n) {
 
 function renderSteps() {
   const container = document.getElementById("step-cards");
+  document.getElementById("tech-toggle-wrap").hidden = !state.selected;
+  document.getElementById("reset-prompt").hidden = !state.selected;
   if (!state.selected) {
     container.innerHTML = "";
     return;
@@ -166,11 +207,13 @@ function renderSteps() {
         `<div class="step-card-grid">` +
         `<div>` +
         `<div class="step-top">` +
-        `<div class="step-badge">${st === "done" ? "✓" : n}</div>` +
+        `<div class="step-badge">${n}</div>` +
         `<span class="step-title">${s.t}</span>` +
-        `${s.llm ? `<span class="llm-chip">${VERA_MINI(12)} LLM thinking</span>` : ""}` +
+        `${s.llm ? `<span class="llm-chip">${VERA_MINI(12)} ${s.llm}</span>` : ""}` +
+        `${s.toolsLink ? `<button class="step-tools-link" type="button" data-goto-tab="tools">View all tools →</button>` : ""}` +
+        `${s.pill ? `<span class="retrieval-chip" style="color:${s.pillColor}">${s.pill}</span>` : ""}` +
         `</div>` +
-        `<div class="step-plain">${s.plain}</div>` +
+        `<ul class="step-plain step-bullets">${s.plain.map((b) => `<li>${b}</li>`).join("")}</ul>` +
         `</div>` +
         `<div class="step-tech">${s.tech}</div>` +
         `</div>` +
@@ -242,6 +285,10 @@ document.getElementById("prompt-buttons").addEventListener("click", (event) => {
 
 document.getElementById("reset-prompt").addEventListener("click", resetPrompt);
 
+document.getElementById("tech-toggle").addEventListener("change", (event) => {
+  document.getElementById("try-prompt-card").classList.toggle("tech-hidden", !event.target.checked);
+});
+
 // Render infrastructure cards
 document.getElementById("infra").innerHTML = INFRA.map(
   (x) => `<div class="icard glass" style="border-left-color:${x.c}"><h4>${x.h}</h4><p>${x.p}</p><span class="src">${x.src}</span></div>`
@@ -255,14 +302,21 @@ document.getElementById("tools").innerHTML = TOOLS.map(
 ).join("");
 
 // Tab switching
-document.querySelectorAll(".tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    const target = tab.dataset.tab;
-    document.querySelectorAll(".tab").forEach((b) => {
-      const active = b === tab;
-      b.classList.toggle("active", active);
-      b.setAttribute("aria-selected", String(active));
-    });
-    document.querySelectorAll(".hiw-panel").forEach((p) => p.classList.toggle("active", p.id === `panel-${target}`));
+function switchTab(target) {
+  document.querySelectorAll(".tab").forEach((b) => {
+    const active = b.dataset.tab === target;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-selected", String(active));
   });
+  document.querySelectorAll(".hiw-panel").forEach((p) => p.classList.toggle("active", p.id === `panel-${target}`));
+}
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+});
+
+document.getElementById("step-cards").addEventListener("click", (event) => {
+  const link = event.target.closest(".step-tools-link");
+  if (!link) return;
+  switchTab(link.dataset.gotoTab);
 });
