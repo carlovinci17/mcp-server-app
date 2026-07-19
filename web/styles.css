@@ -966,7 +966,7 @@ body {
   border-radius: 26px;
   padding: 40px 36px 32px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 1);
   border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
     0 40px 90px -30px rgba(20, 25, 60, 0.5),
