@@ -1,5 +1,26 @@
 import json
+from collections.abc import Callable
 from enum import StrEnum
+from functools import wraps
+
+from src.database.sql import DatabaseUnavailableError
+
+
+def report_database_unavailable(fn: Callable[..., str]) -> Callable[..., str]:
+    """Wrap a tool function so a paused/unavailable database is reported via
+    this package's `{"error": ...}` JSON contract instead of raising and
+    surfacing as an opaque "An error occurred invoking '<tool>'" from the
+    MCP host.
+    """
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs) -> str:
+        try:
+            return fn(*args, **kwargs)
+        except DatabaseUnavailableError as exc:
+            return json.dumps({"error": str(exc)})
+
+    return wrapper
 
 
 def parse_enum_or_error(

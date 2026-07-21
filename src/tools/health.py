@@ -7,7 +7,7 @@ from sqlalchemy import text
 from src.azure.blob_client import BlobClient
 from src.core.logging import get_logger
 from src.core.settings import get_settings
-from src.database.sql import get_session
+from src.database.sql import DatabaseUnavailableError, get_session
 
 bp = func.Blueprint()
 _logger = get_logger(__name__)
@@ -66,6 +66,8 @@ def _check_sql() -> str:
         with get_session() as session:
             session.execute(text("SELECT 1"))
         return "ok"
+    except DatabaseUnavailableError:
+        return "paused: monthly free-tier limit reached"
     except Exception:
         # Full detail (hostnames, driver diagnostics) goes to the logs only -
         # server_health is an MCP tool response, not a trusted-operator surface.

@@ -5,16 +5,18 @@ import azure.functions as func
 from src.core.dependencies import get_customer_service
 from src.models.customer import CustomerStatus
 from src.services.customer_service import CustomerNotFoundError
-from src.tools._common import parse_enum_or_error
+from src.tools._common import parse_enum_or_error, report_database_unavailable
 
 bp = func.Blueprint()
 
 
+@report_database_unavailable
 def _search_customers(query: str) -> str:
     customers = get_customer_service().search_customers(query)
     return json.dumps([c.model_dump(mode="json") for c in customers])
 
 
+@report_database_unavailable
 def _get_customer(customer_id: str) -> str:
     try:
         customer = get_customer_service().get_customer(customer_id)
@@ -23,6 +25,7 @@ def _get_customer(customer_id: str) -> str:
     return customer.model_dump_json()
 
 
+@report_database_unavailable
 def _list_customers(status: str | None = None, limit: int = 20) -> str:
     parsed_status, error = parse_enum_or_error(CustomerStatus, status)
     if error:

@@ -5,7 +5,7 @@ import azure.functions as func
 from src.core.dependencies import get_document_service
 from src.models.document import DocumentType
 from src.services.document_service import DocumentNotFoundError
-from src.tools._common import parse_enum_or_error
+from src.tools._common import parse_enum_or_error, report_database_unavailable
 
 bp = func.Blueprint()
 
@@ -14,6 +14,7 @@ def _not_found(document_id: str) -> str:
     return json.dumps({"error": f"Document '{document_id}' not found"})
 
 
+@report_database_unavailable
 def _search_documents(query: str, doc_type: str | None = None) -> str:
     parsed_type, error = parse_enum_or_error(DocumentType, doc_type)
     if error:
@@ -22,6 +23,7 @@ def _search_documents(query: str, doc_type: str | None = None) -> str:
     return results.model_dump_json()
 
 
+@report_database_unavailable
 def _list_documents(
     doc_type: str | None = None, department: str | None = None, limit: int = 20
 ) -> str:
@@ -34,6 +36,7 @@ def _list_documents(
     return json.dumps([d.model_dump(mode="json") for d in docs])
 
 
+@report_database_unavailable
 def _get_document(document_id: str) -> str:
     try:
         doc = get_document_service().get_document(document_id)
@@ -42,6 +45,7 @@ def _get_document(document_id: str) -> str:
     return doc.model_dump_json()
 
 
+@report_database_unavailable
 def _get_document_metadata(document_id: str) -> str:
     try:
         metadata = get_document_service().get_document_metadata(document_id)
@@ -50,6 +54,7 @@ def _get_document_metadata(document_id: str) -> str:
     return metadata.model_dump_json()
 
 
+@report_database_unavailable
 def _find_related_documents(document_id: str) -> str:
     try:
         related = get_document_service().find_related_documents(document_id)

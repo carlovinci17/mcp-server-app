@@ -6,7 +6,7 @@ from functools import lru_cache
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DBAPIError, OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.azure.identity import get_credential
@@ -22,6 +22,22 @@ _TOKEN_STRUCT_PREFIX_FMT = "<I"  # noqa: S105 -- struct.pack format code, not a 
 # to retry the connection attempt itself after a short delay.
 _CONNECT_RETRY_ATTEMPTS = 5
 _CONNECT_RETRY_DELAY_SECONDS = 8
+
+# Azure SQL's free-tier monthly compute allowance ran out (error 42119): the
+# database is paused for the rest of the calendar month, not just resuming
+# from idle auto-pause, so retrying won't help. SQLAlchemy doesn't classify
+# this as OperationalError, it surfaces as the generic DBAPIError.
+_FREE_TIER_PAUSED_MARKER = "reached the monthly free amount allowance"
+
+
+class DatabaseUnavailableError(RuntimeError):
+    """The database is reachable but not currently usable (e.g. paused for
+    the rest of the month by Azure SQL's free-tier limit), as opposed to a
+    transient connectivity failure worth retrying."""
+
+
+def _is_free_tier_paused(exc: DBAPIError) -> bool:
+    return _FREE_TIER_PAUSED_MARKER in str(getattr(exc, "orig", exc))
 
 
 def _access_token_struct() -> bytes:
@@ -69,8 +85,17 @@ def _ensure_connected(session: Session) -> None:
         try:
             session.connection()
             return
-        except OperationalError:
-            if attempt == _CONNECT_RETRY_ATTEMPTS - 1:
+        except DBAPIError as exc:
+            if _is_free_tier_paused(exc):
+                raise DatabaseUnavailableError(
+                    "The database has reached this month's free-tier usage "
+                    "allowance and is paused for the rest of the month. It "
+                    "resumes automatically on the 1st, or an admin can resume "
+                    "it early from the Azure Portal (database's Compute + "
+                    "storage tab -> Continue using database with additional "
+                    "charges)."
+                ) from exc
+            if not isinstance(exc, OperationalError) or attempt == _CONNECT_RETRY_ATTEMPTS - 1:
                 raise
             time.sleep(_CONNECT_RETRY_DELAY_SECONDS)
 

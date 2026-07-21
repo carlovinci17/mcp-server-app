@@ -3,20 +3,24 @@ import json
 import azure.functions as func
 
 from src.core.dependencies import get_employee_service
+from src.tools._common import report_database_unavailable
 
 bp = func.Blueprint()
 
 
+@report_database_unavailable
 def _find_employee(query: str) -> str:
     employees = get_employee_service().find_employee(query)
     return json.dumps([e.model_dump(mode="json") for e in employees])
 
 
+@report_database_unavailable
 def _list_departments() -> str:
     departments = get_employee_service().list_departments()
     return json.dumps([d.model_dump(mode="json") for d in departments])
 
 
+@report_database_unavailable
 def _get_department_contacts(department: str) -> str:
     employees = get_employee_service().get_department_contacts(department)
     return json.dumps([e.model_dump(mode="json") for e in employees])
