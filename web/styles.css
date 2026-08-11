@@ -798,7 +798,9 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: var(--success);
+  /* Background comes from the paired .cat-* class (matches the "try
+     asking" chip dots) so each source's color identifies its category
+     instead of a uniform "connected" green. */
   flex: none;
 }
 
