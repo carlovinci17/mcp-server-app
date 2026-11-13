@@ -56,3 +56,6 @@ AzuriteConfig
 
 # Design handoff reference material - superseded by web/, kept locally only
 designs/
+
+# Local hibernate backups (scripts/ops/hibernate.sh) - may contain app settings
+/backups

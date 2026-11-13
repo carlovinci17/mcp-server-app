@@ -115,6 +115,10 @@ both work without every Azure resource provisioned.
 
 ## Deployment
 
+The app can be hibernated to ~$0/month (offline page, Free SWA, stopped
+Function App, database backed up and deleted) and woken again - see
+[operations.md](operations.md).
+
 Deployed to `mcp-app-demo-func` (Flex Consumption plan, Linux, Python 3.13),
 via `func azure functionapp publish` — not Container Apps/ACR, no Docker image
 in this architecture. The Function App has a system-assigned managed identity

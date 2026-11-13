@@ -4,6 +4,24 @@ All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/); this project doesn't
 use version tags, so entries are grouped by date instead.
 
+## 2026-11-14 (hibernate / wake)
+
+- Added `scripts/ops/hibernate.sh`, `wake.sh`, and `status.sh` to take the
+  whole app offline for ~$0/month and bring it back in ~5 minutes - see
+  [docs/operations.md](docs/operations.md). Hibernate backs the SQL
+  database up to `backups/` (gitignored) and only deletes it once the
+  export's row counts are verified against the live tables.
+- Added `web/offline.html` ("Vera is offline" with a contact-for-a-demo
+  link), switched on by `scripts/ops/site_mode.py` via
+  `staticwebapp.config.json` routes. `/vera-how-it-works` stays live.
+- `scripts/import_documents.py` takes `--from DIR` to load a backup instead
+  of `data/seed/`.
+- A database recreated by `wake.sh` uses
+  `--free-limit-exhaustion-behavior AutoPause` instead of `BillOverUsage`,
+  so running past the free allowance pauses it rather than billing.
+- Reformatted `web/staticwebapp.config.json` to standard 2-space JSON so
+  `site_mode.py` can round-trip it byte for byte.
+
 ## 2026-07-15 (app copy accuracy pass)
 
 - The sidebar model label (`web/index.html`) no longer hardcodes a model

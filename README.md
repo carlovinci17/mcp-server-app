@@ -53,6 +53,9 @@ func start
 See [docs/setup.md](docs/setup.md) for provisioning the underlying Azure resources
 and [docs/tools.md](docs/tools.md) for the full MCP tool catalog.
 
+To take the whole app offline (~$0/month) and bring it back later, see
+[docs/operations.md](docs/operations.md) (`scripts/ops/hibernate.sh` / `wake.sh`).
+
 ## Local testing
 
 Pick the option that matches what you're changing:
@@ -113,6 +116,7 @@ Pick the option that matches what you're changing:
 config/       non-secret defaults (settings.yaml, logging.yaml)
 data/seed/    generated fictional Vortex Digital sample data
 scripts/      sample data generation, index creation, and Azure seeding scripts
+scripts/ops/  hibernate/wake/status scripts for taking the app offline (docs/operations.md)
 src/core/     settings, logging, dependency wiring
 src/azure/    Azure SDK client wrappers (identity, blob, search, embeddings)
 src/database/ SQLAlchemy models + Azure SQL Database session management

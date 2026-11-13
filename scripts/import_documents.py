@@ -5,10 +5,14 @@ Requires AZURE_SQL_SERVER / AZURE_SQL_DATABASE to be set and the caller to be
 authenticated via DefaultAzureCredential with db_datareader/db_datawriter (or
 higher) on the target database. Run scripts/create_sample_data.py first.
 
+Pass `--from DIR` to load from a different directory with the same layout -
+e.g. a hibernate backup (`backups/<timestamp>/sql`, see docs/operations.md).
+
 Employees are loaded before customers/documents since both have FK references
 to employees.id.
 """
 
+import argparse
 import json
 from datetime import date, datetime
 from pathlib import Path
@@ -22,16 +26,20 @@ logger = get_logger(__name__)
 SEED_DIR = Path(__file__).resolve().parent.parent / "data" / "seed"
 
 
-def _load(name: str) -> list[dict]:
-    return json.loads((SEED_DIR / name).read_text())
+def _load(source_dir: Path, name: str) -> list[dict]:
+    return json.loads((source_dir / name).read_text())
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--from", dest="source_dir", type=Path, default=SEED_DIR)
+    source_dir = parser.parse_args().source_dir
+
     Base.metadata.create_all(get_engine())
 
-    employees = _load("employees.json")
-    customers = _load("customers.json")
-    documents = _load("documents.json")
+    employees = _load(source_dir, "employees.json")
+    customers = _load(source_dir, "customers.json")
+    documents = _load(source_dir, "documents.json")
 
     with get_session() as session:
         for e in employees:
