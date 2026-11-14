@@ -54,7 +54,7 @@ uv run python scripts/ops/restore_db_principals.py "$BACKUP_DIR/sql/db-principal
 
 step "3/5  Start the Function App"
 az functionapp start -n "$FUNC" -g "$RG" -o none
-info "Function App state: $(az functionapp show -n "$FUNC" -g "$RG" --query state -o tsv)"
+info "Function App state: $(func_state)"
 
 step "4/5  Upgrade Static Web App to Standard and relink the backend"
 if [[ "$(az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv)" != "Standard" ]]; then

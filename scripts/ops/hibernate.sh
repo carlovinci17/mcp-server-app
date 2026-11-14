@@ -73,7 +73,7 @@ info "Static Web App SKU: $(az staticwebapp show -n "$SWA" -g "$RG" --query sku.
 
 step "4/5  Stop the Function App"
 az functionapp stop -n "$FUNC" -g "$RG" -o none
-info "Function App state: $(az functionapp show -n "$FUNC" -g "$RG" --query state -o tsv)"
+info "Function App state: $(func_state)"
 
 step "5/5  Delete the SQL database"
 if ! db_exists; then

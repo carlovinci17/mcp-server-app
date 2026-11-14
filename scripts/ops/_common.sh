@@ -46,6 +46,13 @@ backups_newest_first() {
 
 site_mode() { uv run python scripts/ops/site_mode.py "$@"; }
 
+# `az functionapp show --query state` comes back empty for Flex Consumption
+# apps, so read it off the generic ARM resource instead.
+func_state() {
+  az resource show -g "$RG" -n "$FUNC" --resource-type Microsoft.Web/sites \
+    --query properties.state -o tsv
+}
+
 db_exists() {
   az sql db show -g "$RG" -s "$SQL_SERVER" -n "$SQL_DB" --query name -o tsv >/dev/null 2>&1
 }
