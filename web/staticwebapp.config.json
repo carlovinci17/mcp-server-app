@@ -1,12 +1,25 @@
 {
   "routes": [
     {
+      "route": "/",
+      "rewrite": "/offline.html"
+    },
+    {
+      "route": "/index.html",
+      "rewrite": "/offline.html"
+    },
+    {
+      "route": "/api/*",
+      "rewrite": "/offline.html",
+      "statusCode": 503
+    },
+    {
       "route": "/vera-how-it-works",
       "rewrite": "/vera-how-it-works.html"
     }
   ],
   "navigationFallback": {
-    "rewrite": "/index.html",
+    "rewrite": "/offline.html",
     "exclude": [
       "/assets/*",
       "/*.{css,js,png,jpg,svg,ico}"
