@@ -58,8 +58,10 @@ EOF
 step "2/5  Switch the site to offline mode"
 site_mode offline
 push_site_config "Take Vera offline (hibernate)"
+# Don't unlink the backend while visitors could still be on the console.
+# The backup above is complete either way; re-run once the deploy is green.
 wait_for_site "/" 200 "Vera is offline" ||
-  warn "Offline page not live yet - check the GitHub Actions run. Continuing."
+  die "Offline page isn't live - check the GitHub Actions run, then re-run. Nothing else was changed."
 
 step "3/5  Unlink backend and downgrade Static Web App to Free"
 if [[ "$(az staticwebapp backends show -n "$SWA" -g "$RG" --query 'length(@)' -o tsv)" != "0" ]]; then

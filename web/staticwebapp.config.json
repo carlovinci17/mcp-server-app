@@ -10,8 +10,7 @@
     },
     {
       "route": "/api/*",
-      "rewrite": "/offline.html",
-      "statusCode": 503
+      "rewrite": "/offline.html"
     },
     {
       "route": "/vera-how-it-works",

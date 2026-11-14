@@ -5,10 +5,12 @@ offline "contact me for a demo" page.
     uv run python scripts/ops/site_mode.py online
     uv run python scripts/ops/site_mode.py status
 
-Offline mode prepends routes that rewrite the console (and any unknown path)
-to /offline.html and answers /api/* with a 503, since the Function App
-backend is unlinked while hibernated. Everything else in the config -
-including /vera-how-it-works, which stays live - is left untouched, and
+Offline mode prepends routes that rewrite the console, any unknown path, and
+/api/* to /offline.html, since the Function App backend is unlinked while
+hibernated. (Azure rejects a route that sets both `rewrite` and
+`statusCode`, so /api/* answers 200 with the offline page, not a 503.)
+Everything else in the config - including /vera-how-it-works, which stays
+live - is left untouched, and
 `online` restores the original file byte for byte.
 
 Only edits the file; the change reaches production when it's pushed to main
@@ -28,7 +30,7 @@ CONSOLE_PAGE = "/index.html"
 OFFLINE_ROUTES = [
     {"route": "/", "rewrite": OFFLINE_PAGE},
     {"route": "/index.html", "rewrite": OFFLINE_PAGE},
-    {"route": "/api/*", "rewrite": OFFLINE_PAGE, "statusCode": 503},
+    {"route": "/api/*", "rewrite": OFFLINE_PAGE},
 ]
 
 
@@ -37,19 +39,19 @@ def is_offline(config: dict) -> bool:
 
 
 def to_offline(config: dict) -> dict:
-    if is_offline(config):
-        return config
-    config = json.loads(json.dumps(config))
+    # Always rebuild from the online form, so an offline config written by an
+    # older version of this script is normalised rather than left as-is.
+    config = to_online(config)
     config["routes"] = OFFLINE_ROUTES + config.get("routes", [])
     config["navigationFallback"]["rewrite"] = OFFLINE_PAGE
     return config
 
 
 def to_online(config: dict) -> dict:
-    if not is_offline(config):
-        return config
     config = json.loads(json.dumps(config))
-    config["routes"] = [r for r in config["routes"] if r not in OFFLINE_ROUTES]
+    # Any route pointing at the offline page belongs to offline mode,
+    # including ones from older versions of OFFLINE_ROUTES.
+    config["routes"] = [r for r in config.get("routes", []) if r.get("rewrite") != OFFLINE_PAGE]
     config["navigationFallback"]["rewrite"] = CONSOLE_PAGE
     return config
 

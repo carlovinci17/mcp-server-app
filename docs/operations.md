@@ -44,9 +44,12 @@ with a **Contact me for a demo** button (LinkedIn) and a link to the
 `scripts/ops/site_mode.py offline|online|status` switches
 `web/staticwebapp.config.json` between modes:
 
-- **offline** prepends routes rewriting `/` and `/index.html` to
-  `/offline.html`, answers `/api/*` with a 503 + the offline page, and
-  points `navigationFallback` at `/offline.html`.
+- **offline** prepends routes rewriting `/`, `/index.html`, and `/api/*`
+  to `/offline.html`, and points `navigationFallback` at `/offline.html`.
+  (`/api/*` answers 200 with the page rather than a 503: Azure rejects a
+  route that sets both `rewrite` and `statusCode`, even though the local
+  SWA CLI emulator accepts it - `tests/unit/test_ops_site_mode.py` checks
+  for this.)
 - **online** removes exactly those, restoring the original file.
 
 The mode is part of git, not Azure: the Static Web Apps workflow deploys
