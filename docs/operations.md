@@ -98,15 +98,12 @@ only copy - it's the only full copy of the database while hibernated.
 
 ### If the local backup is lost
 
-- **Within 7 days of hibernating:** Azure keeps deleted databases
-  restorable. Portal → SQL server `mcp-app-demo-sql` → *Deleted databases*,
-  or:
-  ```bash
-  az sql db list-deleted -g mcp-app-demo -s mcp-app-demo-sql -o table
-  az sql db restore -g mcp-app-demo -s mcp-app-demo-sql -n enterprise-knowledge-db \
-    --deleted-time "<deletionDate from the list>" --dest-name enterprise-knowledge-db
-  ```
-- **After that:** the sample data is deterministic (`random.seed(42)` in
+- **Don't count on Azure's deleted-database restore.** Azure normally
+  keeps deleted databases restorable for a few days, but after the
+  2026-11-15 hibernate `az sql db list-deleted -g mcp-app-demo -s
+  mcp-app-demo-sql` listed nothing for this free-offer database. Worth a
+  look if a hibernate was very recent, but treat `backups/` as the only copy.
+- **Otherwise:** the sample data is deterministic (`random.seed(42)` in
   `scripts/create_sample_data.py`), so `create_sample_data.py` +
   `import_documents.py` rebuilds identical rows. Then recreate the Function
   App's DB user by hand (these roles are the usual read/write pair - check
