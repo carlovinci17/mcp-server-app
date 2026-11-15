@@ -53,6 +53,21 @@ func_state() {
     --query properties.state -o tsv
 }
 
+swa_sku() { az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv; }
+
+# Linked backends need the Standard plan: on Free, `az staticwebapp backends
+# show` errors ("Staticwebapp must have 'Standard' SKU") instead of returning
+# an empty list, so treat Free as "nothing linked".
+swa_backends_json() {
+  if [[ "$(swa_sku)" == "Free" ]]; then
+    echo "[]"
+  else
+    az staticwebapp backends show -n "$SWA" -g "$RG" -o json
+  fi
+}
+
+swa_backend_count() { swa_backends_json | jq length; }
+
 db_exists() {
   az sql db show -g "$RG" -s "$SQL_SERVER" -n "$SQL_DB" --query name -o tsv >/dev/null 2>&1
 }

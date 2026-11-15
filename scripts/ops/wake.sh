@@ -57,10 +57,10 @@ az functionapp start -n "$FUNC" -g "$RG" -o none
 info "Function App state: $(func_state)"
 
 step "4/5  Upgrade Static Web App to Standard and relink the backend"
-if [[ "$(az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv)" != "Standard" ]]; then
+if [[ "$(swa_sku)" != "Standard" ]]; then
   az staticwebapp update -n "$SWA" -g "$RG" --sku Standard -o none
 fi
-if [[ "$(az staticwebapp backends show -n "$SWA" -g "$RG" --query 'length(@)' -o tsv)" == "0" ]]; then
+if [[ "$(swa_backend_count)" == "0" ]]; then
   BACKEND_ID="$(jq -r '.[0].backendResourceId' "$BACKUP_DIR/azure/swa-backends.json" 2>/dev/null || true)"
   BACKEND_REGION="$(jq -r '.[0].region' "$BACKUP_DIR/azure/swa-backends.json" 2>/dev/null || true)"
   [[ -n "$BACKEND_ID" && "$BACKEND_ID" != null ]] ||
@@ -71,7 +71,7 @@ if [[ "$(az staticwebapp backends show -n "$SWA" -g "$RG" --query 'length(@)' -o
     --backend-resource-id "$BACKEND_ID" --backend-region "$BACKEND_REGION" -o none
   info "Backend linked."
 fi
-info "Static Web App SKU: $(az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv)"
+info "Static Web App SKU: $(swa_sku)"
 
 step "5/5  Switch the site back to the live console"
 site_mode online

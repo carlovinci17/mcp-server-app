@@ -24,7 +24,7 @@ info "Backup folder: $BACKUP_DIR"
 # App settings can hold connection strings - they stay in this gitignored,
 # owner-only folder and never get committed.
 az staticwebapp show -n "$SWA" -g "$RG" -o json >"$BACKUP_DIR/azure/swa.json"
-az staticwebapp backends show -n "$SWA" -g "$RG" -o json >"$BACKUP_DIR/azure/swa-backends.json"
+swa_backends_json >"$BACKUP_DIR/azure/swa-backends.json"
 az staticwebapp appsettings list -n "$SWA" -g "$RG" -o json >"$BACKUP_DIR/azure/swa-appsettings.json"
 az functionapp show -n "$FUNC" -g "$RG" -o json >"$BACKUP_DIR/azure/func.json"
 az functionapp config appsettings list -n "$FUNC" -g "$RG" -o json \
@@ -64,14 +64,14 @@ wait_for_site "/" 200 "Vera is offline" ||
   die "Offline page isn't live - check the GitHub Actions run, then re-run. Nothing else was changed."
 
 step "3/5  Unlink backend and downgrade Static Web App to Free"
-if [[ "$(az staticwebapp backends show -n "$SWA" -g "$RG" --query 'length(@)' -o tsv)" != "0" ]]; then
+if [[ "$(swa_backend_count)" != "0" ]]; then
   az staticwebapp backends unlink -n "$SWA" -g "$RG" -o none
   info "Backend unlinked."
 fi
-if [[ "$(az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv)" != "Free" ]]; then
+if [[ "$(swa_sku)" != "Free" ]]; then
   az staticwebapp update -n "$SWA" -g "$RG" --sku Free -o none
 fi
-info "Static Web App SKU: $(az staticwebapp show -n "$SWA" -g "$RG" --query sku.name -o tsv)"
+info "Static Web App SKU: $(swa_sku)"
 
 step "4/5  Stop the Function App"
 az functionapp stop -n "$FUNC" -g "$RG" -o none
